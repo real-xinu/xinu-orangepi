@@ -19,6 +19,7 @@ start:
 
 	ldr	sp, =MAXADDR
 	bl bputc
+	b forever
 	/* Enable the Instruction Cache	*/
 
 	//mrc	p15, 0, r0, c1, c0, 0
@@ -63,3 +64,6 @@ bputc:
 	mov r4, #67				/* decimal 67 is capitol C */
 	str r4, [r3]
 	mov pc, lr
+
+forever:
+	b forever
