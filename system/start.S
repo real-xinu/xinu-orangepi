@@ -14,7 +14,7 @@
 
 start:
 
-	bl bputc
+	//bl bputc
 	/* Load the stack pointer with end of memory */
 
 	ldr	sp, =MAXADDR
