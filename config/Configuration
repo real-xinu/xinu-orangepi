@@ -132,7 +132,7 @@ spi:
    NULLDEV is null on nothing
 
    /* Physical Ethernet (raw packet transfer) */
-   ETHER0 is eth   on am335x_eth csr 0 -irq 0
+   ETHER0 is eth   on am335x_eth csr 0x01C30000 -irq 0
 
    /* Define a namespace device */
    NAMESPACE is nam on top

@@ -156,12 +156,12 @@ static	void	sysinit()
 
 	/* Platform Specific Initialization */
 
-//	platinit(); TODO:
-//	kprintf("sysinit(): returned from platinit()\n");
+//	platinit(); // TODO:
+	kprintf("sysinit(): returned from platinit()\n");
 
 	/* Initialize the interrupt vectors */
 
-//	initevec(); TODO:
+	initevec();// TODO: is this right for orange pi?
 	
 	/* Initialize free memory list */
 	
@@ -218,7 +218,7 @@ static	void	sysinit()
 
 	/* Initialize the real time clock */
 
-//	clkinit(); TODO:
+//	clkinit(); // TODO:
 
 	for (i = 0; i < NDEVS; i++) {
 //		init(i); TODO:

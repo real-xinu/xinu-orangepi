@@ -70,9 +70,7 @@ extern	int32	ethread(struct dentry *, void *, uint32);
 extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
-
 extern	int32	initintc(void);
-extern	int32	initevec(void);
 extern	int32	set_evec(uint32, uint32);
 extern	void	trap(int32);
 
@@ -163,6 +161,7 @@ extern	status	insertd(pid32, qid16, int32);
 /* in file intr.S */
 extern	intmask	disable(void);
 extern	void	enable(void);
+extern	int32	initevec(void);
 
 /* in file ioerr.c */
 extern	devcall	ioerr(void);

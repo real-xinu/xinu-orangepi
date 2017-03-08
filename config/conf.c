@@ -66,7 +66,7 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)ethinit, (void *)ioerr, (void *)ioerr,
 	  (void *)ethread, (void *)ethwrite, (void *)ioerr,
 	  (void *)ioerr, (void *)ioerr, (void *)ethcontrol,
-	  (void *)0x0, (void *)ethhandler, 0 },
+	  (void *)0x1c30000, (void *)ethhandler, 0 },
 
 /* NAMESPACE is nam */
 	{ 7, 0, "NAMESPACE",

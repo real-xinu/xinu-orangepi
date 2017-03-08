@@ -31,5 +31,4 @@
 #define ARMV7A_EH_END	0x4030CE40	/* Exception handler end addr	*/
 #define ARMV7A_IRQH_ADDR 0x4030CE38	/* IRQ exp handler address	*/
 
-//#define MAXADDR	0xA0000000	/* 512 MB RAM starting from 0x80000000	*/
 #define MAXADDR	0x60000000	/* 512 MB RAM starting from 0x40000000	*/

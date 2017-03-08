@@ -33,33 +33,34 @@ void	platinit(void)
 	kprintf("In platinit()\n");
 
 	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
-	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
+//	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
 
-	// TODO: what should I do here?
 	/* Disable the watchdog timer */
-
-	// TODO: set up this timer?
+	// TODO: just have to turn off watchdog timer
+//	kprintf("attempting to disable watchdog timer...");
 //	wdtptr = (struct watchdog_csreg *)WDTADDR;
 //	wdtptr->wspr = 0x0000aaaa;
 //	while(wdtptr->wwps & 0x00000010);
 //	wdtptr->wspr = 0x00005555;
 //	while(wdtptr->wwps & 0x00000010);
-
+//	kprintf(" disabled\n");
 	/* Initialize the Interrupt Controller */
 
-	initintc();
-	kprintf("platinit(): returned from initinc()\n");
+//	initintc(); TODO:
+//	kprintf("platinit(): returned from initinc()\n");
 
 	/* Initialize the Performance Counters */
 
-	counterinit();
-
+//	counterinit(); TODO:
+//	kprintf("platinit(): returned from coutnerinit()\n");
 	/* Pad control for CONSOLE */
 
-	am335x_padctl(UART0_PADRX_ADDR,
-			AM335X_PADCTL_RXTX | UART0_PADRX_MODE);
-	am335x_padctl(UART0_PADTX_ADDR,
-			AM335X_PADCTL_TX | UART0_PADTX_MODE);
+	// setting multiplexed pinout for uart on bbb
+	// TODO: is this necessary for orange pi?
+//	am335x_padctl(UART0_PADRX_ADDR,
+//			AM335X_PADCTL_RXTX | UART0_PADRX_MODE);
+//	am335x_padctl(UART0_PADTX_ADDR,
+//			AM335X_PADCTL_TX | UART0_PADTX_MODE);
 
 	/* Reset the UART device */
 

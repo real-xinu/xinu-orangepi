@@ -6,7 +6,7 @@ void	*minheap;	/* Start address of heap	*/
 void	*maxheap;	/* End address of heap		*/
 
 /*------------------------------------------------------------------------
- * meminit - Initialize the free memory list for BeagleBone Black
+ * meminit - Initialize the free memory list for Orange Pi
  *------------------------------------------------------------------------
  */
 void	meminit(void)
