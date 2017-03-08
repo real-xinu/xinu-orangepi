@@ -13,29 +13,23 @@
 	.globl	start			/* Declare entry point global	*/
 
 start:
-
-	//bl bputc
 	/* Load the stack pointer with end of memory */
 
 	ldr	sp, =MAXADDR
 	bl bputc
-	b forever
 	/* Enable the Instruction Cache	*/
 
-	//mrc	p15, 0, r0, c1, c0, 0
-	//bl bputc
-	//orr	r0, r0, #ARMV7A_C1CTL_I
-	//bl bputc
-	//mcr	p15, 0, r0, c1, c0, 0
-	//bl bputc
+	mrc	p15, 0, r0, c1, c0, 0
+	orr	r0, r0, #ARMV7A_C1CTL_I
+	mcr	p15, 0, r0, c1, c0, 0
+	bl bputc
+
 	/* Use bzero (below) to zero out the BSS area */
 
-	//ldr	r0, =edata
-	//bl bputc
-	//ldr	r1, =end
-//	bl bputc
-	//bl	bzero
-	//bl bputc
+	ldr	r0, =edata
+	ldr	r1, =end
+	bl	bzero
+
 	/* Call nulluser to initialize the Xinu system  */
 	/*    (Note: the call never returns)		*/
 
@@ -55,15 +49,16 @@ bloop:	cmp	r0, r1			/* Loop until last address	*/
 bexit:	mov	pc, lr			/* Return to caller		*/
 
 bputc:
-	ldr r3, =UART0LSR		/* point to uart line status reg */
-	ldr r4, [r3]			/* get value of line status reg */
-	and r4, r4, #TX_READY	/* mask tx ready bit bit */
-    cmp r4, #TX_READY		/* check for bit set */
+	ldr r0, =UART0LSR		/* point to uart line status reg */
+	ldr r1, [r0]			/* get value of line status reg */
+	and r1, r1, #TX_READY	/* mask tx ready bit bit */
+    cmp r1, #TX_READY		/* check for bit set */
 	bne bputc				/* keep poling until bit is set */
-	ldr r3, =UART0RBR		/* point to TX register */
-	mov r4, #67				/* decimal 67 is capitol C */
-	str r4, [r3]
+	ldr r0, =UART0RBR		/* point to TX register */
+	mov r1, #67				/* decimal 67 is capitol C */
+	str r1, [r0]
 	mov pc, lr
 
 forever:
 	b forever
+	nop

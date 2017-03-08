@@ -13,10 +13,10 @@ syscall kputc(
 {
 	struct	dentry	*devptr;
 	volatile struct	uart_csreg	*csrptr;
-//	intmask	mask;
+	intmask	mask;
 
 	/* Disable interrupts */
-//	mask = disable();
+	mask = disable();
 
 	/* Get CSR address of the console */
 
@@ -25,12 +25,9 @@ syscall kputc(
 
 	/* wait for UART transmit queue to empty */
 
-//	while ( (csrptr->lsr & UART_LSR_THRE) == 0 ) {
-//		;
-//	}
-
-	while ( !(csrptr->lsr & 0x40) )
-		    ;
+	while ( (csrptr->lsr & UART_LSR_THRE) == 0 ) {
+		;
+	}
 
 	/* write the character */
 
@@ -45,7 +42,7 @@ syscall kputc(
 		csrptr->buffer = '\r';
 	}
 
-//	restore(mask);
+	restore(mask);
 	return OK;
 }
 

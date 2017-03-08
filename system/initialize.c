@@ -50,9 +50,9 @@ void	nulluser()
 	uint32	free_mem;		/* Total amount of free memory	*/
 	
 	/* Initialize the system */
-	kputc('G');
 
 	sysinit();
+	kprintf("nulluser(): returned from sysinit()\n");
 
 	/* Output Xinu memory layout */
 	free_mem = 0;
@@ -81,7 +81,7 @@ void	nulluser()
 
 	/* Initialize the network stack and start processes */
 
-	net_init();
+//	net_init(); TODO:
 
 	/* Create a process to finish startup and start main */
 
@@ -90,6 +90,8 @@ void	nulluser()
 
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
+
+	kprintf("nulluser(): looping\n");
 
 	while (TRUE) {
 		;		/* Do nothing */
@@ -100,8 +102,8 @@ void	nulluser()
 
 /*------------------------------------------------------------------------
  *
- * startup  -  Finish startup takss that cannot be run from the Null
- *		  process and then create and resumethe main process
+ * startup  -  Finish startup tasks that cannot be run from the Null
+ *		  process and then create and resume the main process
  *
  *------------------------------------------------------------------------
  */
@@ -154,15 +156,17 @@ static	void	sysinit()
 
 	/* Platform Specific Initialization */
 
-	platinit();
+//	platinit(); TODO:
+//	kprintf("sysinit(): returned from platinit()\n");
 
 	/* Initialize the interrupt vectors */
 
-	initevec();
+//	initevec(); TODO:
 	
 	/* Initialize free memory list */
 	
 	meminit();
+	kprintf("sysinit(): returned from meminit()\n");
 
 	/* Initialize system variables */
 
@@ -214,10 +218,10 @@ static	void	sysinit()
 
 	/* Initialize the real time clock */
 
-	clkinit();
+//	clkinit(); TODO:
 
 	for (i = 0; i < NDEVS; i++) {
-		init(i);
+//		init(i); TODO:
 	}
 	return;
 }
