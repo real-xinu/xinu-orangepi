@@ -33,20 +33,16 @@ void	platinit(void)
 	kprintf("In platinit()\n");
 
 	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
-//	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
+	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
 
 	/* Disable the watchdog timer */
-	// TODO: just have to turn off watchdog timer
-//	kprintf("attempting to disable watchdog timer...");
-//	wdtptr = (struct watchdog_csreg *)WDTADDR;
-//	wdtptr->wspr = 0x0000aaaa;
-//	while(wdtptr->wwps & 0x00000010);
-//	wdtptr->wspr = 0x00005555;
-//	while(wdtptr->wwps & 0x00000010);
-//	kprintf(" disabled\n");
+//	 TODO: is this right?
+	wdtptr = (struct watchdog_csreg *)WDTADDR;
+	wdtptr->ctrl = 0;
+
 	/* Initialize the Interrupt Controller */
 
-//	initintc(); TODO:
+	initintc(); // TODO:
 //	kprintf("platinit(): returned from initinc()\n");
 
 	/* Initialize the Performance Counters */
