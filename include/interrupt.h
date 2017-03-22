@@ -45,6 +45,7 @@ struct intc_csreg {
 
 /* TODO: Orange Pi stuff below this point */
 
+// TODO: double check this
 struct gic_cpuifreg {	/* GIC CPU Interface Registers */
 	reg32 ctl;			/* CPU Interface Control Register */
 	reg32 pm;			/* Interrupt Priority Mask Register */
@@ -67,6 +68,7 @@ struct gic_cpuifreg {	/* GIC CPU Interface Registers */
 	reg32 di;			/* Deactivate Interrupt Register */
 };
 
+// TODO: double check this
 struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 ctl;			/* Distributor Control Register */
 	reg32 type;			/* Interrupt Controller Type Register */
@@ -114,7 +116,7 @@ struct gic_distreg {	/* GIC Distributor Registers */
 
 extern reg32 gic_base;
 
-#define GIC_BASE 0x01C80000	/* General Interrupt Controller Base Address */
+#define GIC_BASE 0x01C80000	/* Generic Interrupt Controller Base Address */
 #define GIC_DIST_BASE (0x01C80000+0x1000) /* GIC Distributor Base Address */
 #define GIC_CPUIF_BASE (0x01C80000 + 0x2000) /* GIC CPU Interface Base Address */
 

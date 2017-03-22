@@ -8,6 +8,7 @@
  */
 void		counterinit()
 {
+	// TODO: This seems right... is it right?
 	/* Program the performance-counter control-register:		*/
 	/*	Enable all counters:					*/
 	asm volatile ("MCR p15, 0, %0, c9, c12, 0\t\n" :: "r"
@@ -34,11 +35,14 @@ void	platinit(void)
 
 //	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
 	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
+	struct 	timer_csreg* tmrptr;	/* Timer registers */
 
 	/* Disable the watchdog timer */
 
 	wdtptr = (struct watchdog_csreg *)WDTADDR;
 	wdtptr->ctrl = 0;
+	tmrptr = (struct timer_csreg*)TIMER_BASE;
+	tmrptr->wd0irqen = 0;
 
 	/* Initialize the Interrupt Controller */
 

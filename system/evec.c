@@ -41,10 +41,11 @@ int32	initintc()
 	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
 	kprintf("sizeof(struct gic_distreg) = %X\n", sizeof(struct gic_distreg));
 
+	kprintf("giccpuif->ctl = %X\n", giccpuif->ctl);
+	kprintf("gicdist->ctl = %X\n", giccpuif->ctl);
+	// TODO: This just disables for now...?
 	giccpuif->ctl = GIC_CTL_RESET;
 	gicdist->ctl = GIC_CTL_RESET;
-
-	kprintf("Done resetting\n");
 
 	return OK;
 }

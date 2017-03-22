@@ -211,14 +211,16 @@ static	void	sysinit()
 	/* Initialize buffer pools */
 
 	bufinit();
-
+	kprintf("sysinit(): returned from bufinit()\n");
 	/* Create a ready list for processes */
 
 	readylist = newqueue();
+	kprintf("sysinit(): initialized readylist queue\n");
 
 	/* Initialize the real time clock */
 
-//	clkinit(); // TODO:
+	clkinit(); // TODO:
+	kprintf("sysinit(): returned from clkinit()\n");
 
 	for (i = 0; i < NDEVS; i++) {
 //		init(i); TODO:
