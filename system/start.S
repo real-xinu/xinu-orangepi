@@ -47,6 +47,9 @@ bloop:	cmp	r0, r1			/* Loop until last address	*/
 	b	bloop			/* Continue to iterate		*/
 bexit:	mov	pc, lr			/* Return to caller		*/
 
+
+	/* Temporary function to print a 'C' on the screen for debugging */
+
 bputc:
 	ldr r0, =UART0LSR		/* point to uart line status reg */
 	ldr r1, [r0]			/* get value of line status reg */
@@ -57,7 +60,6 @@ bputc:
 	mov r1, #67				/* decimal 67 is capitol C */
 	str r1, [r0]
 	mov pc, lr
-
 forever:
 	b forever
 	nop

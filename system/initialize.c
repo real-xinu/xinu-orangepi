@@ -156,7 +156,7 @@ static	void	sysinit()
 
 	/* Platform Specific Initialization */
 
-//	platinit(); // TODO:
+	platinit(); // TODO:
 	kprintf("sysinit(): returned from platinit()\n");
 
 	/* Initialize the interrupt vectors */

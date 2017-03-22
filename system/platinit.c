@@ -32,23 +32,23 @@ void	platinit(void)
 {
 	kprintf("In platinit()\n");
 
-	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
+//	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
 	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
 
 	/* Disable the watchdog timer */
-//	 TODO: is this right?
+
 	wdtptr = (struct watchdog_csreg *)WDTADDR;
 	wdtptr->ctrl = 0;
 
 	/* Initialize the Interrupt Controller */
 
-	initintc(); // TODO:
-//	kprintf("platinit(): returned from initinc()\n");
+	initintc(); // TODO: is this necessary? all is does is reset
+	kprintf("platinit(): returned from initinc()\n");
 
 	/* Initialize the Performance Counters */
 
-//	counterinit(); TODO:
-//	kprintf("platinit(): returned from coutnerinit()\n");
+	counterinit(); // TODO:
+	kprintf("platinit(): returned from coutnerinit()\n");
 	/* Pad control for CONSOLE */
 
 	// setting multiplexed pinout for uart on bbb
@@ -58,9 +58,8 @@ void	platinit(void)
 //	am335x_padctl(UART0_PADTX_ADDR,
 //			AM335X_PADCTL_TX | UART0_PADTX_MODE);
 
-	/* Reset the UART device */
-
-	uptr = (struct uart_csreg *)devtab[CONSOLE].dvcsr;
-	uptr->sysc |= UART_SYSC_SOFTRESET;
-	while((uptr->syss & UART_SYSS_RESETDONE) == 0);
+	/* Reset the UART device TODO: not necessary right? because of above? */
+//	uptr = (struct uart_csreg *)devtab[CONSOLE].dvcsr;
+//	uptr->sysc |= UART_SYSC_SOFTRESET;
+//	while((uptr->syss & UART_SYSS_RESETDONE) == 0);
 }

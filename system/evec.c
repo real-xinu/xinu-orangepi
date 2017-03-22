@@ -11,21 +11,40 @@ extern	void	userret(void);
 uint32	intc_vector[128];	/* Interrupt vector	*/
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
+reg32   gic_base = 0;
+
 /*------------------------------------------------------------------------
  * initintc - Initialize the Interrupt Controller
  *------------------------------------------------------------------------
  */
 int32	initintc()
 {
-	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+//	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+//
+//	/* Reset the interrupt controller */
+//
+//	csrptr->sysconfig |= (INTC_SYSCONFIG_SOFTRESET);
+//
+//	/* Wait until reset is complete */
+//
+//	while((csrptr->sysstatus & INTC_SYSSTATUS_RESETDONE) == 0);
+
+	kprintf("In initintc()\n");
+	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 
 	/* Reset the interrupt controller */
 
-	csrptr->sysconfig |= (INTC_SYSCONFIG_SOFTRESET);
+	// TODO: temporary sanity check
+	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
+	kprintf("gic_base = 0x%08X\n", gic_base);
+	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
+	kprintf("sizeof(struct gic_distreg) = %X\n", sizeof(struct gic_distreg));
 
-	/* Wait until reset is complete */
+	giccpuif->ctl = GIC_CTL_RESET;
+	gicdist->ctl = GIC_CTL_RESET;
 
-	while((csrptr->sysstatus & INTC_SYSSTATUS_RESETDONE) == 0);
+	kprintf("Done resetting\n");
 
 	return OK;
 }
