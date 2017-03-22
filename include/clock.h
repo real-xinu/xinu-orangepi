@@ -80,3 +80,5 @@ struct timer_csreg {
 };
 
 #define TIMER_BASE	0x01C20C00 /* Timer Base Address */
+#define TMR0_CLK_SRC_OSC24M 0x00000002 /* 24M OSC bit for control register*/
+
