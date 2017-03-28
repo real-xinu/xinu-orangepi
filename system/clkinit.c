@@ -74,7 +74,7 @@ void	clkinit(void)
 
 	/* Set interrupt vector for clock to invoke clkint */
 
-//	set_evec(AM335X_TIMER1MS_IRQ, (uint32)clkhandler);
+	set_evec(AM335X_TIMER1MS_IRQ, (uint32)clkhandler);
 
 	sleepq = newqueue();	/* Allocate a queue to hold the delta	*/
 				/*   list of sleeping processes		*/
