@@ -93,7 +93,7 @@ initevec:
 	ldr	r0, =ARMV7A_EV_START  /* Exception base address		*/
 	mcr	p15, 0, r0, c12, c0, 0/* Store excp. base addr. in c12	*/
 	ldr	r0, =ARMV7A_EV_START  /* Start address of exp. vector	*/
-	add	r1, r0, #0x20		  /* End address of exp. vector	*/
+	add	r1, r0, #ARMV7A_EH_OFFSET /* End address of exp. vector	*/
 	ldr	r2, =expjmpinstr      /* Copy the exp jump instr	*/
 	ldr	r2, [r2]	      	  /*   into register r2		*/
 expvec:	str	r2, [r0]	      /* Store the jump instruction	*/
@@ -101,16 +101,16 @@ expvec:	str	r2, [r0]	      /* Store the jump instruction	*/
 	cmp	r0, r1
 	bne	expvec
 	ldr r0, =ARMV7A_EV_START
-	add	r0, r0, #0x20  		   /* Install the default exception	*/
+	add	r0, r0, #ARMV7A_EH_OFFSET  		   /* Install the default exception	*/
 	ldr	r1, =ARMV7A_EV_START   /*   handler for all exceptions	*/
-	add r1, r1, #0x40
+	add r1, r1, #ARMV7A_EV_SIZE
 	ldr	r2, =defexp_handler
 exphnd: str	r2, [r0]
 	add	r0, r0, #4
 	cmp	r0, r1
 	bne	exphnd
 	ldr	r0, =ARMV7A_EV_START /* Install the IRQ handler to	*/
-	add r0, r0, #0x38
+	add r0, r0, #ARMV7A_IRQH_OFFSET
 	ldr	r1, =irq_except       /*   override the default		*/
 	str	r1, [r0]	      /*   exception handler		*/
 	mov	pc, lr
