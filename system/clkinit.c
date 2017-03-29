@@ -74,7 +74,7 @@ void	clkinit(void)
 
 	/* Set interrupt vector for clock to invoke clkint */
 
-	set_evec(AM335X_TIMER1MS_IRQ, (uint32)clkhandler);
+	set_evec(TMR0_IRQ, (uint32)clkhandler);
 
 	sleepq = newqueue();	/* Allocate a queue to hold the delta	*/
 				/*   list of sleeping processes		*/
@@ -92,7 +92,7 @@ void	clkinit(void)
 	tmrptr->t0ctl |= 0x2;			/* set reload bit */
 	while(tmrptr->t0ctl & 0x2){} 	/* wait until reload bit turns to 0 */
 	tmrptr->t0ctl |= 0x1;			/* Enable Timer 0 */
-
+	tmrptr->irqen |= 0x1;			/* Enable Timer 0 Interrupts */
 
 	return;
 }

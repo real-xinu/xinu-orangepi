@@ -8,15 +8,16 @@
 
 extern	void	userret(void);
 
-uint32	intc_vector[128];	/* Interrupt vector	*/
+uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
+uint32 	exp_vector[16];
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
-reg32   gic_base = 0;
+//reg32   gic_base = 0;
 
 // FIXME: Temporary GIC sanity check:
 void gic_sanity(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
-	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
-	kprintf("gic_base = 0x%08X (0x%08X ?)\n", gic_base, GIC_BASE);
+//	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
+//	kprintf("gic_base = 0x%08X (0x%08X ?)\n", gic_base, GIC_BASE);
 	kprintf("GIC_CPUIF_BASE = %08X\n", GIC_CPUIF_BASE);
 	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
 	kprintf("&giccpuif->ahpripnd - GIC_CPUIF_BASE = 0x%X (0x28 ?)\n", (int32)&giccpuif->ahpripnd - GIC_CPUIF_BASE);
@@ -64,13 +65,13 @@ int32	initintc()
 //
 //	while((csrptr->sysstatus & INTC_SYSSTATUS_RESETDONE) == 0);
 
-	kprintf("In initintc()\n");
+//	kprintf("In initintc()\n");
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	int i;	/* index into GIC arrays */
 
 	// TODO: temporary sanity check
-	gic_sanity(gicdist, giccpuif);
+//	gic_sanity(gicdist, giccpuif);
 
 	/* Reset the interrupt controller */
 	// TODO: This just disables for now...?
@@ -84,9 +85,9 @@ int32	initintc()
 	/* clear enable bit for all interrupts */
 	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
 	/* clear pending bit for all interrupts */
-	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
+	for(i = 0; i < 16; i++){ gicdist->clrpnd[i] = 0xFFFFFFFF; }
 	/* clear active bit for all interrupts */
-	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
+	for(i = 0; i < 16; i++){ gicdist->clract[i] = 0xFFFFFFFF; }
 	/* FIXME: for now, set all interrupt priorities to the same max value */
 	for(i = 0; i < 128; i++){ gicdist->pri[i] = 0; }
 	/* FIXME: for now, forward all interrupts to cpu interface 0*/
@@ -104,19 +105,70 @@ int32	initintc()
 	return OK;
 }
 
+///*------------------------------------------------------------------------
+// * initevec - Initialize the exception vector
+// *------------------------------------------------------------------------
+// */
+//void initevec(void) {
+//	int i;		/* index into exception vector */
+//
+//	/* Store excp. base addr. in c12 */
+//	asm volatile ("MCR p15, 0, %0, c1, c0, 0\t\n" :: "r" (0));
+//	asm volatile ("MCR p15, 0, %0, c1, c0, 0\t\n" :: "r" (exp_vector));
+//
+//	for(i=0; i < 8; i++){
+//		exp_vector[i] = expjmpinstr;
+//	}
+//	/* install the default exception handler for all exceptions */
+//	for(; i < 16; i++){
+//		exp_vector[i] = defexp_handler;
+//	}
+//	/* install the IRQ handler to override the default exception handler */
+//	exp_vector[EVEC_IRQ_IND] = irq_except;
+//}
+
 /*------------------------------------------------------------------------
  * set_evec - set exception vector to point to an exception handler
  *------------------------------------------------------------------------
  */
 int32	set_evec(uint32 xnum, uint32 handler)
 {
-	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+	// TODO: old stuff
+//	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+//	uint32	bank;	/* bank number in int controller	*/
+//	uint32	mask;	/* used to set bits in bank		*/
+//
+//	/* There are only 127 interrupts allowed 0-126 */
+//
+//	if(xnum > 127) {
+//		return SYSERR;
+//	}
+//
+//	/* Install the handler */
+//
+//	intc_vector[xnum] = handler;
+//
+//	/* Get the bank number based on interrupt number */
+//
+//	bank = (xnum/32);
+//
+//	/* Get the bit inside the bank */
+//
+//	mask = (0x00000001 << (xnum%32));
+//
+//	/* Reset the bit to enable that interrupt number */
+//
+//	csrptr->banks[bank].mir &= (~mask);
+
+	// TODO: orangepi stuff here: is it right?
+
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	uint32	bank;	/* bank number in int controller	*/
 	uint32	mask;	/* used to set bits in bank		*/
 
 	/* There are only 127 interrupts allowed 0-126 */
 
-	if(xnum > 127) {
+	if(xnum > GIC_IRQ_MAX) {
 		return SYSERR;
 	}
 
@@ -134,7 +186,7 @@ int32	set_evec(uint32 xnum, uint32 handler)
 
 	/* Reset the bit to enable that interrupt number */
 
-	csrptr->banks[bank].mir &= (~mask);
+	gicdist->seten[bank] |= mask;
 
 	return OK;
 }
@@ -145,6 +197,7 @@ int32	set_evec(uint32 xnum, uint32 handler)
  */
 void	irq_dispatch()
 {
+	kprintf("Hello from irq_dispatch()!!!\n");
 	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
 	uint32	xnum;		/* Interrupt number of device	*/
 	interrupt (*handler)(); /* Pointer to handler function	*/

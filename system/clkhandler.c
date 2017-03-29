@@ -8,6 +8,7 @@
  */
 void	clkhandler()
 {
+	kprintf("Hello from clkhandler()!!!!!!!\n");
 
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 	volatile struct am335x_timer1ms *csrptr =

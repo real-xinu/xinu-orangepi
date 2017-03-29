@@ -8,7 +8,6 @@
  */
 void		counterinit()
 {
-	// TODO: This seems right... is it right?
 	/* Program the performance-counter control-register:		*/
 	/*	Enable all counters:					*/
 	asm volatile ("MCR p15, 0, %0, c9, c12, 0\t\n" :: "r"
@@ -31,7 +30,7 @@ void		counterinit()
  */
 void	platinit(void)
 {
-	kprintf("In platinit()\n");
+//	kprintf("In platinit()\n");
 
 //	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
 	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
@@ -46,13 +45,13 @@ void	platinit(void)
 
 	/* Initialize the Interrupt Controller */
 
-	initintc(); // TODO: is this necessary? all is does is reset
-	kprintf("platinit(): returned from initinc()\n");
+	initintc();
+//	kprintf("platinit(): returned from initinc()\n");
 
 	/* Initialize the Performance Counters */
 
 	counterinit(); // TODO:
-	kprintf("platinit(): returned from coutnerinit()\n");
+//	kprintf("platinit(): returned from coutnerinit()\n");
 	/* Pad control for CONSOLE */
 
 	// setting multiplexed pinout for uart on bbb

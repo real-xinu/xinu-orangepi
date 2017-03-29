@@ -25,10 +25,17 @@
 
 /* Exception Vector Addresses */
 
-#define ARMV7A_EV_START	0x4030CE00	/* Exception vector start addr	*/
-#define ARMV7A_EV_END	0x4030CE20	/* Exception vector end addr	*/
-#define ARMV7A_EH_START 0x4030CE24	/* Exception handler start addr	*/
-#define ARMV7A_EH_END	0x4030CE40	/* Exception handler end addr	*/
-#define ARMV7A_IRQH_ADDR 0x4030CE38	/* IRQ exp handler address	*/
+//#define ARMV7A_EV_START	0x4030CE00	/* Exception vector start addr	*/
+//#define ARMV7A_EV_END	0x4030CE20	/* Exception vector end addr	*/
+//#define ARMV7A_EH_START 0x4030CE24	/* Exception handler start addr	*/
+//#define ARMV7A_EH_END	0x4030CE40	/* Exception handler end addr	*/
+//#define ARMV7A_IRQH_ADDR 0x4030CE38	/* IRQ exp handler address	*/
 
 #define MAXADDR	0x60000000	/* 512 MB RAM starting from 0x40000000	*/
+
+/* TODO: Orange Pi stuff below this point */
+//#define EVEC_IRQ_IND 14
+#define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/
+#define ARMV7A_EH_OFFSET 0x20		/* Exception handler offset */
+#define ARMV7A_IRQH_OFFST 0x38		/* IRQ exception offset */
+#define ARMV7A_EV_SIZE 0x40			/* Size of exception vector */

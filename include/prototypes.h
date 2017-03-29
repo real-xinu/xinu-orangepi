@@ -161,6 +161,9 @@ extern	status	insertd(pid32, qid16, int32);
 /* in file intr.S */
 extern	intmask	disable(void);
 extern	void	enable(void);
+extern	void	expjmpinstr(void);
+extern	void	defexp_handler(void);
+extern 	void	irq_except(void);
 extern	int32	initevec(void);
 
 /* in file ioerr.c */

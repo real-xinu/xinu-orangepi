@@ -52,7 +52,7 @@ void	nulluser()
 	/* Initialize the system */
 
 	sysinit();
-	kprintf("nulluser(): returned from sysinit()\n");
+//	kprintf("nulluser(): returned from sysinit()\n");
 
 	/* Output Xinu memory layout */
 	free_mem = 0;
@@ -76,8 +76,11 @@ void	nulluser()
 		(uint32)&data, (uint32)&ebss - 1);
 
 	/* Enable interrupts */
-
-	enable();
+	enable(); // TODO: old bbb, new stuff below
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
+	gicdist->ctrl = GIC_ENABLE;
+	giccpuif->ctrl = GIC_ENABLE;
 
 	/* Initialize the network stack and start processes */
 
@@ -156,17 +159,23 @@ static	void	sysinit()
 
 	/* Platform Specific Initialization */
 
-	platinit(); // TODO:
-	kprintf("sysinit(): returned from platinit()\n");
+	platinit();
+//	kprintf("sysinit(): returned from platinit()\n");
 
 	/* Initialize the interrupt vectors */
 
-	initevec();// TODO: is this right for orange pi?
+	initevec();// TODO: what exactly does this do?
+		kprintf("expjmpinstr = 0x%08X\n", expjmpinstr);
+		kprintf("defexp_handler = 0x%08X\n", defexp_handler);
+		kprintf("irq_except = 0x%08X\n", irq_except);
+	for (i = 0; i < 16; i++){
+		kprintf("exp_vector[i] = 0x%08X\n", exp_vector[i]);
+	}
 	
 	/* Initialize free memory list */
 	
 	meminit();
-	kprintf("sysinit(): returned from meminit()\n");
+//	kprintf("sysinit(): returned from meminit()\n");
 
 	/* Initialize system variables */
 
@@ -211,16 +220,16 @@ static	void	sysinit()
 	/* Initialize buffer pools */
 
 	bufinit();
-	kprintf("sysinit(): returned from bufinit()\n");
+//	kprintf("sysinit(): returned from bufinit()\n");
 	/* Create a ready list for processes */
 
 	readylist = newqueue();
-	kprintf("sysinit(): initialized readylist queue\n");
+//	kprintf("sysinit(): initialized readylist queue\n");
 
 	/* Initialize the real time clock */
 
 	clkinit(); // TODO:
-	kprintf("sysinit(): returned from clkinit()\n");
+//	kprintf("sysinit(): returned from clkinit()\n");
 
 	for (i = 0; i < NDEVS; i++) {
 //		init(i); TODO:
