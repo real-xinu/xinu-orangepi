@@ -94,12 +94,12 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 config[32];	/* Interrupt Configuration Registers */
 	reg32 res11[32];
 	reg32 status[16];	/* Interrupt Status Registers */
-	reg32 res12[128];
+	reg32 res12[112];
 	reg32 sgi;			/* Software Generated Interrupt (SGI) Register */
-	reg32 res13[4];
+	reg32 res13[3];
 	reg32 clrpndsgi[4];	/* SGI Clear-Pending Registers */
 	reg32 setpndsgi[4];	/* SGI Set-Pending Registers */
-	reg32 res14[44];
+	reg32 res14[40];
 	reg32 pid4;			/* Peripheral ID 4 Register */ // TODO: HERE
 	reg32 pid5;			/* Peripheral ID 5 Register */
 	reg32 pid6;			/* Peripheral ID 6 Register */
@@ -118,4 +118,4 @@ extern reg32 gic_base;
 #define GIC_CPUIF_BASE (0x01C80000 + 0x2000) /* GIC CPU Interface Base Address */
 
 #define GIC_CTL_RESET 0x00000000
-#define GIC_IIDR_RESET	0x0020043B
+#define GIC_DIST_CTRL_DISABLE 0x00000000

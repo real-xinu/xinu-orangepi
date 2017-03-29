@@ -13,6 +13,40 @@ char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
 reg32   gic_base = 0;
 
+// FIXME: Temporary GIC sanity check:
+void gic_sanity(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
+	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
+	kprintf("gic_base = 0x%08X (0x%08X ?)\n", gic_base, GIC_BASE);
+	kprintf("GIC_CPUIF_BASE = %08X\n", GIC_CPUIF_BASE);
+	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
+	kprintf("&giccpuif->ahpripnd - GIC_CPUIF_BASE = 0x%X (0x28 ?)\n", (int32)&giccpuif->ahpripnd - GIC_CPUIF_BASE);
+	kprintf("&giccpuif->actpri - GIC_CPUIF_BASE = 0x%X (0xD0 ?)\n", (int32)&giccpuif->actpri - GIC_CPUIF_BASE);
+	kprintf("&giccpuif->nsactpir - GIC_CPUIF_BASE = 0x%X (0xE0 ?)\n", (int32)&giccpuif->nsactpri - GIC_CPUIF_BASE);
+	kprintf("&giccpuif->iid - GIC_CPUIF_BASE = 0x%X (0xFC ?)\n", (int32)&giccpuif->iid - GIC_CPUIF_BASE);
+	kprintf("&giccpuif->deactint - GIC_CPUIF_BASE = 0x%X (0x1000 ?)\n\n", (int32)&giccpuif->deactint - GIC_CPUIF_BASE);
+
+	kprintf("sizeof(struct gic_distreg) = %X\n", sizeof(struct gic_distreg));
+	kprintf("&gicdist->group[0] - GIC_DIST_BASE = 0x%X (0x80 ?)\n", (int32)&gicdist->group[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->seten[0] - GIC_DIST_BASE = 0x%X (0x100 ?)\n", (int32)&gicdist->seten[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->clren[0] - GIC_DIST_BASE = 0x%X (0x180 ?)\n", (int32)&gicdist->clren[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->setpnd[0] - GIC_DIST_BASE = 0x%X (0x200 ?)\n", (int32)&gicdist->setpnd[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->clrpnd[0] - GIC_DIST_BASE = 0x%X (0x280 ?)\n", (int32)&gicdist->clrpnd[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->setact[0] - GIC_DIST_BASE = 0x%X (0x300 ?)\n", (int32)&gicdist->setact[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->clract[0] - GIC_DIST_BASE = 0x%X (0x380 ?)\n", (int32)&gicdist->clract[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->pri[0] - GIC_DIST_BASE = 0x%X (0x400 ?)\n", (int32)&gicdist->pri[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->pctgt[0] - GIC_DIST_BASE = 0x%X (0x800 ?)\n", (int32)&gicdist->pctgt[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->config[0] - GIC_DIST_BASE = 0x%X (0xC00 ?)\n", (int32)&gicdist->config[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->status[0] - GIC_DIST_BASE = 0x%X (0xD00 ?)\n", (int32)&gicdist->status[0] - GIC_DIST_BASE);
+	kprintf("&gicdist->sgi - GIC_DIST_BASE = 0x%X (0xF00 ?)\n", (int32)&gicdist->sgi - GIC_DIST_BASE);
+	kprintf("&gicdist->pid4 - GIC_DIST_BASE = 0x%X (0xFD0 ?)\n", (int32)&gicdist->pid4 - GIC_DIST_BASE);
+	kprintf("&gicdist->cid[3] - GIC_DIST_BASE = 0x%X (0xFFC ?)\n", (int32)&gicdist->cid[3] - GIC_DIST_BASE);
+
+	kprintf("Distributor Type Register Contents: 0x%08X\n", gicdist->type);
+
+	kprintf("giccpuif->ctl = %X\n", giccpuif->ctrl);
+	kprintf("gicdist->ctl = %X\n", giccpuif->ctrl);
+}
+
 /*------------------------------------------------------------------------
  * initintc - Initialize the Interrupt Controller
  *------------------------------------------------------------------------
@@ -36,16 +70,11 @@ int32	initintc()
 	/* Reset the interrupt controller */
 
 	// TODO: temporary sanity check
-	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
-	kprintf("gic_base = 0x%08X\n", gic_base);
-	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
-	kprintf("sizeof(struct gic_distreg) = %X\n", sizeof(struct gic_distreg));
+	gic_sanity(gicdist, giccpuif);
 
-	kprintf("giccpuif->ctl = %X\n", giccpuif->ctl);
-	kprintf("gicdist->ctl = %X\n", giccpuif->ctl);
 	// TODO: This just disables for now...?
-	giccpuif->ctl = GIC_CTL_RESET;
-	gicdist->ctl = GIC_CTL_RESET;
+	giccpuif->ctrl = GIC_CTL_RESET;
+	gicdist->ctrl = GIC_DIST_CTRL_DISABLE;
 
 	return OK;
 }
