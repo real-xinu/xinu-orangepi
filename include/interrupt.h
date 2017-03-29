@@ -118,4 +118,5 @@ extern reg32 gic_base;
 #define GIC_CPUIF_BASE (0x01C80000 + 0x2000) /* GIC CPU Interface Base Address */
 
 #define GIC_CTL_RESET 0x00000000
-#define GIC_DIST_CTRL_DISABLE 0x00000000
+#define GIC_DISABLE 0x00000000
+#define GIC_ENABLE 0x00000001

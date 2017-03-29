@@ -53,6 +53,7 @@ void gic_sanity(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
  */
 int32	initintc()
 {
+	// TODO: old stuff from bbb
 //	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
 //
 //	/* Reset the interrupt controller */
@@ -66,15 +67,39 @@ int32	initintc()
 	kprintf("In initintc()\n");
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
-
-	/* Reset the interrupt controller */
+	int i;	/* index into GIC arrays */
 
 	// TODO: temporary sanity check
 	gic_sanity(gicdist, giccpuif);
 
+	/* Reset the interrupt controller */
 	// TODO: This just disables for now...?
-	giccpuif->ctrl = GIC_CTL_RESET;
-	gicdist->ctrl = GIC_DIST_CTRL_DISABLE;
+	giccpuif->ctrl = GIC_DISABLE;
+	gicdist->ctrl = GIC_DISABLE;
+
+	/* Initialize Distributor */
+
+	/* set all interrupts to group 0 */
+	for(i = 0; i < 16; i++){ gicdist->group[i] = 0; }
+	/* clear enable bit for all interrupts */
+	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
+	/* clear pending bit for all interrupts */
+	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
+	/* clear active bit for all interrupts */
+	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
+	/* FIXME: for now, set all interrupt priorities to the same max value */
+	for(i = 0; i < 128; i++){ gicdist->pri[i] = 0; }
+	/* FIXME: for now, forward all interrupts to cpu interface 0*/
+	for(i = 0; i < 128; i++){ gicdist->pctgt[i] = 0x01010101; }
+	/* make all interrupts level-sensitive */
+	for(i = 0; i < 32; i++){ gicdist->config[i] = 0; }
+
+	/* Initialize CPU Interface */
+
+	/* Set priority filter to accept all priority levels */
+	giccpuif->primask = 0xFFFFFFFF;
+
+
 
 	return OK;
 }
