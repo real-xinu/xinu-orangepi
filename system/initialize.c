@@ -112,25 +112,26 @@ void	nulluser()
  */
 local process	startup(void)
 {
-	uint32	ipaddr;			/* Computer's IP address	*/
-	char	str[128];		/* String used to format output	*/
+//	uint32	ipaddr;			/* Computer's IP address	*/
+//	char	str[128];		/* String used to format output	*/
 
-
+	kprintf("Hello from startup process!\n");
 	/* Use DHCP to obtain an IP address and format it */
 
-	ipaddr = getlocalip();
-	if ((int32)ipaddr == SYSERR) {
-		kprintf("Cannot obtain an IP address\n");
-	} else {
-		/* Print the IP in dotted decimal and hex */
-		ipaddr = NetData.ipucast;
-		sprintf(str, "%d.%d.%d.%d",
-			(ipaddr>>24)&0xff, (ipaddr>>16)&0xff,
-			(ipaddr>>8)&0xff,        ipaddr&0xff);
-	
-		kprintf("Obtained IP address  %s   (0x%08x)\n", str,
-								ipaddr);
-	}
+	// TODO:!!
+//	ipaddr = getlocalip();
+//	if ((int32)ipaddr == SYSERR) {
+//		kprintf("Cannot obtain an IP address\n");
+//	} else {
+//		/* Print the IP in dotted decimal and hex */
+//		ipaddr = NetData.ipucast;
+//		sprintf(str, "%d.%d.%d.%d",
+//			(ipaddr>>24)&0xff, (ipaddr>>16)&0xff,
+//			(ipaddr>>8)&0xff,        ipaddr&0xff);
+//
+//		kprintf("Obtained IP address  %s   (0x%08x)\n", str,
+//								ipaddr);
+//	}
 	/* Create a process to execute function main() */
 
 	resume(create((void *)main, INITSTK, INITPRIO,
@@ -231,9 +232,15 @@ static	void	sysinit()
 	clkinit(); // TODO:
 //	kprintf("sysinit(): returned from clkinit()\n");
 
-	for (i = 0; i < NDEVS; i++) {
-//		init(i); TODO:
-	}
+	// TODO:
+//	for (i = 0; i < NDEVS; i++) {
+////		init(i); TODO:
+//	}
+	// FIXME: temp
+//	kprintf("init(CONSOLE)\n");
+//	init(CONSOLE);
+//	kprintf("returned\n");
+
 	return;
 }
 

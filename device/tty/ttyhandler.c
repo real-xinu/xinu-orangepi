@@ -13,7 +13,7 @@ void ttyhandler(uint32 xnum) {
 	uint32	iir = 0;		/* Interrupt identification	*/
 	uint32	lsr = 0;		/* Line status			*/
 
-
+	kprintf("Hello from ttyhandler()\n");
 	/* Get CSR address of the device (assume console for now) */
 
 	devptr = (struct dentry *) &devtab[CONSOLE];

@@ -56,7 +56,7 @@ struct am335x_timer1ms {
 /*** TODO: Orange Pi stuff down here ***/
 struct timer_csreg {
 	reg32 irqen;		/* IRQ Enable Register */
-	reg32 stat;			/* Status Register */
+	reg32 irqstat;		/* IRQ Status Register */
 	reg32 res1[2];		/* Reserved */
 	reg32 t0ctl;		/* Timer 0 Control Register */
 	reg32 t0intvl;		/* Timer 0 Interval Value Register */

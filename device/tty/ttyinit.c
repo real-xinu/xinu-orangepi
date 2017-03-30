@@ -12,6 +12,7 @@ devcall	ttyinit(
 	  struct dentry	*devptr		/* Entry in device switch table	*/
 	)
 {
+	kprintf("Hello from ttyinit()\n");
 	struct	ttycblk	*typtr;		/* Pointer to ttytab entry	*/
 	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
 

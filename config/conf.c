@@ -24,7 +24,7 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)ttyinit, (void *)ionull, (void *)ionull,
 	  (void *)ttyread, (void *)ttywrite, (void *)ioerr,
 	  (void *)ttygetc, (void *)ttyputc, (void *)ttycontrol,
-	  (void *)0x1c28000, (void *)ttyhandler, 72 },
+	  (void *)0x1c28000, (void *)ttyhandler, 32 },
 
 /* GPIO0 is gpio */
 	{ 1, 0, "GPIO0",

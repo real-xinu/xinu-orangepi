@@ -197,14 +197,16 @@ int32	set_evec(uint32 xnum, uint32 handler)
  */
 void	irq_dispatch()
 {
-	kprintf("Hello from irq_dispatch()!!!\n");
-	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+//	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
+	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	uint32	xnum;		/* Interrupt number of device	*/
 	interrupt (*handler)(); /* Pointer to handler function	*/
 
 	/* Get the interrupt number from the Interrupt controller */
 
-	xnum = csrptr->sir_irq & 0x7F;
+//	xnum = csrptr->sir_irq & 0x7F;
+	xnum = giccpuif->intack & 0x1FF;
+//	kprintf("Hello from irq_dispatch(): xnum = %d\n", xnum); while(1);
 
 	/* Defer scheduling until interrupt is acknowledged */
 
@@ -217,9 +219,10 @@ void	irq_dispatch()
 		handler(xnum);
 	}
 
-	/* Acknowledge the interrupt */
-
-	csrptr->control |= (INTC_CONTROL_NEWIRQAGR);
+//	/* Acknowledge the interrupt */
+//
+//	csrptr->control |= (INTC_CONTROL_NEWIRQAGR);
+	giccpuif->eoi |= xnum;
 
 	/* Resume scheduling */
 

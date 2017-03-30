@@ -55,6 +55,8 @@ process	shell (
 		did32	dev		/* ID of tty device from which	*/
 	)				/*   to accept commands		*/
 {
+	kprintf("Hello from shell process!!!\n");
+	kprintf("dev = %d, CONSOLE = %d\n", dev, CONSOLE);
 	char	buf[SHELL_BUFLEN];	/* Input line (large enough for	*/
 					/*   one line from a tty device	*/
 	int32	len;			/* Length of line read		*/

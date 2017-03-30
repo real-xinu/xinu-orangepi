@@ -19,7 +19,6 @@ int	fprintf(
 {
     va_list ap;
     int putc(did32, char);
-
     va_start(ap, fmt);
     _fdoprnt(fmt, ap, putc, dev);
     va_end(ap);
