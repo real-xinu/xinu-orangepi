@@ -199,6 +199,9 @@ void	irq_dispatch()
 {
 //	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+	uint32	bank;	/* bank number in int controller	*/
+	uint32	mask;	/* used to set bits in bank		*/
 	uint32	xnum;		/* Interrupt number of device	*/
 	interrupt (*handler)(); /* Pointer to handler function	*/
 
@@ -206,7 +209,7 @@ void	irq_dispatch()
 
 //	xnum = csrptr->sir_irq & 0x7F;
 	xnum = giccpuif->intack & 0x1FF;
-//	kprintf("Hello from irq_dispatch(): xnum = %d\n", xnum); while(1);
+//	kprintf("Hello from irq_dispatch(): xnum = %d\n", xnum);
 
 	/* Defer scheduling until interrupt is acknowledged */
 
@@ -219,10 +222,20 @@ void	irq_dispatch()
 		handler(xnum);
 	}
 
-//	/* Acknowledge the interrupt */
+	// TODO: do we need this? : clrpnd and clract
+	/* Get the bank number based on interrupt number */
+	bank = (xnum/32);
+	/* Get the bit inside the bank */
+	mask = (0x00000001 << (xnum%32));
+	/* clear the pending and active flags for this interrupt */
+	gicdist->clrpnd[bank] |= mask;
+	gicdist->clract[bank] |= mask;
+
+//	/* Signal end of interrupt */
 //
 //	csrptr->control |= (INTC_CONTROL_NEWIRQAGR);
 	giccpuif->eoi |= xnum;
+
 
 	/* Resume scheduling */
 

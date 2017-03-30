@@ -56,7 +56,7 @@ process	shell (
 	)				/*   to accept commands		*/
 {
 	kprintf("Hello from shell process!!!\n");
-	kprintf("dev = %d, CONSOLE = %d\n", dev, CONSOLE);
+	kprintf("dev = %d, CONSOLE = %d\n", dev, CONSOLE); while(1);
 	char	buf[SHELL_BUFLEN];	/* Input line (large enough for	*/
 					/*   one line from a tty device	*/
 	int32	len;			/* Length of line read		*/

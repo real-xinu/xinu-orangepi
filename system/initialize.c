@@ -237,9 +237,9 @@ static	void	sysinit()
 ////		init(i); TODO:
 //	}
 	// FIXME: temp
-//	kprintf("init(CONSOLE)\n");
-//	init(CONSOLE);
-//	kprintf("returned\n");
+	kprintf("init(CONSOLE)\n");
+	init(CONSOLE);
+	kprintf("returned\n");
 
 	return;
 }

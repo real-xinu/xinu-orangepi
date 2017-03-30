@@ -22,20 +22,22 @@ struct	uart_csreg
 	volatile uint32	lsr;	/* line status register			*/
 	volatile uint32	msr;	/* modem status register		*/
 	volatile uint32	spr;	/* scratch register			*/
-	volatile uint32 mdr1;
-	volatile uint32 res[12];/* unused UART registers		*/
-	volatile uint32 sysc;	/* system configuration register	*/
+	volatile uint32 res1[23];/* unused UART registers		*/
 	volatile uint32 syss;	/* system status register		*/
-	volatile uint32 wer;
-	volatile uint32 res4;
-	volatile uint32 rxfifo_lvl;
 	volatile uint32 txfifo_lvl;
-	volatile uint32 ier2;
-	volatile uint32 isr2;
-	volatile uint32 freq_sel;
-	volatile uint32 res5[2];
-	volatile uint32 mdr3;
-	volatile uint32 tx_dma_thresh;
+	volatile uint32 rxfifo_lvl;
+	volatile uint32 res2[7]; /* unused UART registers		*/
+	volatile uint32 tx_halt; /* halt tx register		*/
+//	volatile uint32 mdr1;
+//	volatile uint32 sysc;	/* system configuration register	*/
+//	volatile uint32 wer;
+//	volatile uint32 res4;
+//	volatile uint32 ier2;
+//	volatile uint32 isr2;
+//	volatile uint32 freq_sel;
+//	volatile uint32 res5[2];
+//	volatile uint32 mdr3;
+//	volatile uint32 tx_dma_thresh;
 };
 
 /* Alternative names for control and status registers */
@@ -70,12 +72,13 @@ struct	uart_csreg
 /* Interrupt identification masks */
 
 #define UART_IIR_IRQ	0x01	/* Interrupt pending bit		*/
-#define UART_IIR_IDMASK 0x0E	/* 3-bit field for interrupt ID		*/
+#define UART_IIR_IDMASK 0x0F	/* 3-bit field for interrupt ID		*/
 #define UART_IIR_MSC	0x00	/* Modem status change			*/
 #define UART_IIR_THRE	0x02	/* Transmitter holding register empty	*/
 #define UART_IIR_RDA	0x04	/* Receiver data available		*/
 #define UART_IIR_RLSI	0x06	/* Receiver line status interrupt	*/
 #define UART_IIR_RTO	0x0C	/* Receiver timed out			*/
+#define UART_IIR_BUSY	0x07	/* busy detect interrupt */
 
 /* FIFO control bits */
 
