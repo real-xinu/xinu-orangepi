@@ -30,9 +30,8 @@ void		counterinit()
  */
 void	platinit(void)
 {
-//	kprintf("In platinit()\n");
 
-//	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
+//	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/ // TODO:
 	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
 	struct 	timer_csreg* tmrptr;	/* Timer registers */
 
@@ -46,14 +45,12 @@ void	platinit(void)
 	/* Initialize the Interrupt Controller */
 
 	initintc();
-//	kprintf("platinit(): returned from initinc()\n");
 
 	/* Initialize the Performance Counters */
 
-	counterinit(); // TODO:
-//	kprintf("platinit(): returned from coutnerinit()\n");
-	/* Pad control for CONSOLE */
+	counterinit();
 
+	/* Pad control for CONSOLE */
 	// setting multiplexed pinout for uart on bbb
 	// TODO: is this necessary for orange pi?
 //	am335x_padctl(UART0_PADRX_ADDR,

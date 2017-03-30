@@ -12,7 +12,6 @@ devcall	ttyinit(
 	  struct dentry	*devptr		/* Entry in device switch table	*/
 	)
 {
-	kprintf("Hello from ttyinit()\n");
 	struct	ttycblk	*typtr;		/* Pointer to ttytab entry	*/
 	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
 
@@ -55,7 +54,7 @@ devcall	ttyinit(
 	uptr = (struct uart_csreg *)devptr->dvcsr;
 
 	/* Set baud rate */
-	uptr->lcr |= UART_LCR_DLAB; // TODO: does nothing
+	uptr->lcr |= UART_LCR_DLAB;
 	uptr->dlm = UART_DLM;
 	uptr->dll = UART_DLL;
 
@@ -71,9 +70,6 @@ devcall	ttyinit(
 
 	uptr->fcr = UART_FCR_EFIFO | UART_FCR_RRESET |
 			UART_FCR_TRESET | UART_FCR_TRIG2;
-
-	/* UART must be in 16x mode (TI AM335X specific) */
-//	uptr->mdr1 = UART_MDR1_16X; //TODO: changed for orangepi :
 
 	/* Start the device */
 

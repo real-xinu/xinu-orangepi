@@ -52,7 +52,6 @@ void	nulluser()
 	/* Initialize the system */
 
 	sysinit();
-//	kprintf("nulluser(): returned from sysinit()\n");
 
 	/* Output Xinu memory layout */
 	free_mem = 0;
@@ -94,8 +93,6 @@ void	nulluser()
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
 
-	kprintf("nulluser(): looping\n");
-
 	while (TRUE) {
 		;		/* Do nothing */
 	}
@@ -112,10 +109,9 @@ void	nulluser()
  */
 local process	startup(void)
 {
-//	uint32	ipaddr;			/* Computer's IP address	*/
-//	char	str[128];		/* String used to format output	*/
+//	uint32	ipaddr;			/* Computer's IP address	*/ // TODO:
+//	char	str[128];		/* String used to format output	*/ // TODO:
 
-	kprintf("Hello from startup process!\n");
 	/* Use DHCP to obtain an IP address and format it */
 
 	// TODO:!!
@@ -161,22 +157,14 @@ static	void	sysinit()
 	/* Platform Specific Initialization */
 
 	platinit();
-//	kprintf("sysinit(): returned from platinit()\n");
 
 	/* Initialize the interrupt vectors */
 
-	initevec();// TODO: what exactly does this do?
-		kprintf("expjmpinstr = 0x%08X\n", expjmpinstr);
-		kprintf("defexp_handler = 0x%08X\n", defexp_handler);
-		kprintf("irq_except = 0x%08X\n", irq_except);
-	for (i = 0; i < 16; i++){
-		kprintf("exp_vector[i] = 0x%08X\n", exp_vector[i]);
-	}
+	initevec();
 	
 	/* Initialize free memory list */
 	
 	meminit();
-//	kprintf("sysinit(): returned from meminit()\n");
 
 	/* Initialize system variables */
 
@@ -221,25 +209,20 @@ static	void	sysinit()
 	/* Initialize buffer pools */
 
 	bufinit();
-//	kprintf("sysinit(): returned from bufinit()\n");
+
 	/* Create a ready list for processes */
 
 	readylist = newqueue();
-//	kprintf("sysinit(): initialized readylist queue\n");
 
 	/* Initialize the real time clock */
 
-	clkinit(); // TODO:
-//	kprintf("sysinit(): returned from clkinit()\n");
+	clkinit();
 
 	// TODO:
 //	for (i = 0; i < NDEVS; i++) {
 ////		init(i); TODO:
 //	}
-	// FIXME: temp
-	kprintf("init(CONSOLE)\n");
-	init(CONSOLE);
-	kprintf("returned\n");
+	init(CONSOLE); // FIXME: temp
 
 	return;
 }

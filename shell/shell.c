@@ -55,8 +55,6 @@ process	shell (
 		did32	dev		/* ID of tty device from which	*/
 	)				/*   to accept commands		*/
 {
-//	kprintf("Hello from shell process!!!\n");
-//	kprintf("dev = %d, CONSOLE = %d\n", dev, CONSOLE);
 	char	buf[SHELL_BUFLEN];	/* Input line (large enough for	*/
 					/*   one line from a tty device	*/
 	int32	len;			/* Length of line read		*/
@@ -90,13 +88,12 @@ process	shell (
 					/*   builtin commands		*/
 
 	/* Print shell banner and startup message */
-//	kprintf("shell: entering fprintf for banner print\n");
+
 	fprintf(dev, "\n\n%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		SHELL_BAN0,SHELL_BAN1,SHELL_BAN2,SHELL_BAN3,SHELL_BAN4,
 		SHELL_BAN5,SHELL_BAN6,SHELL_BAN7,SHELL_BAN8,SHELL_BAN9);
-//	kprintf("shell: done printing banner\n");
+
 	fprintf(dev, "%s\n\n", SHELL_STRTMSG);
-//	kprintf("shell: done printing Welcome\n");
 
 	/* Continually prompt the user, read input, and execute command	*/
 

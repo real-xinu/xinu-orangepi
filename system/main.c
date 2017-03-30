@@ -4,8 +4,6 @@
 
 process	main(void)
 {
-
-	kprintf("Hello from main process !!!\n");
 	/* Run the Xinu shell */
 
 	recvclr();

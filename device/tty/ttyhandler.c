@@ -12,10 +12,7 @@ void ttyhandler(uint32 xnum) {
 	struct	uart_csreg *csrptr;	/* Address of UART's CSR	*/
 	uint32	iir = 0;		/* Interrupt identification	*/
 	uint32	lsr = 0;		/* Line status			*/
-//	uint32 	syss;			/* System status */
-//	uint32 	msr = 0;		/* Modem status */
 
-//	kprintf("Hello from ttyhandler()\n");
 	/* Get CSR address of the device (assume console for now) */
 
 	devptr = (struct dentry *) &devtab[CONSOLE];
@@ -27,10 +24,9 @@ void ttyhandler(uint32 xnum) {
 
 	/* Decode hardware interrupt request from UART device */
 
-//        /* Check interrupt identification register */
+	/* Check interrupt identification register */
 	iir = csrptr->iir & UART_IIR_IDMASK;
-	if (iir == UART_IIR_IRQ) { // no interrupt pending
-//		kprintf("iir_irq,... returning\n");
+	if (iir == UART_IIR_IRQ) { /* no interrupt pending */
 		return;
 	}
 
@@ -41,8 +37,6 @@ void ttyhandler(uint32 xnum) {
 
 	/* Decode the interrupt cause */
 
-
-//	kprintf("iir = 0x%08X\n", iir);
 	switch (iir) {
 
 	/* Receiver line status interrupt (error) */
