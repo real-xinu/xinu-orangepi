@@ -32,7 +32,7 @@ void	clkinit(void)
 	/* The following values are calculated for a	*/
 	/*   timer that generates 1ms tick rate		*/
 	tmrptr->t0intvl = 0x2EE0;		/* set interval value */
-	tmrptr->t0ctl = 0x94;			/* select single mode, 24MHz clock source, 2 pre-scale */
+	tmrptr->t0ctl = 0x14;			/* select continuous mode, 24MHz clock source, 2 pre-scale */
 	tmrptr->t0ctl |= 0x2;			/* set reload bit */
 	while(tmrptr->t0ctl & 0x2){} 	/* wait until reload bit turns to 0 */
 	tmrptr->t0ctl |= 0x1;			/* Enable Timer 0 */
