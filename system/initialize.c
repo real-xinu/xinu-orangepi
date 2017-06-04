@@ -218,11 +218,9 @@ static	void	sysinit()
 
 	clkinit();
 
-	// TODO:
-//	for (i = 0; i < NDEVS; i++) {
-////		init(i); TODO:
-//	}
-	init(CONSOLE); // FIXME: temp
+	for (i = 0; i < NDEVS; i++) {
+		init(i);
+	}
 
 	return;
 }

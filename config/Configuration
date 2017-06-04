@@ -116,17 +116,16 @@ spi:
 /*   will be present in the system					*/
 
    /* Define the console device to be a tty and specify CSR*/
-   /*CONSOLE is tty  on uart  csr 0x44E09000 -irq 72*/
    CONSOLE is tty  on uart  csr 0x01C28000 -irq 32
    
    /* Define the console device to be a tty and specify CSR*/
-   GPIO0 is gpio  on am335x_gpio  csr 0x44E07000 -irq 96
+   /*TODO:GPIO0 is gpio  on am335x_gpio  csr 0x44E07000 -irq 96*/
    /* Define the console device to be a tty and specify CSR*/
-   GPIO1 is gpio  on am335x_gpio  csr 0x4804C000 -irq 98
+   /*TODO:GPIO1 is gpio  on am335x_gpio  csr 0x4804C000 -irq 98*/
    /* Define the console device to be a tty and specify CSR*/
-   GPIO2 is gpio  on am335x_gpio  csr 0x481AC000 -irq 32
+   /*TODO:GPIO2 is gpio  on am335x_gpio  csr 0x481AC000 -irq 32*/
    /* Define the console device to be a tty and specify CSR*/
-   GPIO3 is gpio  on am335x_gpio  csr 0x481AE000 -irq 62
+   /*TODO:GPIO3 is gpio  on am335x_gpio  csr 0x481AE000 -irq 62*/
 
    /* Define a null device */
    NULLDEV is null on nothing
