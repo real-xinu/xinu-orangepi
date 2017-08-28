@@ -8,7 +8,7 @@
  */
 void	clkhandler()
 {
-//	kprintf("Hello from clkhandler()!!!!!!!\n"); while(1);
+	kprintf("clkhndlr()\n");
 
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 //	volatile struct am335x_timer1ms *csrptr =
@@ -62,7 +62,7 @@ void	clkhandler()
 
 	if((--preempt) == 0) {
 		preempt = QUANTUM;
-//		kprintf("calling resched()\n");
+		kprintf("resched()\n");
 		resched();
 //		kprintf("returned from resched()\n");
 	}

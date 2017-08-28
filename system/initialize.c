@@ -49,10 +49,12 @@ void	nulluser()
 	struct	memblk	*memptr;	/* Ptr to memory block		*/
 	uint32	free_mem;		/* Total amount of free memory	*/
 	
+	uint32  i;
+
 	/* Initialize the system */
 
 	sysinit();
-
+kprintf("After sysinit\n");
 	/* Output Xinu memory layout */
 	free_mem = 0;
 	for (memptr = memlist.mnext; memptr != NULL;
@@ -74,12 +76,20 @@ void	nulluser()
 	kprintf("           [0x%08X to 0x%08X]\n\n",
 		(uint32)&data, (uint32)&ebss - 1);
 
+kprintf("Before interrupts\n");
+
 	/* Enable interrupts */
-	enable(); // TODO: old bbb, new stuff below
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+
+/*	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	gicdist->ctrl = GIC_ENABLE;
-	giccpuif->ctrl = GIC_ENABLE;
+	gicdist->ctrl |= GIC_ENABLE;
+	giccpuif->ctrl |= GIC_ENABLE;
+	for(i=0;i<16;i++)	{
+		kprintf("0x%08x GIC int %d status\n", gicdist->status[i],i);
+		gicdist->clrpnd[i] = 0xFFFFFFFF;
+	}*/
+	//enable(); // TODO: old bbb, new stuff below
+kprintf("After interrupts\n");
 
 	/* Initialize the network stack and start processes */
 
@@ -94,7 +104,7 @@ void	nulluser()
 	/*  something to run when no other process is ready to execute)	*/
 
 	while (TRUE) {
-		;		/* Do nothing */
+		kprintf("N");;		/* Do nothing */
 	}
 
 }
@@ -151,9 +161,9 @@ static	void	sysinit()
 	struct	procent	*prptr;		/* Ptr to process table entry	*/
 	struct	sentry	*semptr;	/* Ptr to semaphore table entry	*/
 
-	kprintf(CONSOLE_RESET);
+	//kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
-
+kprintf("Reached Sysinit\n");
 	/* Platform Specific Initialization */
 
 	platinit();
@@ -165,7 +175,7 @@ static	void	sysinit()
 	/* Initialize free memory list */
 	
 	meminit();
-
+kprintf("After Meminit\n");
 	/* Initialize system variables */
 
 	/* Count the Null process as the first process in the system */
@@ -216,14 +226,14 @@ static	void	sysinit()
 
 	/* Initialize the real time clock */
 
-	clkinit();
-
+	//clkinit();
+kprintf("After clkinit\n");
 	// TODO:
 //	for (i = 0; i < NDEVS; i++) {
 ////		init(i); TODO:
 //	}
 	init(CONSOLE); // FIXME: temp
-
+kprintf("After CONSOLE\n");
 	return;
 }
 

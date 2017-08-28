@@ -7,40 +7,22 @@
  */
 
 /* Number of GPIO devices in the hardware */
-#define NGPIO	4
+#define NGPIO	7
 
+/* Gpio main register set */
 struct gpio_csreg {
-        volatile uint32 revision;
-        volatile uint32 res1[3];
-        volatile uint32 sysconfig;
-        volatile uint32 res2[3];
-        volatile uint32 eoi;
-        volatile uint32 irqstatus0raw;
-        volatile uint32 irqstatus1raw;
-        volatile uint32 irqstatus0;
-        volatile uint32 irqstatus1;
-        volatile uint32 irqset0;
-        volatile uint32 irqset1;
-        volatile uint32 irqclear0;
-        volatile uint32 irqclear1;
-        volatile uint32 irqwaken0;
-        volatile uint32 irqwaken1;
-        volatile uint32 res3[50];
-        volatile uint32 sysstatus;
-        volatile uint32 res4[6];
-        volatile uint32 control;
-        volatile uint32 oe;
-        volatile uint32 datain;
-        volatile uint32 dataout;
-        volatile uint32 level0;
-        volatile uint32 level1;
-        volatile uint32 rising;
-        volatile uint32 falling;
-        volatile uint32 deb_ena;
-        volatile uint32 deb_time;
-        volatile uint32 res5[14];
-        volatile uint32 clear_data;
-        volatile uint32 set_data;
+        volatile uint32 config[4];
+        volatile uint32 data;
+        volatile uint32 multidrv[2];
+        volatile uint32 pull[2];
+};
+
+/* Gpio interrupt register set */
+struct gpio_intreg {
+        volatile uint32 intconfig[4];
+        volatile uint32 intctl;
+        volatile uint32 intsta;
+        volatile uint32 intdeb;
 };
 
 typedef void (*gpiointhook)(uint32, uint32);
@@ -92,51 +74,67 @@ extern	struct	gpiocblk	gpiotab[];
 #define GPIO_VALUE_HIGH		0x01
 
 /* Control features */
-#define GPIO_OUTPUT_DISABLE    	0x00
-#define GPIO_OUTPUT_ENABLE    	0x01
+#define GPIO_INPUT_MODE    	0x00
+#define GPIO_OUTPUT_MODE    	0x01
 #define GPIO_REG_INT_HANDLER	0x02
-#define GPIO_INTERRUPT_CTL		0x03
-#define GPIO_DEB_SET_TIME		0x04
-#define GPIO_READ_PIN			0x05
-#define GPIO_WRITE_PIN			0x06
-
+#define GPIO_INTERRUPT_CTL	0x03
+#define GPIO_DEB_SET_TIME	0x04
+#define GPIO_READ_PIN		0x05
+#define GPIO_WRITE_PIN		0x06
+#define GPIO_SET_MODE		0x07
+#define GPIO_PULL_SELECT	0x08
 
 /* Control Flags */
-#define GPIO_INT_LINE0_EN 	0x01
-#define GPIO_INT_LINE1_EN	0x02
+#define GPIO_INT_ENABLE 	0x01
+#define GPIO_INT_DISABLE	0x02
 #define GPIO_INT_RISE_TRIG 	0x04
 #define GPIO_INT_FALL_TRIG	0x08
 #define GPIO_INT_LVL0_TRIG 	0x10
 #define GPIO_INT_LVL1_TRIG	0x20
-#define GPIO_INT_ALL_LINES 	(GPIO_INT_LINE0_EN|GPIO_INT_LINE1_EN)
-#define GPIO_INT_ALL_TRIG	(GPIO_INT_RISE_TRIG|GPIO_INT_FALL_TRIG|\
-				 GPIO_INT_LVL0_TRIG|GPIO_INT_LVL1_TRIG)
+#define GPIO_INT_DEDGE_TRIG	(GPIO_INT_RISE_TRIG|GPIO_INT_FALL_TRIG)
 
+/* Trigger values for intconf register */
+#define GPIO_INT_POS_TRIG 	0x00
+#define GPIO_INT_NEG_TRIG	0x01
+#define GPIO_INT_LOW_TRIG 	0x02
+#define GPIO_INT_HIGH_TRIG	0x03
+#define GPIO_INT_DOUBLE_TRIG	0x04
 
 /* Base values of the CSR addreses of the four GPIO devices used by	*/
 /*	init and interrupt processing; read and write functions obtain	*/
 /*	these CSR addresses from the csrptr field of the device switch	*/
 /*	table.								*/
 
-#define GPIO0_BASE      (struct gpio_csreg *)0x44E07000
-#define GPIO1_BASE      (struct gpio_csreg *)0x4804C000
-#define GPIO2_BASE      (struct gpio_csreg *)0x481AC000
-#define GPIO3_BASE      (struct gpio_csreg *)0x481AE000
+#define GPIOA_BASE      (struct gpio_csreg *)0x01C20800
+#define GPIOC_BASE      (struct gpio_csreg *)0x01C20824
+#define GPIOD_BASE      (struct gpio_csreg *)0x01C20848
+#define GPIOE_BASE      (struct gpio_csreg *)0x01C2086C
+#define GPIOF_BASE      (struct gpio_csreg *)0x01C20890
+#define GPIOG_BASE      (struct gpio_csreg *)0x01C208B4
+#define GPIOL_BASE      (struct gpio_csreg *)0x01C208D8
+
+#define GPIOA_INT_BASE  (struct gpio_csreg *)0x01C20A00
+#define GPIOG_INT_BASE  (struct gpio_csreg *)0x01C20A20
 
 /* Interrupt vector assignments */
 
-#define GPIO0_INT_A		96
-#define GPIO0_INT_B		97
-#define GPIO1_INT_A		98
-#define GPIO1_INT_B		99
-#define GPIO2_INT_A		32
-#define GPIO2_INT_B		33
-#define GPIO3_INT_A		62
-#define GPIO3_INT_B		63
+#define GPIOA_INT		43
+#define GPIOG_INT		49
 
-/* PRCM Register addresses used for debounce clock */
+/* Pin Modes */
 
-#define PRCM_FCLK_GPIO1	(uint32 *)0x44E000AC
-#define PRCM_FCLK_GPIO2	(uint32 *)0x44E000B0
-#define PRCM_FCLK_GPIO3	(uint32 *)0x44E000B4
-#define PRCM_FCLK_BIT	(0x1<<18)
+#define PIN_MODE_0			0x00
+#define PIN_MODE_1			0x01
+#define PIN_MODE_2			0x02
+#define PIN_MODE_3			0x03
+#define PIN_MODE_4			0x04
+#define PIN_MODE_5			0x05
+#define PIN_MODE_6			0x06
+#define PIN_MODE_7			0x07
+
+/* Pull Settings */
+
+#define PIN_PULL_DISABLE		0x0
+#define PIN_PULL_UP			0x1
+#define PIN_PULL_DOWN			0x2
+

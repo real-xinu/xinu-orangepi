@@ -14,17 +14,15 @@ devcall	gpiowrite(
 {
 	struct gpio_csreg *csrptr;	/* Pointer to GPIO CSRs		*/
 	uint32 val;			/* Value to be written		*/
+	uint32 status;			/* Current status of the pins	*/
 
 	csrptr = (struct gpio_csreg *)(devptr->dvcsr);
 	val = * (uint32 *)value;
-
+	status = csrptr->data;
+	
 	/* Set bits that should become one */
 
-	csrptr->set_data = pinmask & val;	
-
-	/* Clear bits that should become zero */
-
-	csrptr->clear_data = pinmask & ~val;
+	csrptr->data = ((status & ~pinmask) | (pinmask & val));	
 
 	return OK;
 }

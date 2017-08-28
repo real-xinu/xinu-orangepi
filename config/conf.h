@@ -26,40 +26,43 @@ extern	struct	dentry	devtab[]; /* one entry per device */
 /* Device name definitions */
 
 #define CONSOLE              0	/* type tty      */
-#define GPIO0                1	/* type gpio     */
-#define GPIO1                2	/* type gpio     */
-#define GPIO2                3	/* type gpio     */
-#define GPIO3                4	/* type gpio     */
-#define NULLDEV              5	/* type null     */
-#define ETHER0               6	/* type eth      */
-#define NAMESPACE            7	/* type nam      */
-#define RDISK                8	/* type rds      */
-#define RAM0                 9	/* type ram      */
-#define RFILESYS            10	/* type rfs      */
-#define RFILE0              11	/* type rfl      */
-#define RFILE1              12	/* type rfl      */
-#define RFILE2              13	/* type rfl      */
-#define RFILE3              14	/* type rfl      */
-#define RFILE4              15	/* type rfl      */
-#define RFILE5              16	/* type rfl      */
-#define RFILE6              17	/* type rfl      */
-#define RFILE7              18	/* type rfl      */
-#define RFILE8              19	/* type rfl      */
-#define RFILE9              20	/* type rfl      */
-#define LFILESYS            21	/* type lfs      */
-#define LFILE0              22	/* type lfl      */
-#define LFILE1              23	/* type lfl      */
-#define LFILE2              24	/* type lfl      */
-#define LFILE3              25	/* type lfl      */
-#define LFILE4              26	/* type lfl      */
-#define LFILE5              27	/* type lfl      */
-#define SPI0                28	/* type spi      */
-#define SPI1                29	/* type spi      */
+#define GPIOA                1	/* type gpio     */
+#define GPIOC                2	/* type gpio     */
+#define GPIOD                3	/* type gpio     */
+#define GPIOE                4	/* type gpio     */
+#define GPIOF                5	/* type gpio     */
+#define GPIOG                6	/* type gpio     */
+#define GPIOL                7	/* type gpio     */
+#define NULLDEV              8	/* type null     */
+#define ETHER0               9	/* type eth      */
+#define NAMESPACE           10	/* type nam      */
+#define RDISK               11	/* type rds      */
+#define RAM0                12	/* type ram      */
+#define RFILESYS            13	/* type rfs      */
+#define RFILE0              14	/* type rfl      */
+#define RFILE1              15	/* type rfl      */
+#define RFILE2              16	/* type rfl      */
+#define RFILE3              17	/* type rfl      */
+#define RFILE4              18	/* type rfl      */
+#define RFILE5              19	/* type rfl      */
+#define RFILE6              20	/* type rfl      */
+#define RFILE7              21	/* type rfl      */
+#define RFILE8              22	/* type rfl      */
+#define RFILE9              23	/* type rfl      */
+#define LFILESYS            24	/* type lfs      */
+#define LFILE0              25	/* type lfl      */
+#define LFILE1              26	/* type lfl      */
+#define LFILE2              27	/* type lfl      */
+#define LFILE3              28	/* type lfl      */
+#define LFILE4              29	/* type lfl      */
+#define LFILE5              30	/* type lfl      */
+#define SPI0                31	/* type spi      */
+#define SPI1                32	/* type spi      */
 
 /* Control block sizes */
 
 #define	Nnull	1
-#define	Ngpio	4
+#define	Ngpio	7
 #define	Ntty	1
 #define	Neth	1
 #define	Nrds	1
@@ -71,7 +74,7 @@ extern	struct	dentry	devtab[]; /* one entry per device */
 #define	Nnam	1
 #define	Nspi	2
 
-#define NDEVS 30
+#define NDEVS 33
 
 
 /* Configuration and Size Constants */

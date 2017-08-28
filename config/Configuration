@@ -26,7 +26,7 @@ null:
 
 /* type of a gpio device */
 gpio:
-	on am335x_gpio
+	on h3_gpio
 		-i gpioinit      -o ionull       -c ionull
 		-r gpioread      -g ionull       -p ionull
 		-w gpiowrite     -s ioerr        -n gpiocontrol
@@ -116,17 +116,23 @@ spi:
 /*   will be present in the system					*/
 
    /* Define the console device to be a tty and specify CSR*/
-   /*CONSOLE is tty  on uart  csr 0x44E09000 -irq 72*/
-   CONSOLE is tty  on uart  csr 0x01C28000 -irq 32
+   /*CONSOLE is tty  on uart  csr 0x44E09000 -irq 32*/
+   CONSOLE is tty  on uart  csr 0x01C28000 
    
-   /* Define the console device to be a tty and specify CSR*/
-   GPIO0 is gpio  on am335x_gpio  csr 0x44E07000 -irq 96
-   /* Define the console device to be a tty and specify CSR*/
-   GPIO1 is gpio  on am335x_gpio  csr 0x4804C000 -irq 98
-   /* Define the console device to be a tty and specify CSR*/
-   GPIO2 is gpio  on am335x_gpio  csr 0x481AC000 -irq 32
-   /* Define the console device to be a tty and specify CSR*/
-   GPIO3 is gpio  on am335x_gpio  csr 0x481AE000 -irq 62
+   /* Define a gpio device and specify CSR*/
+   GPIOA is gpio  on h3_gpio  csr 0x01C20800 -irq 43
+   /* Define a gpio device and specify CSR*/
+   GPIOC is gpio  on h3_gpio  csr 0x01C20824
+   /* Define a gpio device and specify CSR*/
+   GPIOD is gpio  on h3_gpio  csr 0x01C20848
+   /* Define a gpio device and specify CSR*/
+   GPIOE is gpio  on h3_gpio  csr 0x01C2086C
+   /* Define a gpio device and specify CSR*/
+   GPIOF is gpio  on h3_gpio  csr 0x01C20890
+   /* Define a gpio device and specify CSR*/
+   GPIOG is gpio  on h3_gpio  csr 0x01C208B4
+   /* Define a gpio device and specify CSR*/
+   GPIOL is gpio  on h3_gpio  csr 0x01C208D8 -irq 49
 
    /* Define a null device */
    NULLDEV is null on nothing

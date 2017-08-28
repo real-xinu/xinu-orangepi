@@ -14,7 +14,6 @@
 #include <uart.h>
 #include <tty.h>
 #include <gpio.h>
-#include <gpioselect.h>
 #include <device.h>
 #include <interrupt.h>
 #include <file.h>

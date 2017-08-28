@@ -13,77 +13,53 @@ devcall	gpioinit(
 	)
 {
 	struct gpio_csreg *csrptr;	/* Pointer ot GPIO CSRs		*/
+	struct gpio_intreg *intptr;	/* Pointer ot GPIO Interrupt regs	*/
 	struct gpiocblk	*gpioptr;	/* Pointer ot GPIO Control block*/
-	uint32 *fclkreg;		/* FCLK Register for debounce	*/
+	uint8 cri;			/* Config register index */
 
 	csrptr = (struct gpio_csreg *)(devptr->dvcsr);
 	gpioptr = &gpiotab[devptr->dvminor];
+	
+	/* Check if GPIO has interrupt capability */
+	
+	if(csrptr == GPIOA_BASE)	{
+		intptr = (struct gpio_intreg *)(GPIOA_INT);
+		
+		/* Disable all interrupts */
 
-	/* Get the FCLK Register for the corresponding GPIO module */
+		intptr->intctl = 0x0;
+		
+		/* Clear all pending interrupts */
 
-	if(csrptr == GPIO1_BASE)	{
-		fclkreg = PRCM_FCLK_GPIO1;
-	} else if(csrptr == GPIO2_BASE)	{
-		fclkreg = PRCM_FCLK_GPIO2;
-	} else if(csrptr == GPIO3_BASE)	{
-		fclkreg = PRCM_FCLK_GPIO3;
-	} else {
-		/* GPIO0 FCLK is ON by default */
-		fclkreg = NULL;
+		intptr->intsta= 0x0;
+		
+		/* Set interrupt handler in GIC */
+		//set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+	}
+	else if(csrptr == GPIOG_BASE)	{
+		intptr = (struct gpio_intreg *)(GPIOG_INT);
+		
+		/* Disable all interrupts */
+
+		intptr->intctl = 0x0;
+		
+		/* Clear all pending interrupts */
+
+		intptr->intsta= 0x0;
+
+		/* ToDo: Set interrupt handler in GIC */
+		//set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+	}
+	
+	/* Set all pins as IO disabled */
+	for( cri = 0; cri < 4; cri++ )	{
+		csrptr->config[cri] = 0x77777777;
 	}
 
-	/* Initialize register values */
-
-	csrptr->sysconfig = 0x0;
-	
-	/* Disable output for all pins */
-
-	csrptr->oe = 0xFFFFFFFF;
-
-	/* Clear all pending interrupts */
-
-	csrptr->irqstatus0 = 0xFFFFFFFF;
-	csrptr->irqstatus1 = 0xFFFFFFFF;
-
-	/* Disable all interrupts */
-
-	csrptr->irqclear0 = 0xFFFFFFFF;
-	csrptr->irqclear1 = 0xFFFFFFFF;
-	
 	/* Clear all pins */
-
-	csrptr->clear_data = 0xFFFFFFFF;
+	csrptr->data = 0x0;
 	
-	/* Clear wakeup settings */
-
-	csrptr->irqwaken0 = 0x0;
-	csrptr->irqwaken1 = 0x0;
-
-	/* Clear all interrupt trigger settings */
-
-	csrptr->rising	= 0x0;
-	csrptr->falling = 0x0;
-	csrptr->level0	= 0x0;
-	csrptr->level1	= 0x0;
-
-	/* Disable debouncing */
-
-	csrptr->deb_ena = 0x0;
-
-	/* Setup debouncing clock */
-
-	if(fclkreg != NULL)	{
-		*fclkreg |= PRCM_FCLK_BIT;
-	}
-
-	/* Interrupt A */
-
-	set_evec( devptr->dvirq, (uint32)devptr->dvintr );
-
-	/* Interrupt B is the next interrupt line */
-
-	set_evec( (devptr->dvirq)+1, (uint32)devptr->dvintr );
-
+	/* Clear the interrupt callback function */
 	gpioptr->gphookfn = NULL;
 
 	return OK;

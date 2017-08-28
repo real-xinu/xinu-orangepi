@@ -21,7 +21,7 @@ devcall	gpioread(
 	/* Access the GPIO pins, use the mask to select a subset, and	*/
 	/*	store the result in the specified buffer		*/
 
-	*((uint32 *)value) = csrptr->datain & pinmask;
+	*((uint32 *)value) = csrptr->data & pinmask;
 
 	return OK;
 }

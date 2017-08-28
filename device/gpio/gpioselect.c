@@ -5,6 +5,7 @@
  *  gpioselect  -  Configure modes for GPIO pins
  *------------------------------------------------------------------------
  */
+#if 0
 devcall gpioselect( 	
 		uint32 pinreg,		/* Pin to be affected		*/
 		uint32 pinmode,		/* Multiplexed pin function	*/ 
@@ -23,3 +24,4 @@ devcall gpioselect(
 
 	return OK;
 }
+#endif
