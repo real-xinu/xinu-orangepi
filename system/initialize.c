@@ -75,7 +75,7 @@ void	nulluser()
 		(uint32)&data, (uint32)&ebss - 1);
 
 	/* Enable interrupts */
-	enable(); // TODO: old bbb, new stuff below
+	enable();
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	gicdist->ctrl = GIC_ENABLE;
@@ -99,7 +99,6 @@ void	nulluser()
 
 }
 
-
 /*------------------------------------------------------------------------
  *
  * startup  -  Finish startup tasks that cannot be run from the Null
@@ -114,7 +113,7 @@ local process	startup(void)
 
 	/* Use DHCP to obtain an IP address and format it */
 
-	// TODO:!!
+	// TODO:
 //	ipaddr = getlocalip();
 //	if ((int32)ipaddr == SYSERR) {
 //		kprintf("Cannot obtain an IP address\n");
@@ -128,6 +127,7 @@ local process	startup(void)
 //		kprintf("Obtained IP address  %s   (0x%08x)\n", str,
 //								ipaddr);
 //	}
+
 	/* Create a process to execute function main() */
 
 	resume(create((void *)main, INITSTK, INITPRIO,
