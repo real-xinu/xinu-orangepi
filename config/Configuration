@@ -117,7 +117,7 @@ spi:
 
    /* Define the console device to be a tty and specify CSR*/
    /*CONSOLE is tty  on uart  csr 0x44E09000 -irq 32*/
-   CONSOLE is tty  on uart  csr 0x01C28000 
+   CONSOLE is tty  on uart  csr 0x01C28000 -irq 32
    
    /* Define a gpio device and specify CSR*/
    GPIOA is gpio  on h3_gpio  csr 0x01C20800 -irq 43

@@ -13,23 +13,23 @@ devcall	ethcontrol (
 	int32	arg2			/* argument 2, if needed	*/
 	)
 {
-	struct	ethcblk *ethptr;	/* Ethertab entry pointer	*/
+//	struct	ethcblk *ethptr;	/* Ethertab entry pointer	*/
 	int32	retval = OK;		/* Return value of cntl function*/
-
-	ethptr = &ethertab[devptr->dvminor];
-
-	switch (func) {
-
-		/* Get MAC address */
-
-		case ETH_CTRL_GET_MAC:
-			memcpy((byte *)arg1, ethptr->devAddress,
-					ETH_ADDR_LEN);
-			break;
-
-		default:
-			return SYSERR;
-	}
+// TODO
+//	ethptr = &ethertab[devptr->dvminor];
+//
+//	switch (func) {
+//
+//		/* Get MAC address */
+//
+//		case ETH_CTRL_GET_MAC:
+//			memcpy((byte *)arg1, ethptr->devAddress,
+//					ETH_ADDR_LEN);
+//			break;
+//
+//		default:
+//			return SYSERR;
+//	}
 
 	return retval;
 }

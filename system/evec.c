@@ -6,13 +6,11 @@
 /*#define STKTRACE*/
 /*#define REGDUMP*/
 
-extern	void	userret(void);
-
 uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
 uint32 	exp_vector[16];
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
-//reg32   gic_base = 0;
+//reg32   gic_base = 0; // TODO: mem location for read of gic base from cprc if necessary
 
 // FIXME: Temporary GIC sanity check:
 void gic_sanity(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
@@ -66,12 +64,10 @@ int32	initintc()
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	int i;	/* index into GIC arrays */
 
-	// TODO: temporary sanity check
+	/* FIXME: Temporary Sanity check below... */
 //	gic_sanity(gicdist, giccpuif);
 
 	/* Reset the interrupt controller */
-	// TODO: is there a way to actually RESET GIC?
-	// TODO: This just disables for now...?
 	giccpuif->ctrl = GIC_DISABLE;
 	gicdist->ctrl = GIC_DISABLE;
 
@@ -142,9 +138,6 @@ int32	set_evec(uint32 xnum, uint32 handler)
 void	irq_dispatch()
 {
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
-	uint32	bank;	/* bank number in int controller	*/
-	uint32	mask;	/* used to set bits in bank		*/
 	uint32	xnum;		/* Interrupt number of device	*/
 	interrupt (*handler)(); /* Pointer to handler function	*/
 
@@ -165,19 +158,9 @@ kprintf("i%d ", xnum);
 		handler(xnum);
 	}
 
-	// TODO: do we need this? : clrpnd and clract
-	/* Get the bank number based on interrupt number */
-	bank = (xnum/32);
-	/* Get the bit inside the bank */
-	mask = (0x00000001 << (xnum%32));
-	/* clear the pending and active flags for this interrupt */
-	gicdist->clrpnd[bank] |= mask;
-	gicdist->clract[bank] |= mask;
-
 	/* Signal end of interrupt */
 
 	giccpuif->eoi |= xnum;
-
 
 	/* Resume scheduling */
 

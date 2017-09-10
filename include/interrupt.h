@@ -1,50 +1,5 @@
 /* interrupt.h */
 
-extern	uint16	girmask;	/* mask of interrupts being serviced	*/
-				/* a bit of 1 corresponds to an		*/
-				/* interrupt that is allowed.		*/
-
-struct intc_bank {
-	uint32	itr;
-	uint32	mir;
-	uint32	mir_clear;
-	uint32	mir_set;
-	uint32	isr_set;
-	uint32	isr_clear;
-	uint32	pending_irq;
-	uint32	pending_fiq;
-};
-
-struct intc_csreg {
-	uint32	revision;
-	uint32	res1[3];
-	uint32	sysconfig;
-	uint32	sysstatus;
-	uint32	res2[10];
-	uint32	sir_irq;
-	uint32	sir_fiq;
-	uint32	control;
-	uint32	protection;
-	uint32	idle;
-	uint32	res3[3];
-	uint32	irq_priority;
-	uint32	fiq_priority;
-	uint32	threshold;
-	uint32	res4[5];
-	struct	intc_bank banks[4];
-	uint32	ilr[128];
-};
-
-#define INTC_SYSCONFIG_SOFTRESET	0x00000002
-#define INTC_SYSSTATUS_RESETDONE	0x00000001
-
-#define INTC_SIR_IRQ_MASK	0x0000007F
-
-#define INTC_CONTROL_NEWIRQAGR	0x00000001
-
-
-/* TODO: Orange Pi stuff below this point */
-
 struct gic_cpuifreg {	/* GIC CPU Interface Registers */
 	reg32 ctrl;			/* CPU Interface Control Register */
 	reg32 primask;		/* Interrupt Priority Mask Register */
@@ -99,7 +54,7 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 clrpndsgi[4];	/* SGI Clear-Pending Registers */
 	reg32 setpndsgi[4];	/* SGI Set-Pending Registers */
 	reg32 res14[40];
-	reg32 pid4;			/* Peripheral ID 4 Register */ // TODO: HERE
+	reg32 pid4;			/* Peripheral ID 4 Register */
 	reg32 pid5;			/* Peripheral ID 5 Register */
 	reg32 pid6;			/* Peripheral ID 6 Register */
 	reg32 pid7;			/* Peripheral ID 7 Register */
@@ -110,7 +65,7 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 cid[4];		/* Component ID Registers */
 };
 
-//extern reg32 gic_base;
+//extern reg32 gic_base; // TODO: do we want this in case we want to read from cprcsr?
 extern uint32 exp_vector[];
 
 #define GIC_BASE 0x01C80000	/* Generic Interrupt Controller Base Address */

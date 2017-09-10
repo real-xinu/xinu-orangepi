@@ -26,7 +26,7 @@ struct	memblk	memlist;	/* List of free memory blocks		*/
 int	prcount;		/* Total number of live processes	*/
 pid32	currpid;		/* ID of currently executing process	*/
 
-/* Control sequence to reset the console colors and cusor positiion	*/
+/* Control sequence to reset the console colors and cursor position	*/
 
 #define	CONSOLE_RESET	" \033[0m\033[2J\033[;H"
 
@@ -226,14 +226,12 @@ kprintf("After Meminit\n");
 
 	/* Initialize the real time clock */
 
-	//clkinit();
-kprintf("After clkinit\n");
-	// TODO:
-//	for (i = 0; i < NDEVS; i++) {
-////		init(i); TODO:
-//	}
-	init(CONSOLE); // FIXME: temp
-kprintf("After CONSOLE\n");
+	clkinit();
+
+	for (i = 0; i < NDEVS; i++) {
+		init(i);
+	}
+
 	return;
 }
 
