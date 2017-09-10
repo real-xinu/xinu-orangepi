@@ -17,19 +17,14 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 
 	if (Defer.ndefers > 0) {
 		Defer.attempt = TRUE;
-//		kprintf("resched(): ndefers>0, returning\n");
 		return;
 	}
 
 	/* Point to process table entry for the current (old) process */
-//	kprintf("currpid = %d\n", currpid);
 	ptold = &proctab[currpid];
-//	kprintf("current priority: %d\n", ptold->prprio);
 
 	if (ptold->prstate == PR_CURR) {  /* Process remains eligible */
 		if (ptold->prprio > firstkey(readylist)) {
-//			kprintf("resched(): still highest priority, %d > %d, returning\n",
-//					ptold->prprio, firstkey(readylist));
 			return;
 		}
 
@@ -37,20 +32,15 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 
 		ptold->prstate = PR_READY;
 		insert(currpid, readylist, ptold->prprio);
-//		kprintf("resched(): inserted current proc to readylist\n");
 	}
 
 	/* Force context switch to highest priority ready process */
 
-//	kprintf("resched(): before: currpid = %d\n", currpid);
 	currpid = dequeue(readylist);
-//	kprintf("resched(): after: currpid = %d\n", currpid);
 	ptnew = &proctab[currpid];
 	ptnew->prstate = PR_CURR;
 	preempt = QUANTUM;		/* Reset time slice for process	*/
-//	kprintf("calling ctxsw()\n");
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
-//	kprintf("returned from ctxsw(), currpid=%d\n", currpid);
 
 	/* Old process returns here when resumed */
 

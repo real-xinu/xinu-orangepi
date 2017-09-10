@@ -65,7 +65,6 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 cid[4];		/* Component ID Registers */
 };
 
-//extern reg32 gic_base; // TODO: do we want this in case we want to read from cprcsr?
 extern uint32 exp_vector[];
 
 #define GIC_BASE 0x01C80000	/* Generic Interrupt Controller Base Address */

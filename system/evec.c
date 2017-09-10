@@ -3,19 +3,17 @@
 #include <xinu.h>
 #include <stdio.h>
 
-/*#define STKTRACE*/
-/*#define REGDUMP*/
-
 uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
 uint32 	exp_vector[16];
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
-//reg32   gic_base = 0; // TODO: mem location for read of gic base from cprc if necessary
 
-// FIXME: Temporary GIC sanity check:
-void gic_sanity(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
-//	asm volatile ("MRC p15, 4, %0, c15, c0, 0\t\n" : "=r" (gic_base));
-//	kprintf("gic_base = 0x%08X (0x%08X ?)\n", gic_base, GIC_BASE);
+/*------------------------------------------------------------------------
+ * gic_dump - Dump the contents of the GIC control and status registers
+ * 			  for debugging.
+ *------------------------------------------------------------------------
+ */
+void gic_dump(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
 	kprintf("expjmpinstr = 0x%08X\n", expjmpinstr);
 	kprintf("defexp_handler = 0x%08X\n", defexp_handler);
 	kprintf("irq_except = 0x%08X\n", irq_except);
@@ -64,9 +62,6 @@ int32	initintc()
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	int i;	/* index into GIC arrays */
 
-	/* FIXME: Temporary Sanity check below... */
-//	gic_sanity(gicdist, giccpuif);
-
 	/* Reset the interrupt controller */
 	giccpuif->ctrl = GIC_DISABLE;
 	gicdist->ctrl = GIC_DISABLE;
@@ -84,7 +79,7 @@ int32	initintc()
 	/* FIXME: for now, set all interrupt priorities to the same max value */
 	for(i = 0; i < 128; i++){ gicdist->pri[i] = 0; }
 	/* FIXME: for now, forward all interrupts to cpu interface 0*/
-	for(i = 0; i < 128; i++){ gicdist->pctgt[i] = 0x01010101; }
+	for(i = 0; i < 128; i++){ gicdist->pctgt[i] = 0xFFFFFFFF/*TODO:0x01010101*/; }
 	/* make all interrupts level-sensitive */
 	for(i = 0; i < 32; i++){ gicdist->config[i] = 0; }
 
@@ -166,65 +161,3 @@ kprintf("i%d ", xnum);
 
 	resched_cntl(DEFER_STOP);
 }
-
-#if 0
-static long *fp;
-/*------------------------------------------------------------------------
- * trap -- print some debugging info when a trap occurred
- * Note: Need some more work.
- *------------------------------------------------------------------------
-*/
-#define REGDUMP
-
-void trap(int inum)
-{
-	long		*sp;
-	intmask 	mask;
-
-	mask = disable();
-	kprintf("TRAP\n");
-	//asm("movl	%ebp,fp");
-	sp = fp + 15;	/* eflags/CS/eip/ebp/regs/trap#/Xtrap/ebp */
-	kprintf("Xinu trap!\n");
-	if (inum < 16)
-		kprintf("exception %d (%s) currpid %d (%s)\n", inum,
-			inames[inum], currpid, proctab[currpid].prname);
-	else
-		kprintf("exception %d currpid %d (%s)\n", inum, currpid,
-			proctab[currpid].prname);
-#ifdef REGDUMP
-	kprintf("eflags %X ", *sp--);
-	sp--;	/* skip OLD CS */
-	kprintf("eip %X ", *sp);
-	sp--;
-	if (inum == 8 || (inum >= 10 && inum <= 14)) {
-		kprintf("error code %08x (%u)\n", *sp, *sp);
-		sp--;
-	}
-	sp--;	/* skip FP for Xint call */
-	kprintf("register dump:\n");
-	kprintf("eax %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("ecx %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("edx %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("ebx %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("esp %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("ebp %08X (%u)\n", *sp, *sp);
-	fp = sp;
-	sp--;
-	kprintf("esi %08X (%u)\n", *sp, *sp);
-	sp--;
-	kprintf("edi %08X (%u)\n", *sp, *sp);
-	sp--;
-#endif // REGDUMP
-#ifdef STKTRACE
-	stacktrace(currpid);
-#endif // STKTRACE
-
-	panic("Trap processing complete...\n");
-}
-#endif

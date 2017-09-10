@@ -30,8 +30,6 @@ void		counterinit()
  */
 void	platinit(void)
 {
-
-//	struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/ // TODO:
 	struct	watchdog_csreg *wdtptr;	/* Watchdog registers		*/
 	struct 	timer_csreg* tmrptr;	/* Timer registers */
 
@@ -49,17 +47,4 @@ void	platinit(void)
 	/* Initialize the Performance Counters */
 
 	counterinit();
-
-	/* Pad control for CONSOLE */
-	// setting multiplexed pinout for uart on bbb
-	// TODO: is this necessary for orange pi?
-//	am335x_padctl(UART0_PADRX_ADDR,
-//			AM335X_PADCTL_RXTX | UART0_PADRX_MODE);
-//	am335x_padctl(UART0_PADTX_ADDR,
-//			AM335X_PADCTL_TX | UART0_PADTX_MODE);
-
-	/* Reset the UART device TODO: not necessary right? because of above? */
-//	uptr = (struct uart_csreg *)devtab[CONSOLE].dvcsr;
-//	uptr->sysc |= UART_SYSC_SOFTRESET;
-//	while((uptr->syss & UART_SYSS_RESETDONE) == 0);
 }
