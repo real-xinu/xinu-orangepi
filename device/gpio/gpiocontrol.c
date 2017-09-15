@@ -21,10 +21,10 @@ devcall	gpiocontrol(
 	gpioptr = &gpiotab[devptr->dvminor];
 
 	if(csrptr == GPIOA_BASE)	{
-		intptr = (struct gpio_intreg *)(GPIOA_INT);
+		intptr = (struct gpio_intreg *)(GPIOA_INT_BASE);
 	}
 	if(csrptr == GPIOG_BASE)	{
-		intptr = (struct gpio_intreg *)(GPIOG_INT);
+		intptr = (struct gpio_intreg *)(GPIOG_INT_BASE);
 	}
 
 	/* Process the request */
@@ -122,6 +122,9 @@ devcall	gpiocontrol(
 			/* Write to corresponding bit */
 			
 			intptr->intconfig[arg2/8] |= trigger<<(4*(arg2%8));
+
+			kprintf("int ctl GPIO A status 0x%x \n", (intptr->intctl));
+			kprintf("int config GPIO A status 0x%x \n", intptr->intconfig[arg2/8]);
 		}
 
 		return (devcall)OK;

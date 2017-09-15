@@ -14,7 +14,7 @@ void gpiohandler(
 	gpiointhook gphookfn;		/* The interrupt function	*/
 
 	/* Clear all interrupts */
-
+	kprintf("GPIO handler \n");
 	if(xnum == GPIOA_INT)	{
 		intptr = (struct gpio_intreg *)(GPIOA_INT_BASE);
 		gphookfn = gpiotab[0].gphookfn;

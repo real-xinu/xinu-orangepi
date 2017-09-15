@@ -129,9 +129,9 @@ spi:
    /* Define a gpio device and specify CSR*/
    GPIOF is gpio  on h3_gpio  csr 0x01C20890
    /* Define a gpio device and specify CSR*/
-   GPIOG is gpio  on h3_gpio  csr 0x01C208B4
+   GPIOG is gpio  on h3_gpio  csr 0x01C208B4 -irq 49
    /* Define a gpio device and specify CSR*/
-   GPIOL is gpio  on h3_gpio  csr 0x01C208D8 -irq 49
+   GPIOL is gpio  on h3_gpio  csr 0x01C208D8 
 
    /* Define a null device */
    NULLDEV is null on nothing

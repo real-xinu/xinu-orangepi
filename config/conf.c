@@ -24,7 +24,7 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)ttyinit, (void *)ionull, (void *)ionull,
 	  (void *)ttyread, (void *)ttywrite, (void *)ioerr,
 	  (void *)ttygetc, (void *)ttyputc, (void *)ttycontrol,
-	  (void *)0x1c28000, (void *)ttyhandler, 0 },
+	  (void *)0x1c28000, (void *)ttyhandler, 32 },
 
 /* GPIOA is gpio */
 	{ 1, 0, "GPIOA",
@@ -66,14 +66,14 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)gpioinit, (void *)ionull, (void *)ionull,
 	  (void *)gpioread, (void *)gpiowrite, (void *)ioerr,
 	  (void *)ionull, (void *)ionull, (void *)gpiocontrol,
-	  (void *)0x1c208b4, (void *)gpiohandler, 0 },
+	  (void *)0x1c208b4, (void *)gpiohandler, 49 },
 
 /* GPIOL is gpio */
 	{ 7, 6, "GPIOL",
 	  (void *)gpioinit, (void *)ionull, (void *)ionull,
 	  (void *)gpioread, (void *)gpiowrite, (void *)ioerr,
 	  (void *)ionull, (void *)ionull, (void *)gpiocontrol,
-	  (void *)0x1c208d8, (void *)gpiohandler, 49 },
+	  (void *)0x1c208d8, (void *)gpiohandler, 0 },
 
 /* NULLDEV is null */
 	{ 8, 0, "NULLDEV",

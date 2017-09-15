@@ -219,6 +219,7 @@ static	void	sysinit()
 	clkinit();
 
 	for (i = 0; i < NDEVS; i++) {
+		kprintf("init loop: device %d\n", i);
 		init(i);
 	}
 

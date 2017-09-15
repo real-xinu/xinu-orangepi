@@ -8,8 +8,6 @@
  */
 void	clkhandler()
 {
-	kprintf("clkhndlr()\n");
-
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 
 	struct timer_csreg* csrptr = (struct timer_csreg*)TIMER_BASE;

@@ -121,7 +121,7 @@ int32	set_evec(uint32 xnum, uint32 handler)
 
 	/* Reset the bit to enable that interrupt number */
 
-	//gicdist->seten[bank] |= mask;
+	gicdist->seten[bank] |= mask;
 
 	return OK;
 }
@@ -140,7 +140,9 @@ void	irq_dispatch()
 
 	xnum = giccpuif->intack & 0x1FF;
 
-kprintf("i%d ", xnum);
+	if(xnum != 32 && xnum != 50){
+		kprintf("xnum %d \n", xnum);
+	}
 
 	/* Defer scheduling until interrupt is acknowledged */
 
