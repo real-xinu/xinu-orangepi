@@ -137,27 +137,27 @@ spi:
    NAMESPACE is nam on top
 
    /* Define a remote disk system device */
-   RDISK is rds on udp
+   /* TODO: RDISK is rds on udp */
    
    /* Define a ram disk device */
    RAM0 is ram on mem
  
    /* Define the remote file system device */
 
-   RFILESYS is rfs on udp
+   /* TODO: RFILESYS is rfs on udp */
 
    /* Define remote file pseudo-devices */
 
-   RFILE0 is rfl on rfs
-   RFILE1 is rfl on rfs
-   RFILE2 is rfl on rfs
-   RFILE3 is rfl on rfs
-   RFILE4 is rfl on rfs
-   RFILE5 is rfl on rfs
-   RFILE6 is rfl on rfs
-   RFILE7 is rfl on rfs
-   RFILE8 is rfl on rfs
-   RFILE9 is rfl on rfs
+   /* TODO: RFILE0 is rfl on rfs */
+   /* TODO: RFILE1 is rfl on rfs */
+   /* TODO: RFILE2 is rfl on rfs */
+   /* TODO: RFILE3 is rfl on rfs */
+   /* TODO: RFILE4 is rfl on rfs */
+   /* TODO: RFILE5 is rfl on rfs */
+   /* TODO: RFILE6 is rfl on rfs */
+   /* TODO: RFILE7 is rfl on rfs */
+   /* TODO: RFILE8 is rfl on rfs */
+   /* TODO: RFILE9 is rfl on rfs */
   
    /* Define the local file system master device (one per system) */
 
@@ -174,8 +174,8 @@ spi:
 
    /* SPI devices */
 
-   SPI0 is spi on top csr 0x48030000
-   SPI1 is spi on top csr 0x481A0000
+   /* TODO: SPI0 is spi on top csr 0x48030000 */
+   /* TODO: SPI1 is spi on top csr 0x481A0000 */
 
 %%
 

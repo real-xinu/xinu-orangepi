@@ -29,44 +29,26 @@ extern	struct	dentry	devtab[]; /* one entry per device */
 #define NULLDEV              1	/* type null     */
 #define ETHER0               2	/* type eth      */
 #define NAMESPACE            3	/* type nam      */
-#define RDISK                4	/* type rds      */
-#define RAM0                 5	/* type ram      */
-#define RFILESYS             6	/* type rfs      */
-#define RFILE0               7	/* type rfl      */
-#define RFILE1               8	/* type rfl      */
-#define RFILE2               9	/* type rfl      */
-#define RFILE3              10	/* type rfl      */
-#define RFILE4              11	/* type rfl      */
-#define RFILE5              12	/* type rfl      */
-#define RFILE6              13	/* type rfl      */
-#define RFILE7              14	/* type rfl      */
-#define RFILE8              15	/* type rfl      */
-#define RFILE9              16	/* type rfl      */
-#define LFILESYS            17	/* type lfs      */
-#define LFILE0              18	/* type lfl      */
-#define LFILE1              19	/* type lfl      */
-#define LFILE2              20	/* type lfl      */
-#define LFILE3              21	/* type lfl      */
-#define LFILE4              22	/* type lfl      */
-#define LFILE5              23	/* type lfl      */
-#define SPI0                24	/* type spi      */
-#define SPI1                25	/* type spi      */
+#define RAM0                 4	/* type ram      */
+#define LFILESYS             5	/* type lfs      */
+#define LFILE0               6	/* type lfl      */
+#define LFILE1               7	/* type lfl      */
+#define LFILE2               8	/* type lfl      */
+#define LFILE3               9	/* type lfl      */
+#define LFILE4              10	/* type lfl      */
+#define LFILE5              11	/* type lfl      */
 
 /* Control block sizes */
 
 #define	Nnull	1
 #define	Ntty	1
 #define	Neth	1
-#define	Nrds	1
 #define	Nram	1
-#define	Nrfs	1
-#define	Nrfl	10
 #define	Nlfs	1
 #define	Nlfl	6
 #define	Nnam	1
-#define	Nspi	2
 
-#define NDEVS 26
+#define NDEVS 12
 
 
 /* Configuration and Size Constants */
