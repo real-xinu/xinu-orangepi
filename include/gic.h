@@ -74,5 +74,3 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 pid3;			/* Peripheral ID 3 Register */
 	reg32 cid[4];		/* Component ID Registers */
 };
-
-extern uint32 irq_vector[];
