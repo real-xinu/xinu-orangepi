@@ -45,6 +45,17 @@ int32	gicinit()
 }
 
 /*------------------------------------------------------------------------
+ * gic_enable - Enable interrupts from the GIC
+ *------------------------------------------------------------------------
+ */
+void gic_enable(void){
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
+	gicdist->ctrl = GIC_ENABLE;
+	giccpuif->ctrl = GIC_ENABLE;
+}
+
+/*------------------------------------------------------------------------
  * set_irq_handler - set irq vector to point to an interrupt handler
  *------------------------------------------------------------------------
  */
