@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
-uint32 	exp_vector[16];
+uint32 	exp_vector[ARMV7A_EV_SIZE];
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
 
