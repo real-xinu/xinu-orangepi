@@ -3,6 +3,7 @@
 #include <xinu.h>
 
 extern uint32 exp_vector[];
+extern uint32 irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
 
 /*------------------------------------------------------------------------
  * gicinit - Initialize the Interrupt Controller
