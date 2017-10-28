@@ -41,6 +41,42 @@ void	irq_dispatch()
 }
 
 /*------------------------------------------------------------------------
+ * initevec - Initialize the exception vector
+ *------------------------------------------------------------------------
+ */
+void initevec(void){
+	int i;	/* index into exception vector */
+	uint32* jmp = (uint32*)expjmpinstr;	/* pointer to exception jump */
+
+	/* Set exception vector base address */
+	asm volatile (
+		"mrc	p15, 0, r0, c1, c0, 0\n"	/* Read the c1-control register	*/
+		"bic	r0, r0, #0x00002000\n"		/* V bit = 0, normal exp. base	*/
+		"mcr	p15, 0, r0, c1, c0, 0 \n"	/* Write the c1-control register	*/
+		"ldr	r0, =exp_vector\n"	  		/* Exception base address		*/
+		"mcr	p15, 0, r0, c12, c0, 0\n"	/* Store excp. base addr. in c12	*/
+		"isb\n"
+		:		/* Output	*/
+		:		/* Input	*/
+		: "r0"	/* Clobber	*/
+	);
+
+	/* lower entries of exception vector jump to higher entries */
+
+	for(i = 0; i < 8; i++){
+		exp_vector[i] = (uint32)(*jmp);
+	}
+
+	/* higher entries of exception vector point to exception handlers */
+
+	for(i = 8; i < ARMV7A_EV_SIZE; i++){
+		exp_vector[i] = (uint32)defexp_handler;
+	}
+
+	exp_vector[14] = (uint32)irq_except;
+}
+
+/*------------------------------------------------------------------------
  * defexp_handler - Default Exception handler
  *------------------------------------------------------------------------
  */

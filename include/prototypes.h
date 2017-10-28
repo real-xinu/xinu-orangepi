@@ -71,6 +71,7 @@ extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
 extern	void	defexp_handler(void);
+extern	void	initevec(void);
 
 /* in file exception.c */
 extern  void exception(int32, int32*);
@@ -167,7 +168,6 @@ extern	intmask	disable(void);
 extern	void	enable(void);
 extern	void	expjmpinstr(void);
 extern 	void	irq_except(void);
-extern	int32	initevec(void);
 
 /* in file ioerr.c */
 extern	devcall	ioerr(void);

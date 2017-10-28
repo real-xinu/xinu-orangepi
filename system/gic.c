@@ -19,6 +19,9 @@ int32	gicinit()
 	giccpuif->ctrl = GIC_DISABLE;
 	gicdist->ctrl = GIC_DISABLE;
 
+	/* Clear irq_vector */
+	for(i = 0; i < GIC_NIRQ; i++){ irq_vector[i] = (uint32)NULL; };
+
 	/* Initialize Distributor */
 
 	/* set all interrupts to group 0 */
