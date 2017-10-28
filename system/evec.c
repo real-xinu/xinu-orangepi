@@ -5,8 +5,6 @@
 
 uint32	irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
 uint32 	exp_vector[ARMV7A_EV_SIZE];
-char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
-char	expmsg2[] = "**** EXCEPTION ****";
 
 /*-------------------------------------------------------------------------
  * irq_dispatch - call the handler for specific interrupt
@@ -40,4 +38,18 @@ void	irq_dispatch()
 	/* Resume scheduling */
 
 	resched_cntl(DEFER_STOP);
+}
+
+/*------------------------------------------------------------------------
+ * defexp_handler - Default Exception handler
+ *------------------------------------------------------------------------
+ */
+void defexp_handler(void){
+	uint32 lr;	/* link register */
+
+	/* get link register */
+	asm volatile ( "mov %0, lr\n" : "=r"(lr));
+
+	kprintf("Unhandled exception. Link Register: 0x%x", lr);
+	panic("**** EXCEPTION ****");
 }

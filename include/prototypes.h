@@ -70,7 +70,7 @@ extern	int32	ethread(struct dentry *, void *, uint32);
 extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
-extern	void	trap(int32);
+extern	void	defexp_handler(void);
 
 /* in file exception.c */
 extern  void exception(int32, int32*);
@@ -166,7 +166,6 @@ extern	status	insertd(pid32, qid16, int32);
 extern	intmask	disable(void);
 extern	void	enable(void);
 extern	void	expjmpinstr(void);
-extern	void	defexp_handler(void);
 extern 	void	irq_except(void);
 extern	int32	initevec(void);
 

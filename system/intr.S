@@ -71,17 +71,6 @@ irq_except:
 				/*   stored on the stack		*/
 
 /*------------------------------------------------------------------------
- * defexp_handler - Default Exception handler
- *------------------------------------------------------------------------
- */
-defexp_handler:
-	ldr	r0, =expmsg1
-	mov	r1, lr
-	bl	kprintf
-	ldr	r0, =expmsg2
-	bl	panic
-
-/*------------------------------------------------------------------------
  * initevec - Initialize the exception vector
  *------------------------------------------------------------------------
  */
