@@ -78,11 +78,11 @@ devcall	gpioinit(
 
 	/* Interrupt A */
 
-	set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+	set_irq_handler( devptr->dvirq, (uint32)devptr->dvintr );
 
 	/* Interrupt B is the next interrupt line */
 
-	set_evec( (devptr->dvirq)+1, (uint32)devptr->dvintr );
+	set_irq_handler( (devptr->dvirq)+1, (uint32)devptr->dvintr );
 
 	gpioptr->gphookfn = NULL;
 

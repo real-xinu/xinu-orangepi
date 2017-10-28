@@ -1,9 +1,9 @@
-/* evec.c -- initintc, set_evec, irq_dispatch */
+/* evec.c -- gic_init, set_evec, irq_dispatch */
 
 #include <xinu.h>
 #include <stdio.h>
 
-uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
+uint32	irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
 uint32 	exp_vector[ARMV7A_EV_SIZE];
 char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
 char	expmsg2[] = "**** EXCEPTION ****";
@@ -53,10 +53,10 @@ void gic_dump(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
 }
 
 /*------------------------------------------------------------------------
- * initintc - Initialize the Interrupt Controller
+ * gicinit - Initialize the Interrupt Controller
  *------------------------------------------------------------------------
  */
-int32	initintc()
+int32	gicinit()
 {
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
@@ -92,10 +92,10 @@ int32	initintc()
 }
 
 /*------------------------------------------------------------------------
- * set_evec - set exception vector to point to an exception handler
+ * set_irq_handler - set irq vector to point to an interrupt handler
  *------------------------------------------------------------------------
  */
-int32	set_evec(uint32 xnum, uint32 handler)
+int32	set_irq_handler(uint32 xnum, uint32 handler)
 {
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	uint32	bank;	/* bank number in int controller	*/
@@ -109,7 +109,7 @@ int32	set_evec(uint32 xnum, uint32 handler)
 
 	/* Install the handler */
 
-	intc_vector[xnum] = handler;
+	irq_vector[xnum] = handler;
 
 	/* Get the bank number based on interrupt number */
 
@@ -146,8 +146,8 @@ void	irq_dispatch()
 
 	/* If a handler is set for the interrupt, call it */
 
-	if(intc_vector[xnum]) {
-		handler = ( interrupt(*)() )intc_vector[xnum];
+	if(irq_vector[xnum]) {
+		handler = ( interrupt(*)() )irq_vector[xnum];
 		handler(xnum);
 	}
 

@@ -70,8 +70,8 @@ extern	int32	ethread(struct dentry *, void *, uint32);
 extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
-extern	int32	initintc(void);
-extern	int32	set_evec(uint32, uint32);
+extern	int32	gicinit(void);
+extern	int32	set_irq_handler(uint32, uint32);
 extern	void	trap(int32);
 
 /* in file exception.c */
