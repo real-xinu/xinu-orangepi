@@ -16,7 +16,7 @@
 #include <gpio.h>
 #include <gpioselect.h>
 #include <device.h>
-#include <interrupt.h>
+#include <gic.h>
 #include <file.h>
 #include <rfilesys.h>
 #include <rdisksys.h>
