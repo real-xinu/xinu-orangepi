@@ -6,6 +6,12 @@
 process	main(void)
 {
 	run_all_tests();
+//	int i;
+//	uint32* ptable = (uint32*)0x7DFF0000;
+//	for(i = 0; i < 4096; i++){
+//		kprintf("ptable[%d] = 0x%X\n", i, ptable[i]);
+//	}
+//	kprintf("ptable[%d] = 0x%X\n", i, ptable[i]);
 
 	/* Run the Xinu shell */
 

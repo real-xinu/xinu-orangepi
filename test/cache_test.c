@@ -25,6 +25,10 @@ result cache_test(void){
 	EXPECT_EQ("sctlr & ARMV7A_SCTLR_M", sctlr & ARMV7A_SCTLR_M, ARMV7A_SCTLR_M, HEX);
 //	print_info("Expecting Branch Prediction enabled.\n");
 //	EXPECT_EQ("sctlr & ARMV7A_SCTLR_Z", sctlr & ARMV7A_SCTLR_Z, ARMV7A_SCTLR_Z, HEX);
+	print_info("Expecting Access Flag disabled.\n");
+	EXPECT_EQ("sctlr & ARMV7A_SCTLR_AFE", sctlr & ARMV7A_SCTLR_AFE, 0, HEX);
+	print_info("Expecting TEX Remap Flag disabled.\n");
+	EXPECT_EQ("sctlr & ARMV7A_SCTLR_TRE", sctlr & ARMV7A_SCTLR_TRE, 0, HEX);
 
 	/* read the auxiliary control register */
 	uint32 actlr;
@@ -51,9 +55,9 @@ result cache_test(void){
 	print_info("Processor mode is 0x%X\n", pmode & 0x1F);
 
 	/* check reg 13 PID */
-	uint32 fcsepid;
-	asm volatile ("mrc p15, 0, %0, c13, c0, 1\t\n": "=r"(fcsepid) );
-	print_info("reg 13 pid is is 0x%X\n", fcsepid);
+	uint32 dacr;
+	asm volatile ("mrc p15, 0, %0, c13, c0, 1\t\n": "=r"(dacr) );
+	print_info("reg 13 dacr is is 0x%X\n", dacr);
 
 	/* check SCU base */
 	uint32* scuptr;
