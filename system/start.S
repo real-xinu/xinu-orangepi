@@ -49,7 +49,7 @@ bexit:	mov	pc, lr			/* Return to caller		*/
 
 
 	/* Temporary function to print a 'C' on the screen for debugging */
-
+.globl bputc
 bputc:
 	ldr r0, =UART0LSR		/* point to uart line status reg */
 	ldr r1, [r0]			/* get value of line status reg */

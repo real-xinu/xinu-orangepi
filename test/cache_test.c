@@ -12,6 +12,7 @@ result cache_test(void){
 	/* read the system control register */
 	uint32 sctlr;
 	asm volatile ("mrc p15, 0, %0, c1, c0, 0\t\n": "=r"(sctlr) );
+	print_info("sctlr = 0x%X\n", sctlr);
 	/* expect that address translation is enabled */
 	print_info("Expecting normal exception base register.\n");
 	EXPECT_EQ("sctlr & ARMV7A_SCTLR_V", sctlr & ARMV7A_SCTLR_V, 0x0, HEX);
@@ -33,6 +34,7 @@ result cache_test(void){
 	/* read the auxiliary control register */
 	uint32 actlr;
 	asm volatile ("mrc p15, 0, %0, c1, c0, 1\t\n": "=r"(actlr) );
+	print_info("actlr = 0x%X\n", actlr);
 	/* expect that actlr bit is on */
 	print_info("Checking that smp bit is set for core 0.\n");
 	EXPECT_EQ("actlr & 0x40", actlr & 0x40, 0x40, HEX);

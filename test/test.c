@@ -9,8 +9,8 @@ extern	void	_doprnt(char *, va_list, int (*)(int), int);
 extern int strcmp(char*, char*);
 
 struct test tests[] = {
-		//{"startcores_test", startcores_test},
 		{"cache_test", cache_test},
+		{"startcores_test", startcores_test},
 //		{"spinlock_test", spinlock_test},
 		//{"armmutex_test", armmutex_test},
 //		{"armmutexERG_test", armmutexERG_test},
