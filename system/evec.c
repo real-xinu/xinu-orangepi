@@ -73,7 +73,7 @@ void initevec(void){
 		exp_vector[i] = (uint32)defexp_handler;
 	}
 
-	exp_vector[14] = (uint32)irq_except;
+	exp_vector[ARMV7A_IRQH_IND] = (uint32)irq_except;
 }
 
 /*------------------------------------------------------------------------
