@@ -39,6 +39,12 @@ extern	syscall	close(did32);
 /* in file control.c */
 extern	syscall	control(did32, int32, int32, int32);
 
+/* in file core.c */
+extern	cid32	getcid(void);
+extern	syscall	cpu_enable(cid32);
+extern	void	cpu_set_entry(void*);
+extern	void	cpu_dump(void);
+
 /* in file create.c */
 extern	pid32	create(void *, uint32, pri16, char *, uint32, ...);
 
