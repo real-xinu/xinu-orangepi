@@ -20,7 +20,7 @@ start:
 	/* Enable the Instruction Cache	*/
 
 	mrc	p15, 0, r0, c1, c0, 0
-	orr	r0, r0, #ARMV7A_C1CTL_I
+	orr	r0, r0, #ARMV7A_SCTLR_I
 	mcr	p15, 0, r0, c1, c0, 0
 
 	/* Use bzero (below) to zero out the BSS area */

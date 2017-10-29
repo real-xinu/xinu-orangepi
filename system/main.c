@@ -1,9 +1,12 @@
 /*  main.c  - main */
 
 #include <xinu.h>
+#include <test.h>
 
 process	main(void)
 {
+	run_all_tests();
+
 	/* Run the Xinu shell */
 
 	recvclr();

@@ -15,15 +15,25 @@
 #define ARMV7A_CPSR_SYS	0x0000001F	/* Processor Mode = System	*/
 #define ARMv7A_CPSR_SCM	0x00000016	/* Processor Mode Secure Monitor*/
 
-/* Coprocessor c1 - Control Register bits */
+/* System Control Register (SCTLR) bits */
 
-#define ARMV7A_C1CTL_V	0x00002000	/* Exception base addr control	*/
-#define ARMV7A_C1CTL_I	0x00001000	/* Instruction Cache enable	*/
-#define ARMV7A_C1CTL_C	0x00000004	/* Data Cache enable		*/
-#define ARMV7A_C1CTL_A	0x00000002	/* Strict alignment enable	*/
-#define ARMV7A_C1CTL_M	0x00000001	/* MMU enable			*/
+#define ARMV7A_SCTLR_UWXN	0x00100000	/* Unprivilged write permission XN	*/
+#define ARMV7A_SCTLR_WXN	0x00080000	/* Write permission XN	*/
+#define ARMV7A_SCTLR_TE		0x40000000	/* Thumb Exception Enable	*/
+#define ARMV7A_SCTLR_AFE	0x20000000	/* Access Flag Enable	*/
+#define ARMV7A_SCTLR_TRE	0x10000000	/* TEX Remap Enable	*/
+#define ARMV7A_SCTLR_EE		0x02000000	/* Exception (and TTL) Endianness	*/
+#define ARMV7A_SCTLR_Z		0x00008000	/* Branch Prediction Enable	*/
+#define ARMV7A_SCTLR_V		0x00002000	/* Exception Base Address Control */
+#define ARMV7A_SCTLR_I		0x00001000	/* Instruction Cache enable	*/
+#define ARMV7A_SCTLR_C		0x00000004	/* Data Cache enable		*/
+#define ARMV7A_SCTLR_A		0x00000002	/* Strict alignment enable	*/
+#define ARMV7A_SCTLR_M		0x00000001	/* MMU enable			*/
+#define ARMV7A_SCTLR_SW		0x00000400	/* SWP enable			*/
 
-#define MAXADDR	0x60000000	/* 512 MB RAM starting from 0x40000000	*/
+/* Multiprocessor Affinity Register (MPIDR) bits */
+
+#define ARMV7A_MPIDR_CID	0x00000003
 
 /* Exception Vector Addresses */
 #define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/
@@ -31,3 +41,5 @@
 #define ARMV7A_IRQH_OFFSET 0x38		/* IRQ exception handler offset */
 #define ARMV7A_EV_SIZE 0x40			/* Size of exception vector */
 #define ARMV7A_IRQH_IND 14			/* IRQ exception handler index */
+
+#define MAXADDR	0x60000000	/* 512 MB RAM starting from 0x40000000	*/
