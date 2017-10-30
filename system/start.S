@@ -47,6 +47,14 @@ bloop:	cmp	r0, r1			/* Loop until last address	*/
 	b	bloop			/* Continue to iterate		*/
 bexit:	mov	pc, lr			/* Return to caller		*/
 
+	/* Page Table */
+
+.data
+/* Page table base address must be aligned at 16 KB boundary */
+	.align	14
+	.globl page_table
+page_table:
+	.space	(0x1000 * 4)
 
 	/* Temporary function to print a 'C' on the screen for debugging */
 .globl bputc

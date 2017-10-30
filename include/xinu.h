@@ -42,3 +42,5 @@
 #include <am335x_watchdog.h>
 #include <armv7a.h>
 #include <cpu.h>
+// TODO: need this ? #include <cache.h>
+#include <paging.h>

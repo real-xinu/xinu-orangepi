@@ -18,6 +18,14 @@ extern	status	ascdate(uint32, char *);
 /* in file bufinit.c */
 extern	status	bufinit(void);
 
+/* in file cache.c */
+extern	void	cache_enable_all(void);
+extern	void	cache_disable_all(void);
+extern	void	tlb_inv_all(void);
+extern	void	cache_inv_all(void);
+//TODO: need this? extern	void	cache_get_info(struct cache_info*);
+extern	void	cache_inv(uint32);
+
 /* in file chprio.c */
 extern	pri16	chprio(pid32, pri16);
 
@@ -307,6 +315,12 @@ extern  void    *memset(void *, const int, int32);
 /* in file mkbufpool.c */
 extern	bpid32	mkbufpool(int32, int32);
 
+/* in file mmu.c */
+extern	void	mmu_init(void);
+extern	void	mmu_enable (void);
+extern	void	mmu_disable (void);
+extern	void	mmu_set_ttbr (void*);
+
 /* in file mount.c */
 extern	syscall	mount(char *, char *, did32);
 extern	int32	namlen(char *, int32);
@@ -337,6 +351,9 @@ extern	int32	pci_init(void);
 /* in file pdump.c */
 extern	void	pdump(struct netpacket *);
 extern	void	pdumph(struct netpacket *);
+
+/* in file paging.c */
+extern	status	paging_init (void);
 
 /* in file platinit.c */
 extern	void	platinit(void);
