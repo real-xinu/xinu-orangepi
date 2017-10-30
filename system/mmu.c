@@ -4,10 +4,10 @@
 
 
 /*------------------------------------------------------------------------
- * mmu_init  -  Initialize the MMU
+ * mmuinit  -  Initialize the MMU
  *------------------------------------------------------------------------
  */
-void mmu_init(void){
+void mmuinit(void){
 		/* Disable all caches */
 
 		cache_disable_all();

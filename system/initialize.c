@@ -151,13 +151,17 @@ static	void	sysinit()
 	kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
 
-	/* Platform Specific Initialization */
-
-	platinit();
-
 	/* Initialize the interrupt vectors */
 
 	initevec();
+
+	/* Initialize the MMU */
+
+//	mmuinit();
+
+	/* Platform Specific Initialization */
+
+	platinit();
 	
 	/* Initialize free memory list */
 	

@@ -316,7 +316,7 @@ extern  void    *memset(void *, const int, int32);
 extern	bpid32	mkbufpool(int32, int32);
 
 /* in file mmu.c */
-extern	void	mmu_init(void);
+extern	void	mmuinit(void);
 extern	void	mmu_enable (void);
 extern	void	mmu_disable (void);
 extern	void	mmu_set_ttbr (void*);
