@@ -25,19 +25,31 @@ startcoretest:
 	isb
 	bl bputc
 
+	/* clear the fcseidr */
+	ldr r0, =0x0
+	mcr p15, 0, r0, c13, c0, 0
+	bl bputc
+
 	/* disable mmu and caches */
 	mrc	p15, 0, r0, c1, c0, 0
 	bic	r0, r0, #ARMV7A_SCTLR_I
 	bic	r0, r0, #ARMV7A_SCTLR_C
 	bic	r0, r0, #ARMV7A_SCTLR_M
 	bic	r0, r0, #ARMV7A_SCTLR_Z
+	//bic	r0, r0, #ARMV7A_SCTLR_A
 	mcr	p15, 0, r0, c1, c0, 0
+	isb
+	bl bputc
+
+	/* TODO: invalidate branch prediction array */
+	mov	r0, #0
+	mcr	p15, 0, r0, c7, c5, 6
 	isb
 	bl bputc
 
 	/* set actlr bits, including smp bit */
 	ldr r0, =0x6040
-	mcr p15, 0, r0, c1, c0, 1
+	//mcr p15, 0, r0, c1, c0, 1
 	isb
 	bl bputc
 
@@ -45,6 +57,7 @@ startcoretest:
 	mov	r0, #0
 	mcr	p15, 0, r0, c7, c5, 0
 	isb
+	dsb
 	bl bputc
 
 	/* set smp bit (must happen before cache enable)*/
@@ -53,34 +66,41 @@ startcoretest:
 	//mcr p15, 0, r0, c1, c0, 1
 	//bl bputc
 
+	/* print out sctlr */
+	//mrc	p15, 0, r1, c1, c0, 0
+	//isb
+	//ldr	r0, =rpfmt
+	//bl	kprintf
+
+
 	/* invalidate tlb */
 	mov	r0, #0
 	mcr	p15, 0, r0, c8, c7, 0
 	isb
+	dsb
 	bl bputc
 
 	/* intialize mmu registers */
 	ldr r0, =0x0
 	mcr p15, 0, r0, c3, c0, 0	/* TTBCTRL */
 	bl bputc
+
 	ldr r0, =0xFFFFFFFF
 	mcr p15, 0, r0, c13, c0, 1	/* DACR */
 	isb
 	bl bputc
-	ldr r0, =0x7DFF0059
-	mcr p15, 0, r0, c1, c0, 0	/* TTBR0 */
-	bl bputc
 
-	mrc	p15, 0, r1, c1, c0, 0
+	// CRASH
+//	ldr r0, =0x7DFF0059
+	ldr r0, =0x7DFF0000
+	mcr p15, 0, r0, c1, c0, 0	/* TTBR0 */
 	isb
-	ldr	r0, =rpfmt
-	bl	kprintf
 	bl bputc
 
 	//bl bputc
 	/* set system control register bits */
 	ldr r0, =0xC5187F
-	mcr	p15, 0, r0, c1, c0, 0
+	//mcr	p15, 0, r0, c1, c0, 0
 	isb
 	bl bputc
 

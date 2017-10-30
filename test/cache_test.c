@@ -57,9 +57,9 @@ result cache_test(void){
 	print_info("Processor mode is 0x%X\n", pmode & 0x1F);
 
 	/* check reg 13 PID */
-	uint32 dacr;
-	asm volatile ("mrc p15, 0, %0, c13, c0, 1\t\n": "=r"(dacr) );
-	print_info("reg 13 dacr is is 0x%X\n", dacr);
+	uint32 fcseidr;
+	asm volatile ("mrc p15, 0, %0, c13, c0, 0\t\n": "=r"(fcseidr) );
+	print_info("fcseidr is is 0x%X\n", fcseidr);
 
 	/* check SCU base */
 	uint32* scuptr;
