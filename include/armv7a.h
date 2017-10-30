@@ -38,8 +38,22 @@
 /* Exception Vector Addresses */
 #define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/
 #define ARMV7A_EH_OFFSET 0x20		/* Exception handler offset */
-#define ARMV7A_IRQH_OFFSET 0x38		/* IRQ exception handler offset */
 #define ARMV7A_EV_SIZE 0x40			/* Size of exception vector */
+#define ARMV7A_RSTH_IND 8			/* reset exception handler index */
+#define ARMV7A_UDIH_IND 9			/* undefined instruction exception handler index */
+#define ARMV7A_SWIH_IND 10			/* software interrupt exception handler index */
+#define ARMV7A_PFAH_IND 11			/* prefetch abort exception handler index */
+#define ARMV7A_DABH_IND 12			/* data abort exception handler index */
+#define ARMV7A_RSVH_IND 13			/* reserved exception handler index */
 #define ARMV7A_IRQH_IND 14			/* IRQ exception handler index */
+#define ARMV7A_FIQH_IND 15			/* FIQ exception handler index */
+#define ARMV7A_RSTH_OFFSET 0x20		/* reset exception handler offset */
+#define ARMV7A_UDIH_OFFSET 0x24		/* undefined instruction exception handler offset */
+#define ARMV7A_SWIH_OFFSET 0x28		/* software interrupt exception handler offset */
+#define ARMV7A_PFAH_OFFSET 0x2C		/* prefetch abort exception handler offset */
+#define ARMV7A_DABH_OFFSET 0x30		/* data abort exception handler offset */
+#define ARMV7A_RSVH_OFFSET 0x34		/* reserved exception handler offset */
+#define ARMV7A_IRQH_OFFSET 0x38		/* IRQ exception handler offset */
+#define ARMV7A_FIQH_OFFSET 0x3C		/* FIQ exception handler offset */
 
 #define MAXADDR	0x60000000	/* 512 MB RAM starting from 0x40000000	*/

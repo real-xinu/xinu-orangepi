@@ -181,7 +181,14 @@ extern	status	insertd(pid32, qid16, int32);
 extern	intmask	disable(void);
 extern	void	enable(void);
 extern	void	expjmpinstr(void);
+extern 	void	rst_except(void);
+extern 	void	udi_except(void);
+extern 	void	swi_except(void);
+extern 	void	pfa_except(void);
+extern 	void	dab_except(void);
+extern 	void	rsv_except(void);
 extern 	void	irq_except(void);
+extern 	void	fiq_except(void);
 
 /* in file ioerr.c */
 extern	devcall	ioerr(void);

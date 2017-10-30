@@ -8,11 +8,16 @@
 	.globl	enable
 	.globl	pause
 	.globl	halt
+	.globl	rst_except
+	.globl	udi_except
+	.globl	swi_except
+	.globl	pfa_except
+	.globl	dab_except
+	.globl	rsv_except
 	.globl	irq_except
-	.globl	irq_dispatch
+	.globl	fiq_except
 	.globl	initevec
 	.globl	expjmpinstr
-	.globl  defexp_handler
 
 /*------------------------------------------------------------------------
  * disable  -  Disable interrupts and return the previous state
@@ -76,3 +81,115 @@ irq_except:
  */
 expjmpinstr:
 	ldr	pc, [pc, #ARMV7A_EH_OFFSET]
+
+/*------------------------------------------------------------------------
+ * rst_except  -  Dispatch reset exception to higher level handler
+ *------------------------------------------------------------------------
+ */
+rst_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	rst_handler	/* Call rst_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * udi_except  -  Dispatch undefined instruction exception to
+ *				  higher level handler
+ *------------------------------------------------------------------------
+ */
+udi_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	udi_handler	/* Call udi_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * swi_except  -  Dispatch software interrupt exception to higher level
+ *				  handler
+ *------------------------------------------------------------------------
+ */
+swi_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	swi_handler	/* Call swi_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * pfa_except  -  Dispatch prefetch abort exception to higher level
+ *				  handler
+ *------------------------------------------------------------------------
+ */
+pfa_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	pfa_handler	/* Call pfa_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * dab_except  -  Dispatch data abort exception to higher level
+ *				  handler
+ *------------------------------------------------------------------------
+ */
+dab_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	dab_handler	/* Call dab_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * rsv_except  -  Dispatch reserved exception to higher level
+ *				  handler
+ *------------------------------------------------------------------------
+ */
+rsv_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	rsv_handler	/* Call rsv_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+
+/*------------------------------------------------------------------------
+ * fiq_except  -  Dispatch FIQ exception to higher level
+ *				  handler
+ *------------------------------------------------------------------------
+ */
+fiq_except:
+	sub	lr, lr, #4	/* Correct the return address		*/
+	srsdb	sp!, #19	/* Save return state on the supervisor	*/
+				/*   mode stack				*/
+	cps	#19		/* Change to supervisor mode		*/
+	push	{r0-r12, lr}	/* Save all registers			*/
+	bl	fiq_handler	/* Call fiq_handler			*/
+	pop	{r0-r12, lr}	/* Restore all registers		*/
+	rfeia	sp!		/* Return from the exception using info	*/
+				/*   stored on the stack		*/
+

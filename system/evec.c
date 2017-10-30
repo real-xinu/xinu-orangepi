@@ -73,7 +73,15 @@ void initevec(void){
 		exp_vector[i] = (uint32)defexp_handler;
 	}
 
+	/* overwrite with specific exception handlers as needed */
+	exp_vector[ARMV7A_RSTH_IND] = (uint32)rst_except;
+	exp_vector[ARMV7A_UDIH_IND] = (uint32)udi_except;
+	exp_vector[ARMV7A_SWIH_IND] = (uint32)swi_except;
+	exp_vector[ARMV7A_PFAH_IND] = (uint32)pfa_except;
+	exp_vector[ARMV7A_DABH_IND] = (uint32)dab_except;
+	exp_vector[ARMV7A_RSVH_IND] = (uint32)rsv_except;
 	exp_vector[ARMV7A_IRQH_IND] = (uint32)irq_except;
+	exp_vector[ARMV7A_FIQH_IND] = (uint32)fiq_except;
 }
 
 /*------------------------------------------------------------------------
@@ -88,4 +96,60 @@ void defexp_handler(void){
 
 	kprintf("Unhandled exception. Link Register: 0x%x", lr);
 	panic("**** EXCEPTION ****");
+}
+
+/*------------------------------------------------------------------------
+ * rst_handler - reset exception handler
+ *------------------------------------------------------------------------
+ */
+void rst_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * udi_handler - undefined instruction exception handler
+ *------------------------------------------------------------------------
+ */
+void udi_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * swi_handler - software interrupt exception handler
+ *------------------------------------------------------------------------
+ */
+void swi_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * pfa_handler - prefetch abort exception handler
+ *------------------------------------------------------------------------
+ */
+void pfa_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * dab_handler - data abort exception handler
+ *------------------------------------------------------------------------
+ */
+void dab_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * rsv_handler - reserved exception handler
+ *------------------------------------------------------------------------
+ */
+void rsv_handler(void){
+	return;
+}
+
+/*------------------------------------------------------------------------
+ * fiq_handler - FIQ exception handler
+ *------------------------------------------------------------------------
+ */
+void fiq_handler(void){
+	return;
 }
