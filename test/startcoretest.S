@@ -48,7 +48,7 @@ startcoretest:
 	mov sp, r0					/* set stack pointer */
 	bl bputc
 
-	bl printSCTLR
+	//bl printSCTLR
 	//bl printACTLR
 	//bl printTTBR0
 
