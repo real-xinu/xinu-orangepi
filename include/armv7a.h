@@ -31,6 +31,9 @@
 #define ARMV7A_SCTLR_M		0x00000001	/* MMU enable			*/
 #define ARMV7A_SCTLR_SW		0x00000400	/* SWP enable			*/
 
+/* Auxiliary Control Register (ACTLR) bits */
+#define ARMV7A_ACTLR_SMP	0x00000040	/* SMP enable			*/
+
 /* Multiprocessor Affinity Register (MPIDR) bits */
 
 #define ARMV7A_MPIDR_CID	0x00000003
