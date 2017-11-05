@@ -1,0 +1,7 @@
+is it important what mode I operate in for exceptions?
+initializing mmu for new core should be easier... It should be off already. Is it?
+Check with kputc!  If it is off at reset, I should just have to follow a recipe to intialize it.
+Look at example code in ARM book...
+
+Double check expjmpinstr... Is 32 right? How far ahead does PC point?
+Maybe its different on my board... Or maybe it has to do with prefetch stuff?

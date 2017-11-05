@@ -103,6 +103,7 @@ void defexp_handler(void){
  *------------------------------------------------------------------------
  */
 void rst_handler(void){
+	kputc('R');
 	return;
 }
 
@@ -111,6 +112,7 @@ void rst_handler(void){
  *------------------------------------------------------------------------
  */
 void udi_handler(void){
+	kputc('U');
 	return;
 }
 
@@ -119,6 +121,7 @@ void udi_handler(void){
  *------------------------------------------------------------------------
  */
 void swi_handler(void){
+	kputc('S');
 	return;
 }
 
@@ -127,6 +130,7 @@ void swi_handler(void){
  *------------------------------------------------------------------------
  */
 void pfa_handler(void){
+	kputc('P');
 	return;
 }
 
@@ -135,6 +139,7 @@ void pfa_handler(void){
  *------------------------------------------------------------------------
  */
 void dab_handler(void){
+	kputc('D');
 	return;
 }
 
@@ -143,6 +148,7 @@ void dab_handler(void){
  *------------------------------------------------------------------------
  */
 void rsv_handler(void){
+	kputc('+');
 	return;
 }
 
@@ -151,5 +157,6 @@ void rsv_handler(void){
  *------------------------------------------------------------------------
  */
 void fiq_handler(void){
+	kputc('F');
 	return;
 }

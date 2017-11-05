@@ -47,22 +47,6 @@ void	cache_disable_all (void) {
 			"bic	r0, #0x00000004\n" /* D cache */
 			"bic	r0, #0x00008000\n" /* branch prediciton */
 
-//			/* Clear the TRE bit */
-//
-//			"bic	r0, #0x10000000\n"
-//
-//			/* Clear the AFE bit */
-//
-//			"bic	r0, #0x20000000\n"
-//
-//			/* Clear the EE bit */
-//
-//			"bic	r0, #0x02000000\n"
-//
-//			/* Clear the TE bit */
-//
-//			"bic	r0, #0x40000000\n"
-
 			/* Write the new Control Register */
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
@@ -96,7 +80,7 @@ void	tlb_inv_all (void) {
  */
 // TODO: refactor: cache_inv_L1(), cache_inv_L2()
 void	cache_inv_all (void) {
-//	uint32	level;			/* Level of cache	*/
+	uint32	level;			/* Level of cache	*/
 
 	/* Invalidate all Instruction cache entries */
 
@@ -111,9 +95,9 @@ void	cache_inv_all (void) {
 
 	/* Now invalidate all data cache entries */
 
-//	for(level = 0; level < 1/*cinfo.ncaches*/; level++) {
-//		cache_inv(level);
-//	}
+	for(level = 0; level < 2/*cinfo.ncaches*/; level++) {
+		cache_inv(level);
+	}
 //	kprintf("finished invalidating...\n");
 
 }
@@ -211,8 +195,8 @@ void cache_inv(uint32 level) {
 					: "r" (data)	/* Input	*/
 					  :	/* Clobber	*/
 			);
-			kprintf("Invalidated cache level %d, set %d, way %d\n", level, set, way);
-			kprintf("data for cache inv: %08x\n", data);
+			//kprintf("Invalidated cache level %d, set %d, way %d\n", level, set, way);
+			//kprintf("data for cache inv: %08x\n", data);
 
 		}
 		if (set > nsets){kprintf("set = %d, nsets = %d, WFT?\n"); break;}
