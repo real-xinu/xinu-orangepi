@@ -47,4 +47,8 @@ void	platinit(void)
 	/* Initialize the Performance Counters */
 
 	counterinit();
+
+	/* Initialize the CPUs */
+
+	cpuinit();
 }

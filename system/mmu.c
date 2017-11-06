@@ -37,7 +37,7 @@ void mmuinit(void){
 //		cache_inv(0);
 //		/* Enable caches  */
 //
-		cache_enable_all();
+//		cache_enable_all();
 //
 //		/* Turn on the MMU */
 //

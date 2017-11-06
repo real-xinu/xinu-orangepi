@@ -2,6 +2,7 @@
 
 .globl startcoretest
 startcoretest:
+	wfe
 	/* set actlr bits, including smp bit */
 	/* from TRM - this bit must be enable before any TLB or cache
 	*  maintenance or enabling MMU */
@@ -39,9 +40,9 @@ startcoretest:
 	bl bputc
 
 	//bl invalidate_dcache_all
-	mov r0, #0
-	bl cache_inv
-	bl bputc
+	//mov r0, #0
+	//bl cache_inv
+	//bl bputc
 
 	/* disable mmu, caches, branch prediciton */
 	//mrc	p15, 0, r0, c1, c0, 0
@@ -58,15 +59,15 @@ startcoretest:
 	//bl bputc
 
 	/* Invalidate L1 I/D */
-	mov	r0, #0			@ set up for MCR
-	mcr	p15, 0, r0, c8, c7, 0	@ invalidate unified TLB
+	//mov	r0, #0			@ set up for MCR
+	//mcr	p15, 0, r0, c8, c7, 0	@ invalidate unified TLB
 	//mcr	p15, 0, r0, c8, c6, 0	@ invalidate data TLB
 	//mcr	p15, 0, r0, c8, c5, 0	@ invalidate instruction TLB
-	mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
-	mcr	p15, 0, r0, c7, c5, 6	@ invalidate BP array
-	dsb
-	isb
-	bl bputc
+	//mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
+	//mcr	p15, 0, r0, c7, c5, 6	@ invalidate BP array
+	//dsb
+	//isb
+	//bl bputc
 
 	//bl printSCTLR
 	//bl printACTLR
@@ -86,7 +87,8 @@ startcoretest:
 	isb
 	bl bputc
 
-	ldr r0, =0xFFFFFFFF
+	//ldr r0, =0xFFFFFFFF
+	ldr r0, =0x55555555
 	isb
 	mcr p15, 0, r0, c13, c0, 1	/* DACR */
 	isb
@@ -109,6 +111,9 @@ startcoretest:
 
 
 	/* set system control register bits */
+	//dsb
+	//dmb
+	//isb
 	//ldr r0, =0xC5187F
 	//isb
 	//mcr	p15, 0, r0, c1, c0, 0
@@ -118,21 +123,21 @@ startcoretest:
 	//nop
 	//bl bputc
 	/* enable mmu, caches, branch prediciton */
-	dsb
-	dmb
-	isb
-	mrc	p15, 0, r0, c1, c0, 0
-	isb
+	//dsb
+	//dmb
+	//isb
+	//mrc	p15, 0, r0, c1, c0, 0
+	//isb
 	//orr	r0, r0, #ARMV7A_SCTLR_I
 	//orr	r0, r0, #ARMV7A_SCTLR_C
-	orr	r0, r0, #ARMV7A_SCTLR_M
+	//orr	r0, r0, #ARMV7A_SCTLR_M
 	//orr	r0, r0, #ARMV7A_SCTLR_Z
-	mcr	p15, 0, r0, c1, c0, 0
-	isb
-	nop
-	nop
-	nop
-	bl bputc
+	//mcr	p15, 0, r0, c1, c0, 0
+	//isb
+	//nop
+	//nop
+	//nop
+	//bl bputc
 
 	/* cpu gctrl reg*/
 	//ldr r0, =0x01F01D84

@@ -2,6 +2,20 @@
 #include <xinu.h>
 
 /*------------------------------------------------------------------------
+ *  cpuinit  -  Initialize CPUs
+ *------------------------------------------------------------------------
+ */
+void cpuinit(void){
+	struct cpucfg_csreg* cpucfg = (struct cpucfg_csreg*)CPUCFG_BASE;
+
+	//cpucfg->genctrl = 0x40; /* set snoop interface active */
+	//cpucfg->genctrl |= 0x20; /* apply reset to shared L2 mem controller */
+	//TODO: set csrs
+	//TODO: set secondary entry point
+	//TODO: wake up secondary cores (they might go to wfi/wfe)?
+}
+
+/*------------------------------------------------------------------------
  *  getcid  -  Return the ID of the currently executing core
  *------------------------------------------------------------------------
  */
@@ -30,21 +44,17 @@ syscall cpu_enable(cid32 cid){
 	cpureg = &cpucfg->cpu[cid];
 	cpumask = (1 << cid);
 
-//	/* TODO: invalidate L1 cache  ?*/
-//	uint32 cache;
-//	asm volatile("mrc p15, 0, %0, c7, c10, 6\t\n": "=r"(cache));
-//	cpucfg->genctrl = 0; // hangs
-//	asm volatile ("mcr p15, 0, %0, c7, c5, 0\t\n" :: "r" (0x0));
-
 	/* assert cpu core reset */
-	cpureg->rstctrl = 0;
+	cpureg->rstctrl &= ~CPU_CORE_RST;
 
 	/* L1RSTDISABLE hold low */
 	cpucfg->genctrl &= ~cpumask;
 
 	/* de-assert core reset */
-	cpureg->rstctrl = 3;
+	cpureg->rstctrl |= CPU_CORE_RST;
 
+	cpucfg->genctrl &= ~cpumask;
+	asm volatile("sev");
 	return OK;
 }
 

@@ -5,6 +5,9 @@
 #define CPUCFG_BASE	0x01F01C00	/* Base address */
 #define NCORES 4
 
+#define CPU_CORE_RST 0x00000002
+#define CPU_RST 0x00000001
+
 /* csr for individual cpu */
 struct cpu_csreg {
 	reg32 rstctrl;		/* reset control register */
