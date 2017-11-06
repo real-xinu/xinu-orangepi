@@ -170,8 +170,8 @@ void cache_inv(uint32 level) {
 
 	nways = ((csid >> 3) & 0x3FF) + 1;
 	nsets = ((csid >> 13) & 0x7FFF) + 1;
-	kprintf("nways = %d\n", nways);
-	kprintf("nsets = %d\n", nsets);
+//	kprintf("nways = %d\n", nways);
+//	kprintf("nsets = %d\n", nsets);
 
 	for(set = 0; set < nsets; set++) {
 		for(way = 0; way < nways; way++) {

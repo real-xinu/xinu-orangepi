@@ -32,11 +32,26 @@
 #define ARMV7A_SCTLR_SW		0x00000400	/* SWP enable			*/
 
 /* Auxiliary Control Register (ACTLR) bits */
+
 #define ARMV7A_ACTLR_SMP	0x00000040	/* SMP enable			*/
 
 /* Multiprocessor Affinity Register (MPIDR) bits */
 
 #define ARMV7A_MPIDR_CID	0x00000003
+
+/* Translation Table Base Register Bits */
+
+#define ARMV7A_TTBR_C		0x00000001	/* table walk is inner cacheable bit */
+#define ARMV7A_TTBR_S		0x00000002	/* table walk is shareable bit */
+#define ARMV7A_TTBR_NOS		0x00000020	/* not outer shareable bit (if S == 1) */
+#define ARMV7A_TTBR_RGN0	0x00000000	/* walk outer non-cacheable */
+#define ARMV7A_TTBR_RGN1	0x00000008	/* walk outer write-back write-allocate cacheable */
+#define ARMV7A_TTBR_RGN2	0x00000010	/* walk outer write-through cacheable */
+#define ARMV7A_TTBR_RGN3	0x00000018	/* walk outer write-back no write-allocate cacheable */
+#define ARMV7A_TTBR_IRGN0	0x00000000	/* walk inner non-cacheable */
+#define ARMV7A_TTBR_IRGN1	0x00000001	/* walk inner write-back write-allocate cacheable */
+#define ARMV7A_TTBR_IRGN2	0x00000040	/* walk inner write-through cacheable */
+#define ARMV7A_TTBR_IRGN3	0x00000041	/* walk inner write-back no write-allocate cacheable */
 
 /* Exception Vector Addresses */
 #define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/

@@ -157,7 +157,7 @@ static	void	sysinit()
 
 	/* Initialize the MMU */
 
-	//mmuinit();
+	mmuinit();
 
 	/* Platform Specific Initialization */
 

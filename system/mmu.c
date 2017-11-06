@@ -8,24 +8,23 @@
  *------------------------------------------------------------------------
  */
 void mmuinit(void){
-		/* Disable all caches */
-
-		cache_disable_all();
-
-		/* Invalidate all caches */
-
-		cache_inv_all();
-
-		/* Invalidate the TLB */
-
-		tlb_inv_all();
-
-		/* Make sure MMU is disabled */
-
-		mmu_disable();
+//		/* Disable all caches */
+//
+//		cache_disable_all();
+//
+//		/* Invalidate all caches */
+//
+//		cache_inv_all();
+//
+//		/* Invalidate the TLB */
+//
+//		tlb_inv_all();
+//
+//		/* Make sure MMU is disabled */
+//
+//		mmu_disable();
 
 		/* Initialize page tables */
-
 		paging_init();
 
 		/* Make sure all memory operations are completed */
@@ -35,13 +34,14 @@ void mmuinit(void){
 				"dmb\n"
 		);
 
-		/* Enable caches  */
-
+//		cache_inv(0);
+//		/* Enable caches  */
+//
 		cache_enable_all();
-
-		/* Turn on the MMU */
-
-		mmu_enable();
+//
+//		/* Turn on the MMU */
+//
+//		mmu_enable();
 }
 
 /*------------------------------------------------------------------------
@@ -155,7 +155,7 @@ void	mmu_set_ttbr (
 
 			"mcr	p15, 0, r0, c2, c0, 0\n"
 
-			/* Write the new TTBR1 */
+			/* Write the new TTBR1 (just in case) */
 
 			"mcr	p15, 0, r0, c2, c0, 1\n"
 
