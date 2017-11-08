@@ -3,6 +3,13 @@
 .globl startcoretest
 startcoretest:
 	wfe
+
+	/* Secure Configuration Register */
+	mrc p15, 0, r0, c1, c1, 0
+	bic r0, #ARMV7A_SCR_NS
+	mrc p15, 0, r0, c1, c1, 0
+	isb
+
 	/* set actlr bits, including smp bit */
 	/* from TRM - this bit must be enable before any TLB or cache
 	*  maintenance or enabling MMU */
@@ -87,8 +94,7 @@ startcoretest:
 	isb
 	bl bputc
 
-	//ldr r0, =0xFFFFFFFF
-	ldr r0, =0x55555555
+	ldr r0, =0xFFFFFFFF
 	isb
 	mcr p15, 0, r0, c13, c0, 1	/* DACR */
 	isb
@@ -99,7 +105,6 @@ startcoretest:
 	dsb
 	dmb
 	ldr r0, =page_table
-	orr r0, #ARMV7A_TTBR_C
 	orr r0, #ARMV7A_TTBR_S
 	orr r0, #ARMV7A_TTBR_RGN1
 	orr r0, #ARMV7A_TTBR_IRGN1

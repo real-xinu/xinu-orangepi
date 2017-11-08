@@ -10,6 +10,7 @@ result cache_test(void){
 	EXPECT_EQ("l2ctlr & 0x03000000", l2ctlr & 0x03000000, 0x03000000, HEX);
 
 	/* read the system control register */
+	kprintf("\n");
 	uint32 sctlr;
 	asm volatile ("mrc p15, 0, %0, c1, c0, 0\t\n": "=r"(sctlr) );
 	print_info("sctlr = 0x%X\n", sctlr);
@@ -32,6 +33,7 @@ result cache_test(void){
 	EXPECT_EQ("sctlr & ARMV7A_SCTLR_TRE", sctlr & ARMV7A_SCTLR_TRE, 0, HEX);
 
 	/* read the auxiliary control register */
+	kprintf("\n");
 	uint32 actlr;
 	asm volatile ("mrc p15, 0, %0, c1, c0, 1\t\n": "=r"(actlr) );
 	print_info("actlr = 0x%X\n", actlr);
@@ -39,7 +41,14 @@ result cache_test(void){
 	print_info("Checking that smp bit is set for core 0.\n");
 	EXPECT_EQ("actlr & 0x40", actlr & 0x40, 0x40, HEX);
 
+	/* read the secure configuration register */
+	kprintf("\n");
+	uint32 scr;
+	asm volatile ("mrc p15, 0, %0, c1, c1, 0\t\n": "=r"(scr) );
+	print_info("scr = 0x%X\n", scr);
+
 	/* check tlb base */
+	kprintf("\n");
 	uint32 ttb = 0;
 	//TODO: print_info("&page_dir = 0x%X.\n", &page_dir);
 	asm volatile ("mrc p15, 0, %0, c2, c0, 0\t\n": "=r"(ttb) );
@@ -52,16 +61,19 @@ result cache_test(void){
 	print_info("domain access control is 0x%X.\n", ttb);
 
 	/* check processor mode */
+	kprintf("\n");
 	uint32 pmode;
 	asm (" mrs %0, cpsr\n" : "=r" (pmode));
 	print_info("Processor mode is 0x%X\n", pmode & 0x1F);
 
 	/* check reg 13 PID */
+	kprintf("\n");
 	uint32 fcseidr;
 	asm volatile ("mrc p15, 0, %0, c13, c0, 0\t\n": "=r"(fcseidr) );
 	print_info("fcseidr is is 0x%X\n", fcseidr);
 
 	/* check SCU base */
+	kprintf("\n");
 	uint32* scuptr;
 	asm volatile ("mrc p15, 4, %0, c15, c0, 0\t\n": "=r"(scuptr) );
 	print_info("checking PERIPHBASE...\n");

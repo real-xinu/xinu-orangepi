@@ -39,9 +39,20 @@
 
 #define ARMV7A_MPIDR_CID	0x00000003
 
+/* Secure Configuration Register (SCR) */
+
+#define ARMV7A_SCR_NS	0x00000001	/* Non Secure bit */
+#define ARMV7A_SCR_IRQ	0x00000002	/* IRQ Monitor Mode */
+#define ARMV7A_SCR_FIQ	0x00000004	/* FIQ Monitor Mode */
+#define ARMV7A_SCR_EA	0x00000008	/* External Abort Monitor Mode */
+#define ARMV7A_SCR_FW	0x00000010	/* CPSR.F bit can be modified non-secure */
+#define ARMV7A_SCR_AW	0x00000020	/* CPSR.A bit can be modified non-secure */
+#define ARMV7A_SCR_SCD	0x00000080	/* SMC instruction disabled */
+#define ARMV7A_SCR_HCE	0x00000100	/* HypCall enable */
+#define ARMV7A_SCR_SIF	0x00000200	/* Secure Instruction Fetch */
+
 /* Translation Table Base Register Bits */
 
-#define ARMV7A_TTBR_C		0x00000001	/* table walk is inner cacheable bit */
 #define ARMV7A_TTBR_S		0x00000002	/* table walk is shareable bit */
 #define ARMV7A_TTBR_NOS		0x00000020	/* not outer shareable bit (if S == 1) */
 #define ARMV7A_TTBR_RGN0	0x00000000	/* walk outer non-cacheable */
@@ -53,7 +64,14 @@
 #define ARMV7A_TTBR_IRGN2	0x00000040	/* walk inner write-through cacheable */
 #define ARMV7A_TTBR_IRGN3	0x00000041	/* walk inner write-back no write-allocate cacheable */
 
+#define ARMV7A_TTBR_VAL		( (uint32)page_table	| \
+								ARMV7A_TTBR_S 		| \
+								ARMV7A_TTBR_RGN1 	| \
+								ARMV7A_TTBR_IRGN1 	  \
+							)
+
 /* Exception Vector Addresses */
+
 #define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/
 #define ARMV7A_EH_OFFSET 0x20		/* Exception handler offset */
 #define ARMV7A_EV_SIZE 0x40			/* Size of exception vector */
