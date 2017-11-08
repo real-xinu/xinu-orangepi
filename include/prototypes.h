@@ -1,3 +1,4 @@
+// TODO: clean this file up, some entries don't exist
 /* in file addargs.c */
 extern	status	addargs(pid32, int32, int32[], int32,char *, void *);
 
@@ -53,6 +54,9 @@ extern	void	cpuinit(void);
 extern	syscall	cpu_enable(cid32);
 extern	void	cpu_set_entry(void*);
 extern	void	cpu_dump(void);
+extern	void	secondary_run(void);
+extern	void	cpu_sev(void);
+extern	void	cpu_wfe(void);
 
 /* in file create.c */
 extern	pid32	create(void *, uint32, pri16, char *, uint32, ...);
@@ -85,11 +89,9 @@ extern	int32	ethread(struct dentry *, void *, uint32);
 extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
-extern	void	defexp_handler(void);
 extern	void	initevec(void);
-
-/* in file exception.c */
-extern  void exception(int32, int32*);
+extern	void	evec_set_addr(void*);
+extern	void	defexp_handler(void);
 
 /* in file freebuf.c */
 extern	syscall	freebuf(char *);
@@ -569,14 +571,8 @@ extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 extern	int32	spiinit(struct dentry *);
 
 /* in file start.S */
-extern	int32	inb(int32);
-extern	int32	inw(int32);
-extern	int32	inl(int32);
-extern	int32	outb(int32, int32);
-extern	int32	outw(int32, int32);
-extern	int32	outl(int32, int32);
-extern	int32	outsw(int32, int32, int32);
-extern	int32	insw(int32, int32 ,int32);
+extern	void 	secondary_start(void);
+extern	void 	bputc(void);
 
 /* in file suspend.c */
 extern	syscall	suspend(pid32);

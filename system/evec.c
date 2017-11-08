@@ -48,18 +48,7 @@ void initevec(void){
 	int i;	/* index into exception vector */
 	uint32* jmp = (uint32*)expjmpinstr;	/* pointer to exception jump */
 
-	/* Set exception vector base address */
-	asm volatile (
-		"mrc	p15, 0, r0, c1, c0, 0\n"	/* Read the c1-control register	*/
-		"bic	r0, r0, #0x00002000\n"		/* V bit = 0, normal exp. base	*/
-		"mcr	p15, 0, r0, c1, c0, 0 \n"	/* Write the c1-control register	*/
-		"ldr	r0, =exp_vector\n"	  		/* Exception base address		*/
-		"mcr	p15, 0, r0, c12, c0, 0\n"	/* Store excp. base addr. in c12	*/
-		"isb\n"
-		:		/* Output	*/
-		:		/* Input	*/
-		: "r0"	/* Clobber	*/
-	);
+	evec_set_addr((void*)exp_vector);
 
 	/* lower entries of exception vector jump to higher entries */
 
@@ -82,6 +71,24 @@ void initevec(void){
 	exp_vector[ARMV7A_RSVH_IND] = (uint32)rsv_except;
 	exp_vector[ARMV7A_IRQH_IND] = (uint32)irq_except;
 	exp_vector[ARMV7A_FIQH_IND] = (uint32)fiq_except;
+}
+
+/*------------------------------------------------------------------------
+ * evec_set_addr - set exception vector base address in coprocessor
+ *------------------------------------------------------------------------
+ */
+void evec_set_addr(void* addr){
+	asm volatile (
+		"mrc	p15, 0, r0, c1, c0, 0\n"	/* Read the c1-control register	*/
+		"bic	r0, r0, #0x00002000\n"		/* V bit = 0, normal exp. base	*/
+		"mcr	p15, 0, r0, c1, c0, 0 \n"	/* Write the c1-control register	*/
+		"mov	r0, %0 \n"	  		/* Exception base address		*/
+		"mcr	p15, 0, r0, c12, c0, 0\n"	/* Store excp. base addr. in c12	*/
+		"isb\n"
+		:				/* Output	*/
+		: "r" (addr)	/* Input	*/
+		: "r0"			/* Clobber	*/
+	);
 }
 
 /*------------------------------------------------------------------------

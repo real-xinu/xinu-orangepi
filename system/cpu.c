@@ -1,18 +1,28 @@
 /*  cpu.c */
 #include <xinu.h>
 
+extern uint32 exp_vector[];
+
 /*------------------------------------------------------------------------
  *  cpuinit  -  Initialize CPUs
  *------------------------------------------------------------------------
  */
 void cpuinit(void){
-	struct cpucfg_csreg* cpucfg = (struct cpucfg_csreg*)CPUCFG_BASE;
+	uint32 i;
 
+	//TODO: set csrs
 	//cpucfg->genctrl = 0x40; /* set snoop interface active */
 	//cpucfg->genctrl |= 0x20; /* apply reset to shared L2 mem controller */
-	//TODO: set csrs
-	//TODO: set secondary entry point
-	//TODO: wake up secondary cores (they might go to wfi/wfe)?
+
+	/* set secondary entry point */
+	cpu_set_entry(secondary_start);
+
+	/* wake up secondary cores */
+	for(i = 1; i < NCORES; i++){
+		cpu_enable(i);
+	}
+
+	MDELAY(10);
 }
 
 /*------------------------------------------------------------------------
@@ -25,6 +35,22 @@ cid32 getcid(void){
 	asm volatile ( "MRC p15, 0, %0, c0, c0, 5\t\n": "=r"(cid) );
 	cid &= ARMV7A_MPIDR_CID; /* mask off CPU ID bits */
 	return cid;
+}
+
+/*------------------------------------------------------------------------
+ *  cpu_sev  -  release other cpus from wfe state
+ *------------------------------------------------------------------------
+ */
+void cpu_sev(void){
+	asm volatile("sev");
+}
+
+/*------------------------------------------------------------------------
+ *  cpu_wfe  -  wait for event
+ *------------------------------------------------------------------------
+ */
+void cpu_wfe(void){
+	asm volatile("wfe");
 }
 
 /*------------------------------------------------------------------------
@@ -47,14 +73,14 @@ syscall cpu_enable(cid32 cid){
 	/* assert cpu core reset */
 	cpureg->rstctrl &= ~CPU_CORE_RST;
 
-	/* L1RSTDISABLE hold low */
+	/* L1RSTDISABLE hold low TODO: need this sill? */
 	cpucfg->genctrl &= ~cpumask;
 
 	/* de-assert core reset */
 	cpureg->rstctrl |= CPU_CORE_RST;
 
-	cpucfg->genctrl &= ~cpumask;
-	asm volatile("sev");
+	// TODO: wait for cpu to be in wfe state?
+
 	return OK;
 }
 
@@ -65,6 +91,23 @@ syscall cpu_enable(cid32 cid){
 void cpu_set_entry(void* entry){
 	struct cpucfg_csreg* cpucfg = (struct cpucfg_csreg*)CPUCFG_BASE;
 	cpucfg->pcstart = (uint32)entry;
+}
+
+/*------------------------------------------------------------------------
+ *  secondary_run  -  get already initialized and running secondary core
+ *                    integrated and running Xinu processes
+ *------------------------------------------------------------------------
+ */
+void secondary_run(void){
+	// TODO:
+	cache_enable_all();
+	mmu_set_ttbr(page_table);
+	mmu_enable();
+	evec_set_addr(exp_vector);
+	enable();
+	gic_enable();
+	printf("Hello from core %d\n!", getcid());
+	while(1);
 }
 
 /*------------------------------------------------------------------------
@@ -108,3 +151,4 @@ void cpu_dump(void){
 
 	kprintf("**********************************************************\n");
 }
+

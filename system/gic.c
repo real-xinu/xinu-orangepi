@@ -44,6 +44,9 @@ int32	gicinit()
 	/* Set priority filter to accept all priority levels */
 	giccpuif->primask = 0xFFFFFFFF;
 
+	/* Enable the distributor */
+	gicdist->ctrl = GIC_ENABLE;
+
 	return OK;
 }
 
@@ -52,9 +55,8 @@ int32	gicinit()
  *------------------------------------------------------------------------
  */
 void gic_enable(void){
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	gicdist->ctrl = GIC_ENABLE;
+	giccpuif += getcid(); // TODO: is this right?
 	giccpuif->ctrl = GIC_ENABLE;
 }
 

@@ -10,7 +10,7 @@ extern int strcmp(char*, char*);
 
 struct test tests[] = {
 		{"cache_test", cache_test},
-		{"startcores_test", startcores_test},
+//		{"startcores_test", startcores_test},
 //		{"spinlock_test", spinlock_test},
 		//{"armmutex_test", armmutex_test},
 //		{"armmutexERG_test", armmutexERG_test},

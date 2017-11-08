@@ -82,6 +82,10 @@ void	nulluser()
 
 //	net_init(); TODO:
 
+	/* Initialization is finished, unblock auxiliary cores */
+
+	cpu_sev();
+
 	/* Create a process to finish startup and start main */
 
 	resume(create((void *)startup, INITSTK, INITPRIO,
@@ -150,6 +154,10 @@ static	void	sysinit()
 
 	kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
+
+	/* Initialize CPU CSRs and start up secondary cores */
+
+	cpuinit();
 
 	/* Initialize the interrupt vectors */
 
