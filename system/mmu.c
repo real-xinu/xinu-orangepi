@@ -59,23 +59,6 @@ void	mmu_enable (void) {
 
 			"orr	r0, #0x00000001\n"
 
-			// TODO: move this stuff to start.S?
-//			/* Clear the TRE bit */
-//
-//			"bic	r0, #0x10000000\n"
-//
-//			/* Clear the AFE bit */
-//
-//			"bic	r0, #0x20000000\n"
-//
-//			/* Clear the EE bit */
-//
-//			"bic	r0, #0x02000000\n"
-//
-//			/* Clear the TE bit */
-//
-//			"bic	r0, #0x40000000\n"
-
 			/* Write the new Control Register */
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
@@ -147,9 +130,11 @@ void	mmu_set_ttbr (
 
 			"mov	r0, %0\n"
 
-			/* Make the translation table walk cacheable */
+			/* Set table walk attributes */
 
-			"orr	r0, #0x00000001\n"
+			"orr	r0, #0x00000002\n" /* shareable cacheable */
+			"orr	r0, #0x00000008\n" /* outer write-back write-allocate */
+			"orr	r0, #0x00000001\n" /* inner write-back write-allocate */
 
 			/* Write the new TTBR0 */
 

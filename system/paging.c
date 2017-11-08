@@ -9,9 +9,6 @@
 status	paging_init (void) {
 
 	int32	i;		/* Loop counter			*/
-	uint32	ttbr;	/* Translation Table Base Register value	*/
-
-	//pd = (uint32 *)&page_table;
 
 	/* First, initialize PDEs for device memory	*/
 	/* AP[2:0] = 0b011 for full access		*/
@@ -53,14 +50,7 @@ status	paging_init (void) {
 
 	/* Set the Translation Table Base Address Register */
 
-	ttbr = ( (uint32)page_table	| /* point ttbr to page_table (upper bits) */
-			ARMV7A_TTBR_C | /* table walk inner cacheable */
-			ARMV7A_TTBR_S | /* table walk inner shareable */
-			ARMV7A_TTBR_RGN1 | /* table walk inner write-back write-allocate */
-			ARMV7A_TTBR_IRGN1  /* table walk outter write-back write-allocate */
-			);
-
-	mmu_set_ttbr((void*)ttbr);
+	mmu_set_ttbr(page_table);
 
 	return OK;
 }
