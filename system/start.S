@@ -13,15 +13,16 @@
 	.globl	start			/* Declare entry point global	*/
 
 start:
+	/* Secure Configuration Register */
+
+	mrc p15, 0, r0, c1, c1, 0
+	orr r0, #ARMV7A_SCR_NS
+	mrc p15, 0, r0, c1, c1, 0
+	isb
+
 	/* Load the stack pointer with end of memory */
 
 	ldr	sp, =MAXADDR
-
-	/* Enable the Instruction Cache	*/
-
-	mrc	p15, 0, r0, c1, c0, 0
-	orr	r0, r0, #ARMV7A_SCTLR_I
-	mcr	p15, 0, r0, c1, c0, 0
 
 	/* Use bzero (below) to zero out the BSS area */
 
@@ -57,14 +58,28 @@ bexit:	mov	pc, lr			/* Return to caller		*/
 
 secondary_start:
 
+	/* Disable interrupts */
+	cpsid	i
+
+	/* change to supervisor mode */
+	cps #ARMV7A_CPSR_SPR
+	msr cpsr, #ARMV7A_CPSR_SPR
+
 	/* Secure Configuration Register */
 	mrc p15, 0, r0, c1, c1, 0
 	orr r0, #ARMV7A_SCR_NS
 	mrc p15, 0, r0, c1, c1, 0
 	isb
 
-	/* Disable interrupts */
-	cpsid	i
+	/* Iinvalidate instruction and data caches, branch prediction */
+	mov	r0, #0			@ set up for MCR
+	mcr	p15, 0, r0, c8, c7, 0	@ invalidate unified TLB
+	mcr	p15, 0, r0, c8, c6, 0	@ invalidate data TLB
+	mcr	p15, 0, r0, c8, c5, 0	@ invalidate instruction TLB
+	mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
+	mcr	p15, 0, r0, c7, c5, 6	@ invalidate BP array
+	dsb
+	isb
 
 	/* set actlr bits, including smp bit */
 	/* from TRM - this bit must be enable before any TLB or cache
@@ -72,12 +87,6 @@ secondary_start:
 	mrc p15, 0, r0, c1, c0, 1
 	orr r0, #ARMV7A_ACTLR_SMP
 	mcr p15, 0, r0, c1, c0, 1
-	bl bputc
-
-	/* change to supervisor mode */
-	cps #ARMV7A_CPSR_SPR
-	msr cpsr, #ARMV7A_CPSR_SPR
-	bl bputc
 
 	/* get stack to run on */
 	mrc p15, 0, r11, c0, c0, 5 	/* get cid */
@@ -85,24 +94,17 @@ secondary_start:
 	ldr r0, =boot_stacks 		/* r0 = boot_stacks base */
 	mov r1, r11					/* r1 = cid */
 	add r1, r1, #1				/* r1 = cid + 1 */
-	lsl r2, r1, #12				/* r2 = (cid+1)*4096 */
+	lsl r2, r1, #13				/* r2 = (cid+1)*8192 */
 	add r0, r0, r2				/* use high end of stack */
 	mov sp, r0					/* set stack pointer */
-	bl bputc
 
 	/* clear the fcseidr */
 	ldr r0, =0x0
 	mcr p15, 0, r0, c13, c0, 0
-	//bl bputc
 
 	/* intialize mmu registers */
-	ldr r0, =0x0
-	mcr p15, 0, r0, c3, c0, 0	/* TTBCTRL */
-	bl bputc
-
 	ldr r0, =0xFFFFFFFF
 	mcr p15, 0, r0, c13, c0, 1	/* DACR */
-	bl bputc
 
 	wfe
 
@@ -125,10 +127,10 @@ page_table:
  */
 
 .data
-/* Page table base address must be aligned at 16 KB boundary */
+/* Stacks for cores to run on while booting */
 	.globl boot_stacks
 boot_stacks:
-	.space	(4096 * 4)
+	.space	(8192 * 4)
 
 /*------------------------------------------------------------------------
  * bputc	-	simple polled output, prints C to screen for assembly

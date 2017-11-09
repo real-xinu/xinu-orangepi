@@ -34,6 +34,7 @@ void mmuinit(void){
 				"dmb\n"
 		);
 
+
 //		cache_inv(0);
 //		/* Enable caches  */
 //
@@ -84,10 +85,6 @@ void	mmu_disable (void) {
 
 			"bic	r0, #0x00000001\n"
 
-			/* Reset the C bit */
-
-			"bic	r0, #0x00000004\n"
-
 			/* Write the new Control Register */
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
@@ -95,12 +92,6 @@ void	mmu_disable (void) {
 			"isb\n"
 			"dmb\n"
 			"dsb\n"
-
-			/* Invalidate branch predictor array */
-
-			"mov	r0, #0\n"
-			"mcr	p15, 0, r0, c7, c5, 6\n"
-			"isb\n"
 
 			:	/* Output	*/
 			:	/* Input	*/

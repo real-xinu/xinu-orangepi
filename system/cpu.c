@@ -22,7 +22,6 @@ void cpuinit(void){
 		cpu_enable(i);
 	}
 
-	MDELAY(10);
 }
 
 /*------------------------------------------------------------------------
@@ -99,15 +98,20 @@ void cpu_set_entry(void* entry){
  *------------------------------------------------------------------------
  */
 void secondary_run(void){
-	// TODO:
-	cache_enable_all();
-	mmu_set_ttbr(page_table);
-	mmu_enable();
 	evec_set_addr(exp_vector);
-	enable();
+	cache_inv(0); /* invalidate L1 data cache */
+	tlb_inv_all();
+	mmu_set_ttbr(page_table);
+	cache_enable_all();
+	mmu_enable();
 	gic_enable();
 	printf("Hello from core %d\n!", getcid());
 	while(1);
+	// TODO: set currpid[getcid()]
+	// TODO: create null process with hard affinity for self and then resched
+//	resume(create((void *)startup, NULLSTK, 0,
+//						"prnull<getcid()>", 0, NULL));
+	//resched();
 }
 
 /*------------------------------------------------------------------------

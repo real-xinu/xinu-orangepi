@@ -195,16 +195,20 @@ static	void	sysinit()
 		prptr->prprio = 0;
 	}
 
-	/* Initialize the Null process entry */	
+	/* Initialize the Null process entries */
+	for(i = 0; i < NCORES; i++){
+		prptr = &proctab[i];
+		prptr->prstate = PR_CURR;
+		prptr->prprio = 0;
+		strncpy(prptr->prname, "prnull", 7);
+		prptr->prname[6] = i + 0x30; /* convert i to string and append */
+		prptr->prstkbase = getstk(NULLSTK);
+		prptr->prstklen = NULLSTK;
+		prptr->prstkptr = 0;
+		// TODO: currpid[i] = NULLPROC; ... but avoid false sharing...
+		currpid = NULLPROC;
+	}
 
-	prptr = &proctab[NULLPROC];
-	prptr->prstate = PR_CURR;
-	prptr->prprio = 0;
-	strncpy(prptr->prname, "prnull", 7);
-	prptr->prstkbase = getstk(NULLSTK);
-	prptr->prstklen = NULLSTK;
-	prptr->prstkptr = 0;
-	currpid = NULLPROC;
 	
 	/* Initialize semaphores */
 

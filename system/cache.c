@@ -78,7 +78,6 @@ void	tlb_inv_all (void) {
  * cache_inv_all  -  Invalidate all data and intr. caches
  *------------------------------------------------------------------------
  */
-// TODO: refactor: cache_inv_L1(), cache_inv_L2()
 void	cache_inv_all (void) {
 	uint32	level;			/* Level of cache	*/
 
@@ -95,49 +94,11 @@ void	cache_inv_all (void) {
 
 	/* Now invalidate all data cache entries */
 
-	for(level = 0; level < 2/*cinfo.ncaches*/; level++) {
+	for(level = 0; level < 2; level++) {
 		cache_inv(level);
 	}
-//	kprintf("finished invalidating...\n");
 
 }
-
-/*------------------------------------------------------------------------
- * cache_get_info  -  Get Cache information
- *------------------------------------------------------------------------
- */
-//void	cache_get_info (
-//		struct	cache_info *cinfo	/* Cache information	*/
-//		)
-//{
-//	uint32	clid;	/* Cache Level ID	*/
-//
-//	/* Read the Cache Level ID Register */
-//
-//	asm volatile (
-//			"mrc	p15, 1, %0, c0, c0, 1\n"
-//			: "=r" (clid)	/* Output	*/
-//			:		/* Input	*/
-//			:		/* Clobber	*/
-//		     );
-//
-//	/* Extract the levels of unification and coherence */
-//
-//	cinfo->lou = (clid >> 27) & 0x7;
-//	cinfo->loc = (clid >> 24) & 0x7;
-//
-//	/* Compute the number of cache levels */
-//
-//	cinfo->ncaches = 0;
-//	while((clid & 0x7) != 0) {
-//		clid >>= 3;
-//		cinfo->ncaches++;
-//	}
-//
-//	kprintf("No. of caches: %d\n", cinfo->ncaches);
-//	kprintf("Level of Unification: %d\n", cinfo->lou);
-//	kprintf("Level of Coherence: %d\n", cinfo->loc);
-//}
 
 /*------------------------------------------------------------------------
  * cache_inv  - Invalidate all lines in given cache
@@ -170,8 +131,6 @@ void cache_inv(uint32 level) {
 
 	nways = ((csid >> 3) & 0x3FF) + 1;
 	nsets = ((csid >> 13) & 0x7FFF) + 1;
-//	kprintf("nways = %d\n", nways);
-//	kprintf("nsets = %d\n", nsets);
 
 	for(set = 0; set < nsets; set++) {
 		for(way = 0; way < nways; way++) {
@@ -195,11 +154,7 @@ void cache_inv(uint32 level) {
 					: "r" (data)	/* Input	*/
 					  :	/* Clobber	*/
 			);
-			//kprintf("Invalidated cache level %d, set %d, way %d\n", level, set, way);
-			//kprintf("data for cache inv: %08x\n", data);
-
 		}
-		if (set > nsets){kprintf("set = %d, nsets = %d, WFT?\n"); break;}
 	}
 
 }
