@@ -177,9 +177,9 @@ static	void	sysinit()
 
 	/* Initialize system variables */
 
-	/* Count the Null process as the first process in the system */
+	/* Count the Null processes as the first processes in the system */
 
-	prcount = 1;
+	prcount = 4;
 
 	/* Scheduling is not currently blocked */
 
@@ -196,6 +196,7 @@ static	void	sysinit()
 	}
 
 	/* Initialize the Null process entries */
+
 	for(i = 0; i < NCORES; i++){
 		prptr = &proctab[i];
 		prptr->prstate = PR_CURR;
@@ -205,6 +206,8 @@ static	void	sysinit()
 		prptr->prstkbase = getstk(NULLSTK);
 		prptr->prstklen = NULLSTK;
 		prptr->prstkptr = 0;
+		prptr->prhrdaff = i;
+		prptr->prsftaff = i;
 		// TODO: currpid[i] = NULLPROC; ... but avoid false sharing...
 		currpid = NULLPROC;
 	}
