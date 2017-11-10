@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 uint32	irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
-uint32 	exp_vector[ARMV7A_EV_SIZE];
+uint32 	exp_vector[EV_SIZE];
 
 /*-------------------------------------------------------------------------
  * irq_dispatch - call the handler for specific interrupt
@@ -58,19 +58,19 @@ void initevec(void){
 
 	/* higher entries of exception vector point to exception handlers */
 
-	for(i = 8; i < ARMV7A_EV_SIZE; i++){
+	for(i = 8; i < EV_SIZE; i++){
 		exp_vector[i] = (uint32)defexp_handler;
 	}
 
 	/* overwrite with specific exception handlers as needed */
-	exp_vector[ARMV7A_RSTH_IND] = (uint32)rst_except;
-	exp_vector[ARMV7A_UDIH_IND] = (uint32)udi_except;
-	exp_vector[ARMV7A_SWIH_IND] = (uint32)swi_except;
-	exp_vector[ARMV7A_PFAH_IND] = (uint32)pfa_except;
-	exp_vector[ARMV7A_DABH_IND] = (uint32)dab_except;
-	exp_vector[ARMV7A_RSVH_IND] = (uint32)rsv_except;
-	exp_vector[ARMV7A_IRQH_IND] = (uint32)irq_except;
-	exp_vector[ARMV7A_FIQH_IND] = (uint32)fiq_except;
+	exp_vector[RSTH_IND] = (uint32)rst_except;
+	exp_vector[UDIH_IND] = (uint32)udi_except;
+	exp_vector[SWIH_IND] = (uint32)swi_except;
+	exp_vector[PFAH_IND] = (uint32)pfa_except;
+	exp_vector[DABH_IND] = (uint32)dab_except;
+	exp_vector[RSVH_IND] = (uint32)rsv_except;
+	exp_vector[IRQH_IND] = (uint32)irq_except;
+	exp_vector[FIQH_IND] = (uint32)fiq_except;
 }
 
 /*------------------------------------------------------------------------

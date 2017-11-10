@@ -32,7 +32,7 @@ cid32 getcid(void){
 	cid32 cid;
 	/* Read Multiprocessor Affinity Register */
 	asm volatile ( "MRC p15, 0, %0, c0, c0, 5\t\n": "=r"(cid) );
-	cid &= ARMV7A_MPIDR_CID; /* mask off CPU ID bits */
+	cid &= MPIDR_CID; /* mask off CPU ID bits */
 	return cid;
 }
 

@@ -6,7 +6,7 @@ startcoretest:
 
 	/* Secure Configuration Register */
 	mrc p15, 0, r0, c1, c1, 0
-	bic r0, #ARMV7A_SCR_NS
+	bic r0, #SCR_NS
 	mrc p15, 0, r0, c1, c1, 0
 	isb
 
@@ -14,7 +14,7 @@ startcoretest:
 	/* from TRM - this bit must be enable before any TLB or cache
 	*  maintenance or enabling MMU */
 	mrc p15, 0, r0, c1, c0, 1
-	orr r0, #ARMV7A_ACTLR_SMP
+	orr r0, #ACTLR_SMP
 	mcr p15, 0, r0, c1, c0, 1
 	isb
 	nop
@@ -25,8 +25,8 @@ startcoretest:
 	//wfi
 
 	/* change to supervisor mode */
-	cps #ARMV7A_CPSR_SPR
-	msr cpsr, #ARMV7A_CPSR_SPR
+	cps #CPSR_SPR
+	msr cpsr, #CPSR_SPR
 	isb
 	bl bputc
 
@@ -54,10 +54,10 @@ startcoretest:
 	/* disable mmu, caches, branch prediciton */
 	//mrc	p15, 0, r0, c1, c0, 0
 	//isb
-	//bic	r0, r0, #ARMV7A_SCTLR_I
-	//bic	r0, r0, #ARMV7A_SCTLR_C
-	//bic	r0, r0, #ARMV7A_SCTLR_M
-	//bic	r0, r0, #ARMV7A_SCTLR_Z
+	//bic	r0, r0, #SCTLR_I
+	//bic	r0, r0, #SCTLR_C
+	//bic	r0, r0, #SCTLR_M
+	//bic	r0, r0, #SCTLR_Z
 	//mcr	p15, 0, r0, c1, c0, 0
 	//isb
 	//nop
@@ -105,9 +105,9 @@ startcoretest:
 	dsb
 	dmb
 	ldr r0, =page_table
-	orr r0, #ARMV7A_TTBR_S
-	orr r0, #ARMV7A_TTBR_RGN1
-	orr r0, #ARMV7A_TTBR_IRGN1
+	orr r0, #TTBR_S
+	orr r0, #TTBR_RGN1
+	orr r0, #TTBR_IRGN1
 	isb
 	mcr p15, 0, r0, c2, c0, 0	/* TTBR0 */
 	mcr p15, 0, r0, c2, c0, 1	/* TTBR1 */
@@ -133,10 +133,10 @@ startcoretest:
 	//isb
 	//mrc	p15, 0, r0, c1, c0, 0
 	//isb
-	//orr	r0, r0, #ARMV7A_SCTLR_I
-	//orr	r0, r0, #ARMV7A_SCTLR_C
-	//orr	r0, r0, #ARMV7A_SCTLR_M
-	//orr	r0, r0, #ARMV7A_SCTLR_Z
+	//orr	r0, r0, #SCTLR_I
+	//orr	r0, r0, #SCTLR_C
+	//orr	r0, r0, #SCTLR_M
+	//orr	r0, r0, #SCTLR_Z
 	//mcr	p15, 0, r0, c1, c0, 0
 	//isb
 	//nop

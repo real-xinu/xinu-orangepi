@@ -16,7 +16,7 @@ start:
 	/* Secure Configuration Register */
 
 	mrc p15, 0, r0, c1, c1, 0
-	orr r0, #ARMV7A_SCR_NS
+	orr r0, #SCR_NS
 	mrc p15, 0, r0, c1, c1, 0
 	isb
 
@@ -62,12 +62,12 @@ secondary_start:
 	cpsid	i
 
 	/* change to supervisor mode */
-	cps #ARMV7A_CPSR_SPR
-	msr cpsr, #ARMV7A_CPSR_SPR
+	cps #CPSR_SPR
+	msr cpsr, #CPSR_SPR
 
 	/* Secure Configuration Register */
 	mrc p15, 0, r0, c1, c1, 0
-	orr r0, #ARMV7A_SCR_NS
+	orr r0, #SCR_NS
 	mrc p15, 0, r0, c1, c1, 0
 	isb
 
@@ -85,7 +85,7 @@ secondary_start:
 	/* from TRM - this bit must be enable before any TLB or cache
 	*  maintenance or enabling MMU */
 	mrc p15, 0, r0, c1, c0, 1
-	orr r0, #ARMV7A_ACTLR_SMP
+	orr r0, #ACTLR_SMP
 	mcr p15, 0, r0, c1, c0, 1
 
 	/* get stack to run on */

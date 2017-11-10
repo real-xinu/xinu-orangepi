@@ -80,7 +80,7 @@ irq_except:
  *------------------------------------------------------------------------
  */
 expjmpinstr:
-	ldr	pc, [pc, #ARMV7A_EH_OFFSET]
+	ldr	pc, [pc, #EH_OFFSET]
 
 /*------------------------------------------------------------------------
  * rst_except  -  Dispatch reset exception to higher level handler

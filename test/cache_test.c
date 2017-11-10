@@ -16,21 +16,21 @@ result cache_test(void){
 	print_info("sctlr = 0x%X\n", sctlr);
 	/* expect that address translation is enabled */
 	print_info("Expecting normal exception base register.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_V", sctlr & ARMV7A_SCTLR_V, 0x0, HEX);
+	EXPECT_EQ("sctlr & SCTLR_V", sctlr & SCTLR_V, 0x0, HEX);
 	print_info("Expecting I-cache enabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_I", sctlr & ARMV7A_SCTLR_I, ARMV7A_SCTLR_I, HEX);
+	EXPECT_EQ("sctlr & SCTLR_I", sctlr & SCTLR_I, SCTLR_I, HEX);
 	print_info("Expecting D-cache enabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_C", sctlr & ARMV7A_SCTLR_C, ARMV7A_SCTLR_C, HEX);
+	EXPECT_EQ("sctlr & SCTLR_C", sctlr & SCTLR_C, SCTLR_C, HEX);
 	print_info("Expecting strict alignment enabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_A", sctlr & ARMV7A_SCTLR_A, ARMV7A_SCTLR_A, HEX);
+	EXPECT_EQ("sctlr & SCTLR_A", sctlr & SCTLR_A, SCTLR_A, HEX);
 	print_info("Expecting MMU enabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_M", sctlr & ARMV7A_SCTLR_M, ARMV7A_SCTLR_M, HEX);
+	EXPECT_EQ("sctlr & SCTLR_M", sctlr & SCTLR_M, SCTLR_M, HEX);
 //	print_info("Expecting Branch Prediction enabled.\n");
-//	EXPECT_EQ("sctlr & ARMV7A_SCTLR_Z", sctlr & ARMV7A_SCTLR_Z, ARMV7A_SCTLR_Z, HEX);
+//	EXPECT_EQ("sctlr & SCTLR_Z", sctlr & SCTLR_Z, SCTLR_Z, HEX);
 	print_info("Expecting Access Flag disabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_AFE", sctlr & ARMV7A_SCTLR_AFE, 0, HEX);
+	EXPECT_EQ("sctlr & SCTLR_AFE", sctlr & SCTLR_AFE, 0, HEX);
 	print_info("Expecting TEX Remap Flag disabled.\n");
-	EXPECT_EQ("sctlr & ARMV7A_SCTLR_TRE", sctlr & ARMV7A_SCTLR_TRE, 0, HEX);
+	EXPECT_EQ("sctlr & SCTLR_TRE", sctlr & SCTLR_TRE, 0, HEX);
 
 	/* read the auxiliary control register */
 	kprintf("\n");
