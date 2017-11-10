@@ -75,6 +75,9 @@ secondary_start:
 	mrc p15, 0, r0, c1, c0, 1
 	orr r0, #ACTLR_SMP
 	mcr p15, 0, r0, c1, c0, 1
+	isb
+	dsb
+	dmb
 
 	/* get stack to run on */
 	mrc p15, 0, r11, c0, c0, 5 	/* get cid */
@@ -85,10 +88,16 @@ secondary_start:
 	lsl r2, r1, #13				/* r2 = (cid+1)*8192 */
 	add r0, r0, r2				/* use high end of stack */
 	mov sp, r0					/* set stack pointer */
+	isb
+	dsb
+	dmb
 
 	/* clear the fcseidr */
 	ldr r0, =0x0
 	mcr p15, 0, r0, c13, c0, 0
+	isb
+	dsb
+	dmb
 
 	bl secondary_run	/* never returns */
 

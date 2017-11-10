@@ -99,6 +99,7 @@ void cpu_set_entry(void* entry){
  */
 void secondary_run(void){
 	//cache_set_prefetch(L1PF_DISABLED);
+	kprintf("Hello from core %d\n!", getcid());
 	cache_inv(0); /* invalidate L1 data cache */
 	bp_inv();
 	tlb_inv_all();
@@ -108,10 +109,10 @@ void secondary_run(void){
 	mmu_set_dacr(0xFFFFFFFF);
 	mmu_set_ttbr(page_table);
 //	cache_set_prefetch(L1PF_3);
-	enable();
-	gic_enable();
 	cpu_wfe();
 	printf("Hello from core %d\n!", getcid());
+	enable();
+	gic_enable();
 	while(1);
 	// TODO: set currpid[getcid()]
 	// TODO: create null process with hard affinity for self and then resched

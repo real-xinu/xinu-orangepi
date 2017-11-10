@@ -68,7 +68,6 @@ void initevec(void){
 	exp_vector[SWIH_IND] = (uint32)swi_except;
 	exp_vector[PFAH_IND] = (uint32)pfa_except;
 	exp_vector[DABH_IND] = (uint32)dab_except;
-	exp_vector[RSVH_IND] = (uint32)rsv_except;
 	exp_vector[IRQH_IND] = (uint32)irq_except;
 	exp_vector[FIQH_IND] = (uint32)fiq_except;
 }
@@ -85,6 +84,8 @@ void evec_set_addr(void* addr){
 		"mov	r0, %0 \n"	  		/* Exception base address		*/
 		"mcr	p15, 0, r0, c12, c0, 0\n"	/* Store excp. base addr. in c12	*/
 		"isb\n"
+		"dsb\n"
+		"dmb\n"
 		:				/* Output	*/
 		: "r" (addr)	/* Input	*/
 		: "r0"			/* Clobber	*/
@@ -111,6 +112,7 @@ void defexp_handler(void){
  */
 void rst_handler(void){
 	kputc('R');
+	panic("**** RESET EXCEPTION ****");
 	return;
 }
 
@@ -120,6 +122,7 @@ void rst_handler(void){
  */
 void udi_handler(void){
 	kputc('U');
+	panic("**** UNDEFINED INSTRUCTION EXCEPTION ****");
 	return;
 }
 
@@ -129,6 +132,7 @@ void udi_handler(void){
  */
 void swi_handler(void){
 	kputc('S');
+	panic("**** SOFTWARE INTERRUPT EXCEPTION ****");
 	return;
 }
 
@@ -138,6 +142,7 @@ void swi_handler(void){
  */
 void pfa_handler(void){
 	kputc('P');
+	panic("**** PREFETCH ABORT EXCEPTION ****");
 	return;
 }
 
@@ -147,6 +152,7 @@ void pfa_handler(void){
  */
 void dab_handler(void){
 	kputc('D');
+	panic("**** DATA ABORT EXCEPTION ****");
 	return;
 }
 
@@ -165,5 +171,6 @@ void rsv_handler(void){
  */
 void fiq_handler(void){
 	kputc('F');
+	panic("**** FIQ EXCEPTION ****");
 	return;
 }

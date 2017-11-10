@@ -24,6 +24,9 @@ void	cache_enable_all (void) {
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 
+			"isb\n"
+			"dsb\n"
+			"dmb\n"
 			:		/* Output	*/
 			:		/* Input	*/
 			: "r0"	/* Clobber	*/
@@ -50,7 +53,8 @@ void	cache_disable_all (void) {
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 			"isb\n"
-
+			"dsb\n"
+			"dmb\n"
 			:		/* Output	*/
 			:		/* Input	*/
 			: "r0"	/* Clobber	*/
@@ -66,7 +70,9 @@ void	tlb_inv_all (void) {
 	asm volatile (
 			"mov	r0, #0\n"
 			"mcr	p15, 0, r0, c8, c7, 0\n"
-
+			"isb\n"
+			"dsb\n"
+			"dmb\n"
 			: 	/* No output 	*/
 			: 	/* No input	*/
 			: "r0"	/* Clobber 	*/
@@ -86,6 +92,8 @@ void	cache_inv_all (void) {
 			"mov	r0, #0\n"
 			"mcr	p15, 0, r0, c7, c5, 0\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 			:
 			:
 			: "r0"
@@ -121,6 +129,8 @@ void cache_inv(uint32 level) {
 			"mcr	p15, 2, %1, c0, c0, 0\n"
 			"mrc	p15, 1, %0, c0, c0, 0\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 			: "=r" (csid)		/* Output	*/
 			  : "r" (level << 1)	/* Input	*/
 				:			/* Clobber	*/
@@ -151,6 +161,8 @@ void cache_inv(uint32 level) {
 			asm volatile (
 					"mcr	p15, 0, %0, c7, c6, 2\n" /* invalidate by set/way */
 					"isb\n"
+					"dsb\n"
+					"dmb\n"
 					:		/* Ouptut	*/
 					: "r" (rtdata)	/* Input	*/
 					  :	/* Clobber	*/
@@ -170,6 +182,8 @@ void	bp_inv (void) {
 			"mov	r0, #0\n"
 			"mcr	p15, 0, r0, c7, c5, 6\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 			:
 			:
 			: "r0"
@@ -196,6 +210,8 @@ void	bp_disable (void) {
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 
 			:		/* Output	*/
 			:		/* Input	*/
@@ -222,6 +238,8 @@ void	bp_enable (void) {
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 
 			:		/* Output	*/
 			:		/* Input	*/
@@ -267,6 +285,9 @@ void	bp_enable (void) {
 //			/* Write the new Control register */
 //
 //			"mcr	p15, 0, r0, c1, c0, 1\n"
+//			"isb\n"
+//			"dsb\n"
+//			"dmb\n"
 //
 //			:		/* Output	*/
 //			: "r" (actlr)	/* Input	*/

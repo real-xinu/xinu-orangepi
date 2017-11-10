@@ -24,11 +24,10 @@ void mmuinit(void){
 	/* Initialize page tables */
 
 	paging_init();
-	kprintf("After paging_init()\n");
 
-	/* Set all Domains to Client */
+	/* Set all Domains to Manager */
 
-	mmu_set_dacr(0x55555555);
+	mmu_set_dacr(0xFFFFFFFF);
 
 //	tlb_inv_all(); // TODO: invalidate to PoU/PoC?
 //	kprintf("After tlb_inv_all()\n");
@@ -42,6 +41,7 @@ void mmuinit(void){
 	/* Make sure all memory operations are completed */
 
 	asm volatile (
+			"isb\n"
 			"dsb\n"
 			"dmb\n"
 	);
@@ -66,6 +66,8 @@ void	mmu_enable (void) {
 
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 
 			:	/* Output	*/
 			:	/* Input	*/
@@ -92,8 +94,8 @@ void	mmu_disable (void) {
 			"mcr	p15, 0, r0, c1, c0, 0\n"
 
 			"isb\n"
-			"dmb\n"
 			"dsb\n"
+			"dmb\n"
 
 			:	/* Output	*/
 			:	/* Input	*/
@@ -166,6 +168,8 @@ void	mmu_set_dacr (uint32 dacr)
 
 			/* Perform memory synchronization */
 			"isb\n"
+			"dsb\n"
+			"dmb\n"
 
 			:		/* Output	*/
 			: "r" (dacr)	/* Input	*/
