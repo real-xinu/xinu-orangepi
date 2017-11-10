@@ -26,7 +26,7 @@ void	cache_enable_all (void) {
 
 			:		/* Output	*/
 			:		/* Input	*/
-			: "r0", "r1"	/* Clobber	*/
+			: "r0"	/* Clobber	*/
 			);
 }
 
@@ -45,7 +45,6 @@ void	cache_disable_all (void) {
 
 			"bic	r0, #0x00001000\n" /* I cache */
 			"bic	r0, #0x00000004\n" /* D cache */
-			"bic	r0, #0x00008000\n" /* branch prediciton */
 
 			/* Write the new Control Register */
 
@@ -54,7 +53,7 @@ void	cache_disable_all (void) {
 
 			:		/* Output	*/
 			:		/* Input	*/
-			: "r0", "r1"	/* Clobber	*/
+			: "r0"	/* Clobber	*/
 			);
 }
 
@@ -112,7 +111,7 @@ void cache_inv(uint32 level) {
 	uint32	csid;			/* Cache Size ID	*/
 	uint32	set;			/* Cache set iterator	*/
 	uint32	way;			/* Cache way iterator	*/
-	uint32	data;			/* data for cache line clear */
+	uint32	rtdata;			/* rtdata for cache line clear */
 
 	if(level < 0 || level > 1){return;}
 
@@ -135,26 +134,144 @@ void cache_inv(uint32 level) {
 	for(set = 0; set < nsets; set++) {
 		for(way = 0; way < nways; way++) {
 
-			/* Generate the data item for	*/
+			/* Generate the rtdata item for	*/
 			/* cache invalidation		*/
 
-			data = (level << 1) | (set << 6);
+			rtdata = (level << 1) | (set << 4);// FIXME, used to be set << 6 ?
 			if(level == 0) {
-				data |= (way << 30);
+				rtdata |= (way << 30);
 			}
 			else {
-				data |= (way << 29);
+				rtdata |= (way << 29);
 			}
 
+//			kprintf("invalidating level %d, set %d, way %d, rtdata 0x%X\n",
+//					level, set, way, rtdata);
 
 			asm volatile (
 					"mcr	p15, 0, %0, c7, c6, 2\n" /* invalidate by set/way */
 					"isb\n"
 					:		/* Ouptut	*/
-					: "r" (data)	/* Input	*/
+					: "r" (rtdata)	/* Input	*/
 					  :	/* Clobber	*/
 			);
 		}
 	}
 
 }
+
+/*------------------------------------------------------------------------
+ * bp_inv  -  Invalidate branch prediction array
+ *------------------------------------------------------------------------
+ */
+void	bp_inv (void) {
+
+	asm volatile (
+			"mov	r0, #0\n"
+			"mcr	p15, 0, r0, c7, c5, 6\n"
+			"isb\n"
+			:
+			:
+			: "r0"
+		     );
+
+}
+
+/*------------------------------------------------------------------------
+ * bp_disable	-  Disable branch prediction
+ *------------------------------------------------------------------------
+ */
+void	bp_disable (void) {
+
+	asm volatile (
+			/* Read the Control Register */
+
+			"mrc	p15, 0, r0, c1, c0, 0\n"
+
+			/* Reset the Branch Prediction Enable bit */
+
+			"bic	r0, #0x00008000\n"
+
+			/* Write the new Control Register */
+
+			"mcr	p15, 0, r0, c1, c0, 0\n"
+			"isb\n"
+
+			:		/* Output	*/
+			:		/* Input	*/
+			: "r0"	/* Clobber	*/
+			);
+}
+
+/*------------------------------------------------------------------------
+ * bp_enable	-  Enable branch prediction
+ *------------------------------------------------------------------------
+ */
+void	bp_enable (void) {
+
+	asm volatile (
+			/* Read the Control Register */
+
+			"mrc	p15, 0, r0, c1, c0, 0\n"
+
+			/* Reset the Branch Prediction Enable bit */
+
+			"bic	r0, #0x00008000\n"
+
+			/* Write the new Control Register */
+
+			"mcr	p15, 0, r0, c1, c0, 0\n"
+			"isb\n"
+
+			:		/* Output	*/
+			:		/* Input	*/
+			: "r0"	/* Clobber	*/
+			);
+}
+
+///*------------------------------------------------------------------------
+// * cache_set_prefetch  -  set catch prefetch policy
+// *------------------------------------------------------------------------
+// */
+//status	cache_set_prefetch (int32 policy) {
+//	uint32 actlr;	/* bits for auxiliary control register */
+//
+//	switch(policy) {
+//	case L1PF_DISABLED:
+//		actlr = ACTLR_L1PCTL0;
+//		break;
+//	case L1PF_1:
+//		actlr = ACTLR_L1PCTL1;
+//		break;
+//	case L1PF_2:
+//		actlr = ACTLR_L1PCTL2;
+//		break;
+//	case L1PF_3:
+//		actlr = ACTLR_L1PCTL3;
+//		break;
+//	default:
+//		return SYSERR;
+//	}
+//
+//	asm volatile (
+//			/* Read the Auxiliary Control Register */
+//
+//			"mrc	p15, 0, r0, c1, c0, 1\n"
+//
+//			/* Set the bits for L1 Prefetch Policy */
+//
+//			"bic	r0, #0x00006000\n"
+//
+//			"orr	r0, #%0\n"
+//
+//			/* Write the new Control register */
+//
+//			"mcr	p15, 0, r0, c1, c0, 1\n"
+//
+//			:		/* Output	*/
+//			: "r" (actlr)	/* Input	*/
+//			: "r0"	/* Clobber	*/
+//			);
+//
+//	return OK;
+//}

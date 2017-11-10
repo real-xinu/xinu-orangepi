@@ -24,8 +24,10 @@ extern	void	cache_enable_all(void);
 extern	void	cache_disable_all(void);
 extern	void	tlb_inv_all(void);
 extern	void	cache_inv_all(void);
-//TODO: need this? extern	void	cache_get_info(struct cache_info*);
 extern	void	cache_inv(uint32);
+extern	void	bp_inv(void);
+extern	void	bp_enable(void);
+extern	void	bp_disable(void);
 
 /* in file chprio.c */
 extern	pri16	chprio(pid32, pri16);
@@ -330,6 +332,7 @@ extern	void	mmuinit(void);
 extern	void	mmu_enable (void);
 extern	void	mmu_disable (void);
 extern	void	mmu_set_ttbr (void*);
+extern	void	mmu_set_dacr (uint32);
 
 /* in file mount.c */
 extern	syscall	mount(char *, char *, did32);

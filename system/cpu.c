@@ -98,13 +98,19 @@ void cpu_set_entry(void* entry){
  *------------------------------------------------------------------------
  */
 void secondary_run(void){
-	evec_set_addr(exp_vector);
+	//cache_set_prefetch(L1PF_DISABLED);
 	cache_inv(0); /* invalidate L1 data cache */
+	bp_inv();
 	tlb_inv_all();
-	mmu_set_ttbr(page_table);
 	cache_enable_all();
 	mmu_enable();
+	evec_set_addr((void*)exp_vector);
+	mmu_set_dacr(0xFFFFFFFF);
+	mmu_set_ttbr(page_table);
+//	cache_set_prefetch(L1PF_3);
+	enable();
 	gic_enable();
+	cpu_wfe();
 	printf("Hello from core %d\n!", getcid());
 	while(1);
 	// TODO: set currpid[getcid()]

@@ -8,41 +8,43 @@
  *------------------------------------------------------------------------
  */
 void mmuinit(void){
-//		/* Disable all caches */
+//	kprintf("In mmuinit\n");
+//	bp_disable();
+//	kprintf("After bp_disable()\n");
 //
-//		cache_disable_all();
+//	bp_inv();
+//	kprintf("After bp_inv()\n");
 //
-//		/* Invalidate all caches */
+//	cache_disable_all();
+//	kprintf("After cache_disable_all()\n");
 //
-//		cache_inv_all();
-//
-//		/* Invalidate the TLB */
-//
-//		tlb_inv_all();
-//
-//		/* Make sure MMU is disabled */
-//
-//		mmu_disable();
+//	cache_inv_all();
+//	kprintf("After cache_inv_all()\n");
 
-		/* Initialize page tables */
-		paging_init();
+	/* Initialize page tables */
 
-		/* Make sure all memory operations are completed */
+	paging_init();
+	kprintf("After paging_init()\n");
 
-		asm volatile (
-				"dsb\n"
-				"dmb\n"
-		);
+	/* Set all Domains to Client */
 
+	mmu_set_dacr(0x55555555);
 
-//		cache_inv(0);
-//		/* Enable caches  */
-//
-//		cache_enable_all();
-//
-//		/* Turn on the MMU */
-//
-//		mmu_enable();
+//	tlb_inv_all(); // TODO: invalidate to PoU/PoC?
+//	kprintf("After tlb_inv_all()\n");
+
+//	cache_enable_all();
+
+	/* Enable branch prediction */
+
+//	bp_enable();
+
+	/* Make sure all memory operations are completed */
+
+	asm volatile (
+			"dsb\n"
+			"dmb\n"
+	);
 }
 
 /*------------------------------------------------------------------------
@@ -142,6 +144,31 @@ void	mmu_set_ttbr (
 
 			:		/* Output	*/
 			: "r" (ttbaddr)	/* Input	*/
+			: "r0"		/* Clobber	*/
+		);
+}
+
+/*------------------------------------------------------------------------
+ * mmu_set_dacr -  Set the Domain Access Control Register
+ *------------------------------------------------------------------------
+ */
+void	mmu_set_dacr (uint32 dacr)
+{
+	asm volatile (
+
+			/* Load the dacr setting into r0 */
+
+			"mov	r0, %0\n"
+
+			/* Write the new DACR */
+
+			"mcr	p15, 0, r0, c13, c0, 1\n"
+
+			/* Perform memory synchronization */
+			"isb\n"
+
+			:		/* Output	*/
+			: "r" (dacr)	/* Input	*/
 			: "r0"		/* Clobber	*/
 		);
 }

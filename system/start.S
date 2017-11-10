@@ -13,12 +13,9 @@
 	.globl	start			/* Declare entry point global	*/
 
 start:
-	/* Secure Configuration Register */
 
-	mrc p15, 0, r0, c1, c1, 0
-	orr r0, #SCR_NS
-	mrc p15, 0, r0, c1, c1, 0
-	isb
+	/* Disable interrupts */
+	cpsid	iaf
 
 	/* Load the stack pointer with end of memory */
 
@@ -59,27 +56,18 @@ bexit:	mov	pc, lr			/* Return to caller		*/
 secondary_start:
 
 	/* Disable interrupts */
-	cpsid	i
+	cpsid	iaf
+
+	/* Disable thumb exception, AFE, TRE */
+	//mrc	p15, 0, r0, c1, c0, 0
+	//bic	r0, #SCTLR_TE
+	//bic	r0, #SCTLR_AFE
+	//bic	r0, #SCTLR_TRE
+	//mcr	p15, 0, r0, c1, c0, 0
 
 	/* change to supervisor mode */
 	cps #CPSR_SPR
 	msr cpsr, #CPSR_SPR
-
-	/* Secure Configuration Register */
-	mrc p15, 0, r0, c1, c1, 0
-	orr r0, #SCR_NS
-	mrc p15, 0, r0, c1, c1, 0
-	isb
-
-	/* Iinvalidate instruction and data caches, branch prediction */
-	mov	r0, #0			@ set up for MCR
-	mcr	p15, 0, r0, c8, c7, 0	@ invalidate unified TLB
-	mcr	p15, 0, r0, c8, c6, 0	@ invalidate data TLB
-	mcr	p15, 0, r0, c8, c5, 0	@ invalidate instruction TLB
-	mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
-	mcr	p15, 0, r0, c7, c5, 6	@ invalidate BP array
-	dsb
-	isb
 
 	/* set actlr bits, including smp bit */
 	/* from TRM - this bit must be enable before any TLB or cache
@@ -101,12 +89,6 @@ secondary_start:
 	/* clear the fcseidr */
 	ldr r0, =0x0
 	mcr p15, 0, r0, c13, c0, 0
-
-	/* intialize mmu registers */
-	ldr r0, =0xFFFFFFFF
-	mcr p15, 0, r0, c13, c0, 1	/* DACR */
-
-	wfe
 
 	bl secondary_run	/* never returns */
 
