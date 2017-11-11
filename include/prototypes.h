@@ -574,12 +574,6 @@ extern	syscall	signaln(sid32, int32);
 extern	syscall	sleepms(int32);
 extern	syscall	sleep(int32);
 
-/* in file slkcreate.c */
-extern	lid32	slkcreate(void);
-
-/* in file slkdelete.c */
-extern	status	slkdelete(lid32);
-
 /* in file slkinit.c */
 extern	void	slkinit(void);
 
