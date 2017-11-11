@@ -13,7 +13,7 @@ status lock(
 	){
 	struct lentry* slkptr;	/* Ptr to spinlock table entry */
 
-	if (isbadslk(slk)) {
+	if (isbadlid(slk)) {
 		return SYSERR;
 	}
 
@@ -23,7 +23,7 @@ status lock(
 	}
 
 	arm_lock(&(slkptr->lock));
-	slkptr->lowner = currpid; // TODO: currpid[getcid()]
+	slkptr->lowner = currpid;
 
 	return OK;
 }
@@ -38,7 +38,7 @@ status unlock(
 
 	struct lentry* slkptr;	/* Ptr to spinlock table entry */
 
-	if (isbadslk(slk)) {
+	if (isbadlid(slk)) {
 		return SYSERR;
 	}
 
@@ -47,7 +47,7 @@ status unlock(
 		return SYSERR;
 	}
 
-	slkptr->lowner = SLK_NEMO;
+	slkptr->lowner = SLK_NONE;
 	arm_unlock(&(slkptr->lock));
 
 	return OK;

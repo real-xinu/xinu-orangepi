@@ -5,10 +5,7 @@
 #define	SLK_FREE		0		/* Spinlock table entry is available */
 #define	SLK_USED		1		/* Spinlock table entry is available */
 
-#define SLK_NEMO		(-1)	/* Spinlock currently not owned.
- 	 	 	 	 	 	 	 	   Nemo is Latin for "no one"	*/
-
-#define SLK_TABLK	0			/* id of lock on the spinlock table */
+#define SLK_NONE		(-1)	/* Spinlock currently not owned. */
 
 /* Spinlock table entry: each entry must be equal to the size of the ERG
  * in order to prevent false sharing.
@@ -22,4 +19,4 @@ struct lentry {
 
 extern	struct	lentry	slktab[];	/* spinlock table */
 
-#define	isbadslk(s)	((int32)(s) < 0 || (s) >= NSLK)
+#define	isbadlid(l)	((int32)(l) < 0 || (l) >= NSLK)
