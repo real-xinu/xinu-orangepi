@@ -50,7 +50,4 @@ void	platinit(void)
 
 	/* TODO: move cpuinit() here... */
 
-	/* Initialize the Spinlock Table */
-
-	slkinit();
 }

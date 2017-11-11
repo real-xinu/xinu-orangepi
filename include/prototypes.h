@@ -571,9 +571,6 @@ extern	syscall	signaln(sid32, int32);
 extern	syscall	sleepms(int32);
 extern	syscall	sleep(int32);
 
-/* in file slkinit.c */
-extern	void	slkinit(void);
-
 /* in file spicontrol.c */
 extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 
