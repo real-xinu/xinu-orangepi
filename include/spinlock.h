@@ -12,11 +12,10 @@
  */
 struct lentry {
 	int32	lock;		/* Actual spinlock word used by hardware */
-	int32	lstate;		/* Whether entry is SLK_FREE or SLK_USED */
 	pid32	lowner;		/* id of process that currently owns spinlock */
 	int32	lpad[13];	/* padding to reach size of ERG */
 };
 
-extern	struct	lentry	slktab[];	/* spinlock table */
+extern	struct	lentry	locktab[];	/* spinlock table */
 
 #define	isbadlid(l)	((int32)(l) < 0 || (l) >= NSLK)
