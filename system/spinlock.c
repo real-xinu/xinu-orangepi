@@ -55,8 +55,9 @@ lid32	newlock(void)
 {
 	static lid32	nextlid = 0;	/* Next lock in locktab to use	*/
 	lid32		l;		/* ID of allocated lock 	*/
+	// TODO: setting l=0 gives cpu output!
 
-//	l = nextlid++; TODO: uncommenting this causes weird behavior... why?
+//	l = nextlid++; //TODO: uncommenting this causes weird behavior... why?
 
 	if (l >= NSLK) {		/* Check for table overflow	*/
 		return SYSERR;
