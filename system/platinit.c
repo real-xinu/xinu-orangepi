@@ -47,4 +47,10 @@ void	platinit(void)
 	/* Initialize the Performance Counters */
 
 	counterinit();
+
+	/* TODO: move cpuinit() here... */
+
+	/* Initialize the Spinlock Table */
+
+	slkinit();
 }

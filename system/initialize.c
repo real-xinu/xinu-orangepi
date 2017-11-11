@@ -208,7 +208,7 @@ static	void	sysinit()
 		prptr->prstkptr = 0;
 		prptr->prhrdaff = i;
 		prptr->prsftaff = i;
-		// TODO: currpid[i] = NULLPROC; ... but avoid false sharing...
+		// TODO: currpid[i] = i; ... but avoid false sharing...
 		currpid = NULLPROC;
 	}
 

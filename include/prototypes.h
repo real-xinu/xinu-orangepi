@@ -294,6 +294,9 @@ extern	status	lfsetup(struct lflcblk *);
 /* in file lftruncate.c */
 extern	status	lftruncate(struct lflcblk *);
 
+/* in file lock.c */
+extern	syscall	lock(lid32);
+
 /* in file lpgetc.c */
 extern	devcall	lpgetc(struct dentry *);
 
@@ -567,11 +570,24 @@ extern	syscall	signaln(sid32, int32);
 extern	syscall	sleepms(int32);
 extern	syscall	sleep(int32);
 
+/* in file slkcreate.c */
+extern	lid32	slkcreate(void);
+
+/* in file slkdelete.c */
+extern	syscall	slkdelete(lid32);
+
+/* in file slkinit.c */
+extern	void	slkinit(void);
+
 /* in file spicontrol.c */
 extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 
 /* in spiinit.c */
 extern	int32	spiinit(struct dentry *);
+
+/* in file spinlock.S */
+extern	void	arm_lock(int32*);
+extern	void	arm_unlock(int32*);
 
 /* in file start.S */
 extern	void 	secondary_start(void);
@@ -623,6 +639,8 @@ extern	status	udp_release(uid32);
 extern	void	udp_ntoh(struct netpacket *);
 extern	void	udp_hton(struct netpacket *);
 
+/* in file unlock.c */
+extern	syscall	unlock(lid32);
 
 /* in file unsleep.c */
 extern	syscall	unsleep(pid32);
