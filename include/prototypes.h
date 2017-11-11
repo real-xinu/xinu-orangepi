@@ -298,9 +298,6 @@ extern	status	lfsetup(struct lflcblk *);
 /* in file lftruncate.c */
 extern	status	lftruncate(struct lflcblk *);
 
-/* in file lock.c */
-extern	status	lock(lid32);
-
 /* in file lpgetc.c */
 extern	devcall	lpgetc(struct dentry *);
 
@@ -583,6 +580,10 @@ extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 /* in spiinit.c */
 extern	int32	spiinit(struct dentry *);
 
+/* in file spinlock.c */
+extern	status	lock(lid32);
+extern	status	unlock(lid32);
+
 /* in file start.S */
 extern	void 	secondary_start(void);
 extern	void 	bputc(void);
@@ -632,9 +633,6 @@ extern	status	udp_sendto(uid32, uint32, uint16, char *, int32);
 extern	status	udp_release(uid32);
 extern	void	udp_ntoh(struct netpacket *);
 extern	void	udp_hton(struct netpacket *);
-
-/* in file unlock.c */
-extern	status	unlock(lid32);
 
 /* in file unsleep.c */
 extern	syscall	unsleep(pid32);
