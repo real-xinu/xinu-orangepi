@@ -1,4 +1,4 @@
-/* spinlock.S - s_lock, s_unlock */
+/* spinlock.S - arm_lock, arm_unlock */
 
 .text
 .globl arm_lock
