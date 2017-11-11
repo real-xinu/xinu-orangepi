@@ -2,6 +2,8 @@
 
 #include <xinu.h>
 
+struct	lentry	slktab[NSLK];	/* Spinlock Table				*/
+
 /*------------------------------------------------------------------------
  *  lock  -  Cause current process to lock a spinlock
  *------------------------------------------------------------------------
