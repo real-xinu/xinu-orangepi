@@ -56,7 +56,7 @@ void cpu_wfe(void){
  *  cpu_enable  -  reset and turn on given core
  *------------------------------------------------------------------------
  */
-syscall cpu_enable(cid32 cid){
+status cpu_enable(cid32 cid){
 	struct cpucfg_csreg* cpucfg;
 	struct cpu_csreg* cpureg;
 	uint32 cpumask;

@@ -6,7 +6,7 @@
  * slkdelete  -  Delete a spinlock by releasing its table entry
  *------------------------------------------------------------------------
  */
-syscall	slkdelete(
+status	slkdelete(
 	  lid32		slk		/* ID of spinlock to delete	*/
 	)
 {

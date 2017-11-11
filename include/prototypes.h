@@ -53,7 +53,7 @@ extern	syscall	control(did32, int32, int32, int32);
 /* in file cpu.c */
 extern	cid32	getcid(void);
 extern	void	cpuinit(void);
-extern	syscall	cpu_enable(cid32);
+extern	status	cpu_enable(cid32);
 extern	void	cpu_set_entry(void*);
 extern	void	cpu_dump(void);
 extern	void	secondary_run(void);
@@ -295,7 +295,7 @@ extern	status	lfsetup(struct lflcblk *);
 extern	status	lftruncate(struct lflcblk *);
 
 /* in file lock.c */
-extern	syscall	lock(lid32);
+extern	status	lock(lid32);
 
 /* in file lpgetc.c */
 extern	devcall	lpgetc(struct dentry *);
@@ -574,7 +574,7 @@ extern	syscall	sleep(int32);
 extern	lid32	slkcreate(void);
 
 /* in file slkdelete.c */
-extern	syscall	slkdelete(lid32);
+extern	status	slkdelete(lid32);
 
 /* in file slkinit.c */
 extern	void	slkinit(void);
@@ -640,7 +640,7 @@ extern	void	udp_ntoh(struct netpacket *);
 extern	void	udp_hton(struct netpacket *);
 
 /* in file unlock.c */
-extern	syscall	unlock(lid32);
+extern	status	unlock(lid32);
 
 /* in file unsleep.c */
 extern	syscall	unsleep(pid32);

@@ -6,7 +6,7 @@
  *  unlock  -  Cause current process to unlock a spinlock
  *------------------------------------------------------------------------
  */
-syscall unlock(
+status unlock(
 		lid32	slk		/* id of spinlock to unlock */
 	){
 

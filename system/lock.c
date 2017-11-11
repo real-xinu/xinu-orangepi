@@ -6,7 +6,7 @@
  *  lock  -  Cause current process to lock a spinlock
  *------------------------------------------------------------------------
  */
-syscall lock(
+status lock(
 		lid32	slk		/* id of spinlock to lock */
 	){
 	struct lentry* slkptr;	/* Ptr to spinlock table entry */
