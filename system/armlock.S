@@ -1,4 +1,4 @@
-/* spinlock.S - arm_lock, arm_unlock */
+/* armlock.S - arm_lock, arm_unlock */
 
 #include <cache.h>
 

@@ -13,6 +13,10 @@ extern	int32	arp_alloc(void);
 extern	void	arp_ntoh(struct arppacket *);
 extern	void	arp_hton(struct arppacket *);
 
+/* in file armlock.S */
+extern	void	arm_lock(int32*);
+extern	void	arm_unlock(int32*);
+
 /* in file ascdate.c */
 extern	status	ascdate(uint32, char *);
 
@@ -584,10 +588,6 @@ extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 
 /* in spiinit.c */
 extern	int32	spiinit(struct dentry *);
-
-/* in file spinlock.S */
-extern	void	arm_lock(int32*);
-extern	void	arm_unlock(int32*);
 
 /* in file start.S */
 extern	void 	secondary_start(void);
