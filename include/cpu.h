@@ -1,9 +1,10 @@
 /* cpu.h */
 
+#define NCORE 4	/* number of cores in SMP system */
+
 /* CPU Config Control and Status Registers */
 
 #define CPUCFG_BASE	0x01F01C00	/* Base address */
-#define NCORES 4
 
 #define CPU_CORE_RST 0x00000002
 #define CPU_RST 0x00000001
@@ -35,5 +36,5 @@ struct cpucfg_csreg {
 	reg32 cnt64high;			/* 64-bit counter high register */
 };
 
-#define isbadcid(x)	(x < 0 || x >= NCORES)
+#define isbadcid(x)	(x < 0 || x >= NCORE)
 

@@ -29,7 +29,7 @@ syscall	slkdelete(
 		return SYSERR;
 	}
 	slkptr->lstate = SLK_FREE;
-	slkptr->lock = SLK_UNLOCKED;
+	slkptr->lock = UNLOCKED;
 	slkptr->lowner = SLK_NEMO;
 
 	unlock(SLK_TABLK);

@@ -25,7 +25,7 @@ struct	memblk	memlist;		/* List of free memory blocks	*/
 /* Active system status */
 
 int	prcount;		/* Total number of live processes	*/
-pid32	currpid;		/* ID of currently executing process	*/
+struct	cpident	cpidtab[NCORE];	/* IDs of currently executing processes */
 
 /* Control sequence to reset the console colors and cursor position	*/
 
@@ -198,7 +198,7 @@ static	void	sysinit()
 
 	/* Initialize the Null process entries */
 
-	for(i = 0; i < NCORES; i++){
+	for(i = 0; i < NCORE; i++){
 		prptr = &proctab[i];
 		prptr->prstate = PR_CURR;
 		prptr->prprio = 0;
@@ -209,7 +209,6 @@ static	void	sysinit()
 		prptr->prstkptr = 0;
 		prptr->prhrdaff = i;
 		prptr->prsftaff = i;
-		// TODO: currpid[i] = i; ... but avoid false sharing...
 		currpid = NULLPROC;
 	}
 

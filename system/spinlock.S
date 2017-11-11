@@ -1,5 +1,7 @@
 /* spinlock.S - arm_lock, arm_unlock */
 
+#include <cache.h>
+
 .text
 .globl arm_lock
 .globl arm_unlock
@@ -9,7 +11,7 @@
  *------------------------------------------------------------------------
  */
 arm_lock:
-		ldr r1, =1	/* SLK_LOCKED = 1 */
+		ldr r1, =LOCKED
 spin:	ldrex r2, [r0]
 		cmp r2, r1 	/* Test if mutex is locked or unlocked */
 		beq spin 	/* If locked - wait for it to be released */
@@ -25,7 +27,7 @@ spin:	ldrex r2, [r0]
  *------------------------------------------------------------------------
  */
 arm_unlock:
-		ldr r1, =0		/* SLK_UNLOCKED = 0 */
+		ldr r1, =UNLOCKED
 		dmb				/* Required before releasing protected resource */
 		str r1, [r0]	/* Unlock mutex */
 		bx lr

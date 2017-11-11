@@ -21,7 +21,7 @@ lid32	slkcreate(void)
 		restore(mask);
 		return SYSERR;
 	}
-	slktab[slk].lock = SLK_UNLOCKED;
+	slktab[slk].lock = UNLOCKED;
 	slktab[slk].lowner = SLK_NEMO;
 
 	unlock(SLK_TABLK);

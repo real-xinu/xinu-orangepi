@@ -1,4 +1,4 @@
-/* process.h - isbadpid */
+/* process.h - isbadpid, currpid */
 
 /* Maximum number of processes in the system */
 
@@ -56,9 +56,19 @@ struct procent {		/* Entry in the process table		*/
 	uint32  prsftaff;	/* Processor soft affinity */
 };
 
+/* Hold current pid executing on each processor */
+
+struct cpident {
+	pid32 cpid;					/* ID of currently executing process */
+	int32 cpidpad[15];			/* Pad to size of ERG to avoid false sharing */
+};
+
 /* Marker for the top of a process stack (used to help detect overflow)	*/
 #define	STACKMAGIC	0x0A0AAAA9
 
 extern	struct	procent proctab[];
+extern 	struct	cpident	cpidtab[];
 extern	int32	prcount;	/* Currently active processes		*/
-extern	pid32	currpid;	/* Currently executing process		*/
+
+/* id of process currently executing on this core */
+#define	currpid		(cpidtab[getcid()].cpid)

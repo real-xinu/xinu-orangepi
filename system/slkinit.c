@@ -15,7 +15,7 @@ void	slkinit(void)
 
 	for (i = 0; i < NSLK; i++){
 		slkptr = &slktab[i];
-		slkptr->lock = SLK_UNLOCKED;
+		slkptr->lock = UNLOCKED;
 		slkptr->lstate = SLK_FREE;
 		slkptr->lowner = SLK_NEMO;
 	}
@@ -23,7 +23,7 @@ void	slkinit(void)
 	/* Initialize the table lock */
 
 	slkptr = &slktab[SLK_TABLK];
-	slkptr->lock = SLK_UNLOCKED;
+	slkptr->lock = UNLOCKED;
 	slkptr->lstate = SLK_USED;
 	slkptr->lowner = SLK_NEMO;
 }
