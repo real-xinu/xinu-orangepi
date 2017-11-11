@@ -580,6 +580,7 @@ extern	int32	spiinit(struct dentry *);
 /* in file spinlock.c */
 extern	status	lock(lid32);
 extern	status	unlock(lid32);
+extern	lid32	newlock(void);
 
 /* in file start.S */
 extern	void 	secondary_start(void);

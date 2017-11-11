@@ -46,7 +46,7 @@ void	platinit(void)
 
 	/* Initialize the Performance Counters */
 
-	counterinit();
+//	counterinit();
 
 	/* TODO: move cpuinit() here... */
 

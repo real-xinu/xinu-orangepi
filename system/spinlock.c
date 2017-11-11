@@ -46,3 +46,26 @@ status unlock(
 
 	return OK;
 }
+
+/*------------------------------------------------------------------------
+ *  newlock  -  Allocate and initialize a lock in the spinlock table
+ *------------------------------------------------------------------------
+ */
+lid32	newlock(void)
+{
+	static lid32	nextlid = 0;	/* Next lock in locktab to use	*/
+	lid32		l;		/* ID of allocated lock 	*/
+
+//	l = nextlid++; TODO: uncommenting this causes weird behavior... why?
+
+	if (l >= NSLK) {		/* Check for table overflow	*/
+		return SYSERR;
+	}
+
+	/* Initialize lock */
+
+	locktab[l].lock = UNLOCKED;
+	locktab[l].lowner = SLK_NONE;
+
+	return l;
+}
