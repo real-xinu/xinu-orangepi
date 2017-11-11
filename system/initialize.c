@@ -17,9 +17,10 @@ local	process startup(void);	/* Process to finish startup tasks	*/
 
 /* Declarations of major kernel variables */
 
-struct	procent	proctab[NPROC];	/* Process table			*/
-struct	sentry	semtab[NSEM];	/* Semaphore table			*/
-struct	memblk	memlist;	/* List of free memory blocks		*/
+struct	procent	proctab[NPROC];	/* Process table				*/
+struct	sentry	semtab[NSEM];	/* Semaphore table				*/
+struct	lentry	slktab[NSLK];	/* Spinlock Table				*/
+struct	memblk	memlist;		/* List of free memory blocks	*/
 
 /* Active system status */
 
@@ -201,7 +202,7 @@ static	void	sysinit()
 		prptr = &proctab[i];
 		prptr->prstate = PR_CURR;
 		prptr->prprio = 0;
-		strncpy(prptr->prname, "prnull", 7);
+		strncpy(prptr->prname, "prnullx", 8);
 		prptr->prname[6] = i + 0x30; /* convert i to string and append */
 		prptr->prstkbase = getstk(NULLSTK);
 		prptr->prstklen = NULLSTK;

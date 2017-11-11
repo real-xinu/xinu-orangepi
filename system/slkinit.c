@@ -2,8 +2,6 @@
 
 #include <xinu.h>
 
-struct	lentry	slktab[NSLK];		/* Spinlock Table	*/
-
 /*------------------------------------------------------------------------
  *  slkinit  -  Initialize the Spinlock Table
  *------------------------------------------------------------------------
