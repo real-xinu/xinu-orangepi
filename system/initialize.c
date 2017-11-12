@@ -18,7 +18,6 @@ local	process startup(void);	/* Process to finish startup tasks	*/
 /* Declarations of major kernel variables */
 
 struct	procent	proctab[NPROC];	/* Process table				*/
-struct	sentry	semtab[NSEM];	/* Semaphore table				*/
 struct	memblk	memlist;		/* List of free memory blocks	*/
 
 /* Active system status */
@@ -150,7 +149,6 @@ static	void	sysinit()
 {
 	int32	i;
 	struct	procent	*prptr;		/* Ptr to process table entry	*/
-	struct	sentry	*semptr;	/* Ptr to semaphore table entry	*/
 
 	kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
@@ -211,15 +209,9 @@ static	void	sysinit()
 		currpid = NULLPROC;
 	}
 
-	
 	/* Initialize semaphores */
 
-	for (i = 0; i < NSEM; i++) {
-		semptr = &semtab[i];
-		semptr->sstate = S_FREE;
-		semptr->scount = 0;
-		semptr->squeue = newqueue();
-	}
+	seminit();
 
 	/* Initialize buffer pools */
 

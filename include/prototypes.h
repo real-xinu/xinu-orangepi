@@ -552,6 +552,9 @@ extern	sid32	semcreate(int32);
 /* in file semdelete.c */
 extern	syscall	semdelete(sid32);
 
+/* in file seminit.c */
+extern	status	seminit(void);
+
 /* in file semreset.c */
 extern	syscall	semreset(sid32, int32);
 
