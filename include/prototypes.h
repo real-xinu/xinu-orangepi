@@ -375,6 +375,9 @@ extern	status	paging_init (void);
 /* in file platinit.c */
 extern	void	platinit(void);
 
+/* in file procinit.c */
+extern	status	procinit(void);
+
 /* in file ptclear.c */
 extern	void	_ptclear(struct ptentry *, uint16, int32 (*)(int32));
 

@@ -17,7 +17,6 @@ local	process startup(void);	/* Process to finish startup tasks	*/
 
 /* Declarations of major kernel variables */
 
-struct	procent	proctab[NPROC];	/* Process table				*/
 struct	memblk	memlist;		/* List of free memory blocks	*/
 
 /* Active system status */
@@ -147,9 +146,7 @@ local process	startup(void)
  */
 static	void	sysinit()
 {
-	int32	i;
-	struct	procent	*prptr;		/* Ptr to process table entry	*/
-
+	int32 i;	/* iterator over devices */
 	kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
 
@@ -175,39 +172,13 @@ static	void	sysinit()
 
 	/* Initialize system variables */
 
-	/* Count the Null processes as the first processes in the system */
-
-	prcount = 4;
-
 	/* Scheduling is not currently blocked */
 
 	Defer.ndefers = 0;
 
-	/* Initialize process table entries free */
+	/* Initialize process variables */
 
-	for (i = 0; i < NPROC; i++) {
-		prptr = &proctab[i];
-		prptr->prstate = PR_FREE;
-		prptr->prname[0] = NULLCH;
-		prptr->prstkbase = NULL;
-		prptr->prprio = 0;
-	}
-
-	/* Initialize the Null process entries */
-
-	for(i = 0; i < NCORE; i++){
-		prptr = &proctab[i];
-		prptr->prstate = PR_CURR;
-		prptr->prprio = 0;
-		strncpy(prptr->prname, "prnullx", 8);
-		prptr->prname[6] = i + 0x30; /* convert i to string and append */
-		prptr->prstkbase = getstk(NULLSTK);
-		prptr->prstklen = NULLSTK;
-		prptr->prstkptr = 0;
-		prptr->prhrdaff = i;
-		prptr->prsftaff = i;
-		currpid = NULLPROC;
-	}
+	procinit();
 
 	/* Initialize semaphores */
 
@@ -224,6 +195,8 @@ static	void	sysinit()
 	/* Initialize the real time clock */
 
 	clkinit();
+
+	/* Initialize devices */
 
 	for (i = 0; i < NDEVS; i++) {
 		init(i);
