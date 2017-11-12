@@ -16,13 +16,16 @@ sid32	semcreate(
 	sid32	sem;			/* Semaphore ID to return	*/
 
 	mask = disable();
+	lock(semtablock);
 
 	if (count < 0 || ((sem=newsem())==SYSERR)) {
+		unlock(semtablock);
 		restore(mask);
 		return SYSERR;
 	}
 	semtab[sem].scount = count;	/* Initialize table entry	*/
 
+	unlock(semtablock);
 	restore(mask);
 	return sem;
 }
