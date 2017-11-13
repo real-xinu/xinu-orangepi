@@ -28,12 +28,10 @@ syscall	semdelete(
 	}
 	semptr->sstate = S_FREE;
 
-	lock(semptr->slock);
 	resched_cntl(DEFER_START);
 	while (semptr->scount++ < 0) {	/* Free all waiting processes	*/
 		ready(getfirst(semptr->squeue));
 	}
-	unlock(semptr->slock);
 	unlock(semtablock);
 	resched_cntl(DEFER_STOP);
 	restore(mask);
