@@ -13,13 +13,16 @@ syscall	signaln(
 {
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	sentry	*semptr;	/* Ptr to sempahore table entry */
+	pid32	proc;				/* pid of process at head of wait list */
 
 	mask = disable();
+	semptr = &semtab[sem];
+	lock(semptr->slock);
 	if (isbadsem(sem) || (count < 0)) {
+		unlock(semptr->slock);
 		restore(mask);
 		return SYSERR;
 	}
-	semptr = &semtab[sem];
 	if (semptr->sstate == S_FREE) {
 		restore(mask);
 		return SYSERR;
@@ -31,6 +34,7 @@ syscall	signaln(
 			ready(dequeue(semptr->squeue));
 		}
 	}
+	unlock(semptr->slock);
 	resched_cntl(DEFER_STOP);
 	restore(mask);
 	return OK;
