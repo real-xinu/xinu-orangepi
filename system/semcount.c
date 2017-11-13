@@ -17,10 +17,15 @@ syscall semcount(
 	mask = disable();
 	
 	if (isbadsem(semid) || semtab[semid].sstate == S_FREE) {
+		unlock(semtablock);
 		restore(mask);
 		return SYSERR;
 	}
+
+	lock(semtab[semid].sllock);
 	count = semtab[semid].scount;
+	unlock(semtab[semid].sllock);
+
 	restore(mask);
 	return count;
 }
