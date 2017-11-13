@@ -25,10 +25,12 @@ syscall	semreset(
 	
 	semptr = &semtab[sem];
 	semqueue = semptr->squeue;	/* Free any waiting processes */
+	lock(semptr->slock);
 	resched_cntl(DEFER_START);
 	while ((pid=getfirst(semqueue)) != EMPTY)
 		ready(pid);
 	semptr->scount = count;		/* Reset count as specified */
+	unlock(semptr->slock);
 	resched_cntl(DEFER_STOP);
 	restore(mask);
 	return OK;
