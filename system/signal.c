@@ -12,6 +12,7 @@ syscall	signal(
 {
 	intmask mask;			/* Saved interrupt mask		*/
 	struct	sentry *semptr;		/* Ptr to sempahore table entry	*/
+	pid32	proc;				/* pid of process at head of wait list */
 
 	mask = disable();
 	if (isbadsem(sem)) {
@@ -23,8 +24,13 @@ syscall	signal(
 		restore(mask);
 		return SYSERR;
 	}
+	lock(semptr->slock);
 	if ((semptr->scount++) < 0) {	/* Release a waiting process */
-		ready(dequeue(semptr->squeue));
+		proc = dequeue(semptr->squeue);
+		unlock(semptr->slock);
+		ready(proc);
+	} else {
+		unlock(semptr->slock);
 	}
 	restore(mask);
 	return OK;
