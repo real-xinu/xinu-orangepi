@@ -34,9 +34,10 @@ syscall	wait(
 		enqueue(currpid,semptr->squeue);/* Enqueue on semaphore	*/
 		unlock(semptr->slock);
 		resched();			/*   and reschedule	*/
+	} else {
+		unlock(semptr->slock);
 	}
 
-	unlock(semptr->slock);
 	restore(mask);
 	return OK;
 }
