@@ -25,13 +25,14 @@ sid32	semcreate(
 	}
 	semtab[sem].scount = count;	/* Initialize table entry	*/
 
+	unlock(semtab[sem].slock); /* locked in newsem */
 	unlock(semtablock);
 	restore(mask);
 	return sem;
 }
 
 /*------------------------------------------------------------------------
- *  newsem  -  Allocate an unused semaphore and return its index
+ *  newsem  -  Allocate an unused semaphore, lock it, and return its index
  *------------------------------------------------------------------------
  */
 local	sid32	newsem(void)
@@ -44,9 +45,12 @@ local	sid32	newsem(void)
 		sem = nextsem++;
 		if (nextsem >= NSEM)
 			nextsem = 0;
+		lock(semtab[sem].slock);
 		if (semtab[sem].sstate == S_FREE) {
 			semtab[sem].sstate = S_USED;
 			return sem;
+		} else {
+			unlock(semtab[sem].slock);
 		}
 	}
 	return SYSERR;

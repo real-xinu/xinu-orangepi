@@ -14,19 +14,20 @@ syscall	wait(
 	struct	procent *prptr;		/* Ptr to process's table entry	*/
 	struct	sentry *semptr;		/* Ptr to sempahore table entry	*/
 
-	mask = disable();
 	if (isbadsem(sem)) {
-		restore(mask);
 		return SYSERR;
 	}
-
 	semptr = &semtab[sem];
+
+	mask = disable();
+	lock(semptr->slock);
+
 	if (semptr->sstate == S_FREE) {
+		unlock(semptr->slock);
 		restore(mask);
 		return SYSERR;
 	}
 
-	lock(semptr->slock);
 	if (--(semptr->scount) < 0) {		/* If caller must block	*/
 		prptr = &proctab[currpid];
 		prptr->prstate = PR_WAIT;	/* Set state to waiting	*/

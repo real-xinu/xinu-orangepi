@@ -14,17 +14,20 @@ syscall	signal(
 	struct	sentry *semptr;		/* Ptr to sempahore table entry	*/
 	pid32	proc;				/* pid of process at head of wait list */
 
-	mask = disable();
 	if (isbadsem(sem)) {
-		restore(mask);
 		return SYSERR;
 	}
 	semptr= &semtab[sem];
+
+	mask = disable();
+	lock(semptr->slock);
+
 	if (semptr->sstate == S_FREE) {
+		unlock(semptr->slock);
 		restore(mask);
 		return SYSERR;
 	}
-	lock(semptr->slock);
+
 	if ((semptr->scount++) < 0) {	/* Release a waiting process */
 		proc = dequeue(semptr->squeue);
 		unlock(semptr->slock);
@@ -32,6 +35,7 @@ syscall	signal(
 	} else {
 		unlock(semptr->slock);
 	}
+
 	restore(mask);
 	return OK;
 }

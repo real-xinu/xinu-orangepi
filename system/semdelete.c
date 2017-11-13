@@ -13,26 +13,28 @@ syscall	semdelete(
 	intmask mask;			/* Saved interrupt mask		*/
 	struct	sentry *semptr;		/* Ptr to semaphore table entry	*/
 
-	mask = disable();
 	if (isbadsem(sem)) {
-		restore(mask);
 		return SYSERR;
 	}
-	
 	semptr = &semtab[sem];
-	lock(semtablock);
+	
+	mask = disable();
+	lock(semptr->slock);
+
 	if (semptr->sstate == S_FREE) {
-		unlock(semtablock);
+		unlock(semptr->slock);
 		restore(mask);
 		return SYSERR;
 	}
+
 	semptr->sstate = S_FREE;
 
 	resched_cntl(DEFER_START);
 	while (semptr->scount++ < 0) {	/* Free all waiting processes	*/
 		ready(getfirst(semptr->squeue));
 	}
-	unlock(semtablock);
+
+	unlock(semptr->slock);
 	resched_cntl(DEFER_STOP);
 	restore(mask);
 	return OK;

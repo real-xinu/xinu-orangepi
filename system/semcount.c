@@ -14,18 +14,22 @@ syscall semcount(
 	intmask	mask;			/* Saved interrupt mask		*/
 	int32	count;			/* Current sempahore count	*/
 
+	if(isbadsem(semid)){
+		return SYSERR;
+	}
+
 	mask = disable();
+	lock(semtab[semid].slock);
 	
-	if (isbadsem(semid) || semtab[semid].sstate == S_FREE) {
-		unlock(semtablock);
+	if (semtab[semid].sstate == S_FREE) {
+		unlock(semtab[semid].slock);
 		restore(mask);
 		return SYSERR;
 	}
 
-	lock(semtab[semid].slock);
 	count = semtab[semid].scount;
-	unlock(semtab[semid].slock);
 
+	unlock(semtab[semid].slock);
 	restore(mask);
 	return count;
 }
