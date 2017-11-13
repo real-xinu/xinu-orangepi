@@ -2,8 +2,6 @@
 
 #include <xinu.h>
 
-struct	procent	proctab[NPROC];	/* Process table				*/
-
 /*------------------------------------------------------------------------
  *  procinit  - Initialize process variables
  *------------------------------------------------------------------------

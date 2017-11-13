@@ -2,7 +2,6 @@
 
 #include <xinu.h>
 
-struct	sentry	semtab[NSEM];	/* Semaphore table				*/
 lid32	semtablock;				/* Lock on semaphore table */
 
 /*------------------------------------------------------------------------

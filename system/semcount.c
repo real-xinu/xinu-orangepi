@@ -22,9 +22,9 @@ syscall semcount(
 		return SYSERR;
 	}
 
-	lock(semtab[semid].sllock);
+	lock(semtab[semid].slock);
 	count = semtab[semid].scount;
-	unlock(semtab[semid].sllock);
+	unlock(semtab[semid].slock);
 
 	restore(mask);
 	return count;
