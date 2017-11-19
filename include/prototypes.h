@@ -656,6 +656,10 @@ extern	syscall	write(did32, char *, uint32);
 /* in file xdone.c */
 extern	void	xdone(void);
 
+/* in file xsec.c */
+extern	intmask	xsec_beg(lid32);
+extern	status	xsec_end(lid32, intmask);
+
 /* in file yield.c */
 extern	syscall	yield(void);
 
