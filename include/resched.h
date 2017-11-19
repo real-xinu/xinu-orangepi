@@ -16,4 +16,4 @@ struct	deferent	{
 
 extern	struct	deferent	defertab[];
 
-#define	Defer	defertab[getcid()];
+#define	Defer	(defertab[getcid()])
