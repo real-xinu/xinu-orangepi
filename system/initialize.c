@@ -176,7 +176,10 @@ static	void	sysinit()
 
 	/* Scheduling is not currently blocked */
 
-	Defer.ndefers = 0;
+	for(i = 0; i < NCORE; i++){
+		defertab[i].ndefers = 0;
+		defertab[i].attempt = FALSE;
+	}
 
 	/* Initialize process variables */
 
