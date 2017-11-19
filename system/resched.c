@@ -13,8 +13,12 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	struct procent *ptold;		/* Ptr to table entry for old process	*/
 	struct procent *ptnew;		/* Ptr to table entry for new process	*/
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
+	struct cpident *cpidptr;	/* Ptr to current pid entry				*/
+	cid32 thiscore;				/* ID of currently running core			*/
 
-	dfrptr = &Defer;
+	thiscore = getcid();
+	cpidptr = &cpidtab[thiscore];
+	dfrptr = &defertab[thiscore];
 
 	/* If rescheduling is deferred, record attempt and return */
 
@@ -24,7 +28,7 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	}
 
 	/* Point to process table entry for the current (old) process */
-	ptold = &proctab[currpid];
+	ptold = &proctab[cpidptr->cpid];
 
 	if (ptold->prstate == PR_CURR) {  /* Process remains eligible */
 		if (ptold->prprio > firstkey(readylist)) {
@@ -34,13 +38,13 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 		/* Old process will no longer remain current */
 
 		ptold->prstate = PR_READY;
-		insert(currpid, readylist, ptold->prprio);
+		insert(cpidptr->cpid, readylist, ptold->prprio);
 	}
 
 	/* Force context switch to highest priority ready process */
 
-	currpid = dequeue(readylist);
-	ptnew = &proctab[currpid];
+	cpidptr->cpid = dequeue(readylist);
+	ptnew = &proctab[cpidptr->cpid];
 	ptnew->prstate = PR_CURR;
 	preempt = QUANTUM;		/* Reset time slice for process	*/
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
@@ -60,7 +64,7 @@ status	resched_cntl(		/* Assumes interrupts are disabled	*/
 {
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
 
-	dfrptr = &Defer;
+	dfrptr = &defertab[getcid()];
 
 	switch (defer) {
 

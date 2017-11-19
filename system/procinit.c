@@ -38,7 +38,7 @@ status procinit(void){
 		prptr->prstkptr = 0;
 		prptr->prhrdaff = i;
 		prptr->prsftaff = i;
-		currpid = NULLPROC;
+		cpidtab[i].cpid = i;
 	}
 
 	return OK;
