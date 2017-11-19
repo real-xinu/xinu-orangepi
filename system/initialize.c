@@ -94,10 +94,7 @@ void	nulluser()
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
 
-	while (TRUE) {
-		;		/* Do nothing */
-	}
-
+	prnull();
 }
 
 /*------------------------------------------------------------------------
@@ -196,6 +193,7 @@ static	void	sysinit()
 	/* Create a ready list for processes */
 
 	readylist = newqueue();
+	readylock = newlock();
 
 	/* Initialize the real time clock */
 

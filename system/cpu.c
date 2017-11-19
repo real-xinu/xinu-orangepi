@@ -113,11 +113,8 @@ void secondary_run(void){
 	printf("Hello from core %d! (printf)\n", getcid());
 	enable();
 	gic_enable();
-	while(1);
-	// TODO: create null process with hard affinity for self and then resched
-//	resume(create((void *)startup, NULLSTK, 0,
-//						"prnull<getcid()>", 0, NULL));
-	//resched();
+	/* TODO: set stack pointer */
+	prnull();
 }
 
 /*------------------------------------------------------------------------

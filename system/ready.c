@@ -3,6 +3,7 @@
 #include <xinu.h>
 
 qid16	readylist;			/* Index of ready list		*/
+lid32	readylock;			/* Index of ready list spinlock	*/
 
 /*------------------------------------------------------------------------
  *  ready  -  Make a process eligible for CPU service

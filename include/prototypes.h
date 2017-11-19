@@ -375,6 +375,9 @@ extern	status	paging_init (void);
 /* in file platinit.c */
 extern	void	platinit(void);
 
+/* in file prnull.c */
+extern	process	prnull(void);
+
 /* in file procinit.c */
 extern	status	procinit(void);
 
