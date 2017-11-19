@@ -18,24 +18,19 @@ syscall	semdelete(
 	}
 	semptr = &semtab[sem];
 	
-	mask = disable();
-	lock(semptr->slock);
+	mask = xsec_beg(semptr->slock);
 
 	if (semptr->sstate == S_FREE) {
-		unlock(semptr->slock);
-		restore(mask);
+		xsec_end(semptr->slock, mask);
 		return SYSERR;
 	}
 
 	semptr->sstate = S_FREE;
 
-	resched_cntl(DEFER_START);
 	while (semptr->scount++ < 0) {	/* Free all waiting processes	*/
 		ready(getfirst(semptr->squeue));
 	}
 
-	unlock(semptr->slock);
-	resched_cntl(DEFER_STOP);
-	restore(mask);
+	xsec_end(semptr->slock, mask);
 	return OK;
 }

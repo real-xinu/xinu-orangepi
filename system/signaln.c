@@ -19,24 +19,19 @@ syscall	signaln(
 	}
 	semptr = &semtab[sem];
 
-	mask = disable();
-	lock(semptr->slock);
+	mask = xsec_beg(semptr->slock);
 
 	if (semptr->sstate == S_FREE) {
-		unlock(semptr->slock);
-		restore(mask);
+		xsec_end(semptr->slock, mask);
 		return SYSERR;
 	}
 
-	resched_cntl(DEFER_START);
 	for (; count > 0; count--) {
 		if ((semptr->scount++) < 0) {
 			ready(dequeue(semptr->squeue));
 		}
 	}
 
-	unlock(semptr->slock);
-	resched_cntl(DEFER_STOP);
-	restore(mask);
+	xsec_end(semptr->slock, mask);
 	return OK;
 }

@@ -18,18 +18,15 @@ syscall semcount(
 		return SYSERR;
 	}
 
-	mask = disable();
-	lock(semtab[semid].slock);
+	mask = xsec_beg(semtab[semid].slock);
 	
 	if (semtab[semid].sstate == S_FREE) {
-		unlock(semtab[semid].slock);
-		restore(mask);
+		xsec_end(semtab[semid].slock, mask);
 		return SYSERR;
 	}
 
 	count = semtab[semid].scount;
 
-	unlock(semtab[semid].slock);
-	restore(mask);
+	xsec_end(semtab[semid].slock, mask);
 	return count;
 }
