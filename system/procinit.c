@@ -23,6 +23,7 @@ status procinit(void){
 		prptr->prname[0] = NULLCH;
 		prptr->prstkbase = NULL;
 		prptr->prprio = 0;
+		prptr->prlock = newlock();
 	}
 
 	/* Initialize the Null process entries */
@@ -36,8 +37,6 @@ status procinit(void){
 		prptr->prstkbase = getstk(NULLSTK);
 		prptr->prstklen = NULLSTK;
 		prptr->prstkptr = 0;
-		prptr->prhrdaff = i;
-		prptr->prsftaff = i;
 		cpidtab[i].cpid = i;
 	}
 
