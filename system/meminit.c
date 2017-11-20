@@ -4,6 +4,7 @@
 
 void	*minheap;	/* Start address of heap	*/
 void	*maxheap;	/* End address of heap		*/
+lid32	memlock;	/* Lock on low level memory manager */
 
 /*------------------------------------------------------------------------
  * meminit - Initialize the free memory list for Orange Pi
@@ -26,4 +27,7 @@ void	meminit(void)
 	memptr->mnext = (struct memblk *)NULL;
 	memlist.mlength = memptr->mlength =
 		(uint32)maxheap - (uint32)minheap;
+
+	/* Initialize the low level memory manager spinlock */
+	memlock = newlock();
 }
