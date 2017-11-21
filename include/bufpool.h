@@ -18,7 +18,10 @@ struct	bpentry	{		/* Description of a single buffer pool	*/
 	sid32	bpsem;		/* semaphore that counts buffers	*/
 				/*    currently available in the pool	*/
 	uint32	bpsize;		/* size of buffers in this pool		*/
+	uint16  bpwtf;	//TODO/FIXME: If this padding isn't here we get software interrupt exception!
+	lid32	bplock;		/* lock on this buffer pool */
 	};
 
 extern	struct	bpentry buftab[];/* Buffer pool table			*/
 extern	bpid32	nbpools;	/* current number of allocated pools	*/
+extern	lid32	buftablock;			/* spinlock on the buffer pool table */
