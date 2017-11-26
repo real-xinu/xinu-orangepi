@@ -3,9 +3,8 @@
 #include <xinu.h>
 
 uint32	clktime;		/* Seconds since boot			*/
-uint32	ctr1000 = 0;		/* Milliseconds since boot		*/
 qid16	sleepq;			/* Queue of sleeping processes		*/
-//lid32	sleepqlock;		/* Lock on the sleep queue */
+lid32	sleepqlock;		/* Lock on the sleep queue */
 uint32	preempt;		/* Preemption counter			*/
 
 /*------------------------------------------------------------------------
@@ -24,8 +23,8 @@ void	clkinit(void)
 	sleepq = newqueue();	/* Allocate a queue to hold the delta	*/
 				/*   list of sleeping processes		*/
 
-// TODO:	sleepqlock = newlock();	/* Allocate a lock to protect acces to
-		//					   the sleep queue */
+	sleepqlock = newlock();	/* Allocate a lock to protect acces to
+							   the sleep queue */
 
 	preempt = QUANTUM;	/* Set the preemption time		*/
 
