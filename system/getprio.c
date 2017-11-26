@@ -12,13 +12,22 @@ syscall	getprio(
 {
 	intmask	mask;			/* Saved interrupt mask		*/
 	uint32	prio;			/* Priority to return		*/
+	struct	procent *prptr;		/* Ptr to process's table entry	*/
 
-	mask = disable();
 	if (isbadpid(pid)) {
-		restore(mask);
+		return  SYSERR;
+	}
+	prptr = &proctab[pid];
+
+	mask = xsec_beg(prptr->prlock);
+
+	if(prptr->prstate == PR_FREE){
+		xsec_end(prptr->prlock, mask);
 		return SYSERR;
 	}
-	prio = proctab[pid].prprio;
-	restore(mask);
+
+	prio = prptr->prprio;
+
+	xsec_end(prptr->prlock, mask);
 	return prio;
 }

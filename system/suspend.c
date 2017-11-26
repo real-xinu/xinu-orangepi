@@ -19,6 +19,7 @@ syscall	suspend(
 		restore(mask);
 		return SYSERR;
 	}
+	// TODO: check for PR_FREE
 
 	/* Only suspend a process that is current or ready */
 

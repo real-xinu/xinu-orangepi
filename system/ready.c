@@ -18,6 +18,7 @@ status	ready(
 	if (isbadpid(pid)) {
 		return SYSERR;
 	}
+	// TODO: check for PR_FREE
 
 	/* Set process state to indicate ready and add to ready list */
 

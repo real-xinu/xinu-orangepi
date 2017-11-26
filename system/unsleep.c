@@ -19,29 +19,36 @@ status	unsleep(
 					/*   that follows the process	*/
 					/*   which is being removed	*/
 
-	mask = disable();
-
 	if (isbadpid(pid)) {
-		restore(mask);
+		return SYSERR;
+	}
+	prptr = &proctab[pid];
+
+	mask = xsec_beg(prptr->prlock);
+
+	if(prptr->prstate == PR_FREE){
+		xsec_end(prptr->prlock, mask);
 		return SYSERR;
 	}
 
 	/* Verify that candidate process is on the sleep queue */
 
-	prptr = &proctab[pid];
 	if ((prptr->prstate!=PR_SLEEP) && (prptr->prstate!=PR_RECTIM)) {
-		restore(mask);
+		xsec_end(prptr->prlock, mask);
 		return SYSERR;
 	}
 
 	/* Increment delay of next process if such a process exists */
 
+//	TODO: lock(sleepqlock);
 	pidnext = queuetab[pid].qnext;
 	if (pidnext < NPROC) {
 		queuetab[pidnext].qkey += queuetab[pid].qkey;
 	}
 
 	getitem(pid);			/* Unlink process from queue */
-	restore(mask);
+//	TODO: unlock(sleepqlock);
+
+	xsec_end(prptr->prlock, mask);
 	return OK;
 }

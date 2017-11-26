@@ -19,6 +19,7 @@ syscall	send(
 		restore(mask);
 		return SYSERR;
 	}
+	// TODO: check for PR_FREE
 
 	prptr = &proctab[pid];
 	if (prptr->prhasmsg) {

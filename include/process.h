@@ -31,8 +31,7 @@
 /* Inline code to check process ID (assumes interrupts are disabled)	*/
 
 #define	isbadpid(x)	( ((pid32)(x) < 0) || \
-			  ((pid32)(x) >= NPROC) || \
-			  (proctab[(x)].prstate == PR_FREE))
+			  ((pid32)(x) >= NPROC) )
 
 /* Number of device descriptors a process can have open */
 

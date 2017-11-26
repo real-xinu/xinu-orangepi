@@ -18,6 +18,9 @@ status	insertd(			/* Assumes interrupts disabled	*/
 	if (isbadqid(q) || isbadpid(pid)) {
 		return SYSERR;
 	}
+	// TODO: check for PR_FREE
+
+	// TODO: xsec on sleepqlock
 
 	prev = queuehead(q);
 	next = queuetab[queuehead(q)].qnext;

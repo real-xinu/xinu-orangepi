@@ -20,6 +20,7 @@ syscall	kill(
 		restore(mask);
 		return SYSERR;
 	}
+	// TODO: check for PR_FREE
 
 	if (--prcount <= 1) {		/* Last user process completes	*/
 		xdone();
