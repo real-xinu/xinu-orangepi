@@ -40,10 +40,9 @@ local	sid32	newsem(void)
 	sid32	sem;			/* Semaphore ID to return	*/
 	int32	i;			/* Iterate through # entries	*/
 
-	for (i=0 ; i<NSEM ; i++) {
+	for (i = 0 ; i < NSEM ; i++) {
 		sem = nextsem++;
-		if (nextsem >= NSEM)
-			nextsem = 0;
+		nextsem %= NSEM;
 		lock(semtab[sem].slock);
 		if (semtab[sem].sstate == S_FREE) {
 			semtab[sem].sstate = S_USED;
@@ -52,5 +51,6 @@ local	sid32	newsem(void)
 			unlock(semtab[sem].slock);
 		}
 	}
+
 	return SYSERR;
 }
