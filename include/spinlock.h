@@ -13,7 +13,8 @@
 struct lentry {
 	int32	lock;		/* Actual spinlock word used by hardware */
 	pid32	lowner;		/* id of process that currently owns spinlock */
-	int32	lpad[14];	/* padding to reach size of ERG */
+	uint32	lcount;		/* count locks by lowner */
+	int32	lpad[13];	/* padding to reach size of ERG */
 };
 
 extern	struct	lentry	locktab[];	/* spinlock table */

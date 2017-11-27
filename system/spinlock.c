@@ -12,15 +12,24 @@ status lock(
 		lid32	lid		/* id of spinlock to lock */
 	){
 	struct lentry* lockptr;	/* Ptr to spinlock table entry */
+	pid32 cpid;				/* ID of process currently executing
+	                           on this core */
 
 	if (isbadlid(lid)) {
 		return SYSERR;
 	}
 
 	lockptr = &locktab[lid];
+	cpid = currpid;
+
+	if(lockptr->lowner == cpid){
+		lockptr->lcount++;
+		return OK;
+	}
 
 	arm_lock(&(lockptr->lock));
-	lockptr->lowner = currpid;
+	lockptr->lowner = cpid;
+	lockptr->lcount++;
 
 	return OK;
 }
@@ -41,8 +50,10 @@ status unlock(
 
 	lockptr = &locktab[lid];
 
-	lockptr->lowner = SLK_NONE;
-	arm_unlock(&(lockptr->lock));
+	if(--lockptr->lcount == 0){
+		lockptr->lowner = SLK_NONE;
+		arm_unlock(&(lockptr->lock));
+	}
 
 	return OK;
 }
@@ -67,6 +78,7 @@ lid32	newlock(void)
 
 	locktab[l].lock = UNLOCKED;
 	locktab[l].lowner = SLK_NONE;
+	locktab[l].lcount = 0;
 
 	return l;
 }
