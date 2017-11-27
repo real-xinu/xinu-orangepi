@@ -36,5 +36,7 @@ struct cpucfg_csreg {
 	reg32 cnt64high;			/* 64-bit counter high register */
 };
 
+#define CPU_NONE	-1
+
 #define isbadcid(x)	(x < 0 || x >= NCORE)
 

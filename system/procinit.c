@@ -2,6 +2,8 @@
 
 #include <xinu.h>
 
+char* null_stack[NCORE];	/* null process stack for each core */
+
 /*------------------------------------------------------------------------
  *  procinit  - Initialize process variables
  *------------------------------------------------------------------------
@@ -13,7 +15,7 @@ status procinit(void){
 
 	/* Count the Null processes as the first processes in the system */
 
-	prcount = 4;
+	prcount = NCORE;
 
 	/* Initialize process table entries free */
 
@@ -34,10 +36,12 @@ status procinit(void){
 		prptr->prprio = 0;
 		strncpy(prptr->prname, "prnullx", 8);
 		prptr->prname[6] = i + 0x30; /* convert i to string and append */
-		prptr->prstkbase = getstk(NULLSTK);
+		null_stack[i] = getstk(NULLSTK);
+		prptr->prstkbase = null_stack[i];
 		prptr->prstklen = NULLSTK;
 		prptr->prstkptr = 0;
 		cpidtab[i].cpid = i;
+		prptr->praff = i;
 	}
 
 	return OK;

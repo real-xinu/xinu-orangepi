@@ -82,9 +82,9 @@ void	nulluser()
 
 //	net_init(); TODO:
 
-	/* Initialization is finished, unblock auxiliary cores */
-
-	cpu_sev();
+//	/* Initialization is finished, unblock auxiliary cores */
+//
+//	cpu_sev();
 
 	/* Create a process to finish startup and start main */
 
@@ -149,10 +149,6 @@ static	void	sysinit()
 	kprintf(CONSOLE_RESET);
 	kprintf("\n%s\n\n", VERSION);
 
-	/* Initialize CPU CSRs and start up secondary cores */
-
-	cpuinit();
-
 	/* Initialize the interrupt vectors */
 
 	initevec();
@@ -204,6 +200,10 @@ static	void	sysinit()
 	for (i = 0; i < NDEVS; i++) {
 		init(i);
 	}
+
+	/* Initialize CPU CSRs and start up secondary cores */
+
+	cpuinit();
 
 	return;
 }

@@ -78,8 +78,6 @@ status cpu_enable(cid32 cid){
 	/* de-assert core reset */
 	cpureg->rstctrl |= CPU_CORE_RST;
 
-	// TODO: wait for cpu to be in wfe state?
-
 	return OK;
 }
 
@@ -108,7 +106,7 @@ void secondary_run(void){
 	mmu_set_dacr(0xFFFFFFFF);
 	mmu_set_ttbr(page_table);
 //	cache_set_prefetch(L1PF_3);
-	cpu_wfe();
+//	cpu_wfe();
 	kprintf("Hello from core %d! (kprintf)\n", getcid());
 	printf("Hello from core %d! (printf)\n", getcid());
 	enable();

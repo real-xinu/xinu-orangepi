@@ -80,14 +80,11 @@ secondary_start:
 	dmb
 
 	/* get stack to run on */
-	mrc p15, 0, r11, c0, c0, 5 	/* get cid */
-	and r11, r11, #0x03		   	/* and store in r11 */
-	ldr r0, =boot_stacks 		/* r0 = boot_stacks base */
-	mov r1, r11					/* r1 = cid */
-	add r1, r1, #1				/* r1 = cid + 1 */
-	lsl r2, r1, #13				/* r2 = (cid+1)*8192 */
-	add r0, r0, r2				/* use high end of stack */
-	mov sp, r0					/* set stack pointer */
+	mrc p15, 0, r11, c0, c0, 5 	/* r11 = cpu id register */
+	and r11, r11, #0x03		   	/* r11 = cid of this core */
+	ldr r0, =null_stack 		/* r0 = null_stack[] */
+	ldr r1, [r0, +r11]			/* r1 = null_stack[cid]	*/
+	mov sp, r1					/* sp = null_stack[cid] */
 	isb
 	dsb
 	dmb
@@ -111,17 +108,6 @@ secondary_start:
 	.globl page_table
 page_table:
 	.space	(0x1000 * 4)
-
-/*------------------------------------------------------------------------
- * Page Table
- *------------------------------------------------------------------------
- */
-
-.data
-/* Stacks for cores to run on while booting */
-	.globl boot_stacks
-boot_stacks:
-	.space	(8192 * 4)
 
 /*------------------------------------------------------------------------
  * bputc	-	simple polled output, prints C to screen for assembly
