@@ -67,7 +67,8 @@ struct cpident {
 
 extern	struct	procent proctab[];
 extern 	struct	cpident	cpidtab[];
-extern	int32	prcount;	/* Currently active processes		*/
+extern	int32	prcount;		/* Currently active processes	*/
+extern	lid32	proctablock;	/* Lock on the process table	*/
 
 /* id of process currently executing on this core */
 #define	currpid		(cpidtab[getcid()].cpid)
