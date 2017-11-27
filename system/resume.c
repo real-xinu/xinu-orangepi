@@ -14,18 +14,21 @@ pri16	resume(
 	struct	procent *prptr;		/* Ptr to process's table entry	*/
 	pri16	prio;			/* Priority to return		*/
 
-	mask = disable();
 	if (isbadpid(pid)) {
-		restore(mask);
 		return (pri16)SYSERR;
 	}
 	prptr = &proctab[pid];
+
+	mask = xsec_beg(prptr->prlock);
+
 	if (prptr->prstate != PR_SUSP) {
-		restore(mask);
+		xsec_end(prptr->prlock, mask);
 		return (pri16)SYSERR;
 	}
+
 	prio = prptr->prprio;		/* Record priority to return	*/
 	ready(pid);
-	restore(mask);
+
+	xsec_end(prptr->prlock, mask);
 	return prio;
 }

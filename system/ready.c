@@ -15,16 +15,19 @@ status	ready(
 {
 	register struct procent *prptr;
 
-	if (isbadpid(pid)) {
+	if (isbadpid(pid) || proctab[pid].prstate == PR_FREE) {
 		return SYSERR;
 	}
-	// TODO: check for PR_FREE
 
 	/* Set process state to indicate ready and add to ready list */
 
 	prptr = &proctab[pid];
 	prptr->prstate = PR_READY;
+
+	lock(readylock);
 	insert(pid, readylist, prptr->prprio);
+	unlock(readylock);
+
 	resched();
 
 	return OK;
