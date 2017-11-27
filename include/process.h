@@ -28,10 +28,13 @@
 #define	INITPRIO	20	/* Initial process priority		*/
 #define	INITRET		userret	/* Address to which process returns	*/
 
-/* Inline code to check process ID (assumes interrupts are disabled)	*/
+/* Inline code to check process ID	*/
 
 #define	isbadpid(x)	( ((pid32)(x) < 0) || \
 			  ((pid32)(x) >= NPROC) )
+
+#define	isnullpid(x) ( ((pid32)(x) >= 0) && \
+			  ((pid32)(x) < NCORE) )
 
 /* Number of device descriptors a process can have open */
 
