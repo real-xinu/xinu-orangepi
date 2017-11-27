@@ -10,7 +10,7 @@
 process	prnull(void){
 
 	while(TRUE){
-		if(!isempty(readylist)){
+		if(firstkey(readylist) > 0){
 			resched();
 		}
 	}
