@@ -26,18 +26,26 @@ pid32	create(
 	uint32		*a;		/* points to list of args	*/
 	uint32		*saddr;		/* stack address		*/
 
-	mask = disable();
-	if (ssize < MINSTK)
-		ssize = MINSTK;
+	if(priority < 1){return SYSERR;}
+
+	if (ssize < MINSTK){ssize = MINSTK;}
 	ssize = (uint32) roundew(ssize);
-	if (((saddr = (uint32 *)getstk(ssize)) ==
-	    (uint32 *)SYSERR ) ||
-	    (pid=newpid()) == SYSERR || priority < 1 ) {
-		restore(mask);
+
+	if((saddr = (uint32*)getstk(ssize)) == (uint32*)SYSERR){
 		return SYSERR;
 	}
 
-	prcount++;
+	mask = xsec_beg(proctablock);
+
+	/* newpid() locks the new process if successful */
+	if((pid=newpid()) == SYSERR){
+		freestk(saddr, ssize);
+		xsec_end(proctablock, mask);
+		return SYSERR;
+	}
+
+	prcount++; // TODO: this is protected by proctablock for now, is that good enough?
+
 	prptr = &proctab[pid];
 
 	/* initialize process table entry for new process */
@@ -79,12 +87,15 @@ pid32	create(
 	*--saddr = (long)0x00000053;	/* CPSR F bit set,		*/
 					/* Supervisor mode		*/
 	prptr->prstkptr = (char *)saddr;
-	restore(mask);
+
+	unlock(prptr->prlock);	/* locked in newpid	*/
+
+	xsec_end(proctablock, mask);
 	return pid;
 }
 
 /*------------------------------------------------------------------------
- *  newpid  -  Obtain a new (free) process ID
+ *  newpid  -  Obtain a new (free) process ID and lock the new process
  *------------------------------------------------------------------------
  */
 local	pid32	newpid(void)
@@ -92,16 +103,20 @@ local	pid32	newpid(void)
 	uint32	i;			/* iterate through all processes*/
 	static	pid32 nextpid = 1;	/* position in table to try or	*/
 					/*  one beyond end of table	*/
+	pid32	pid;
 
 	/* check all NPROC slots */
 
 	for (i = 0; i < NPROC; i++) {
+		pid = nextpid++;
 		nextpid %= NPROC;	/* wrap around to beginning */
-		if (proctab[nextpid].prstate == PR_FREE) {
-			return nextpid++;
+		lock(proctab[pid].prlock);
+		if (proctab[pid].prstate == PR_FREE) {
+			return pid;
 		} else {
-			nextpid++;
+			unlock(proctab[nextpid].prlock);
 		}
 	}
+
 	return (pid32) SYSERR;
 }
