@@ -1,6 +1,6 @@
-/* spinlock.h: definitions and data structures for spinlocks */
+/* lock.h: definitions and data structures for locks */
 
-#define NSLK	2*NSEM + NPROC	/* Number of spinlocks */
+#define NSLK	2*NSEM + NPROC	/* Number of locks */
 
 #define	SLK_FREE		0		/* Spinlock table entry is available */
 #define	SLK_USED		1		/* Spinlock table entry is available */
@@ -11,12 +11,12 @@
  * in order to prevent false sharing.
  */
 struct lentry {
-	int32	lock;		/* Actual spinlock word used by hardware */
-	pid32	lowner;		/* id of process that currently owns spinlock */
+	int32	lock;		/* Actual lock word used by hardware */
+	pid32	lowner;		/* id of process that currently owns lock */
 	uint32	lcount;		/* count locks by lowner */
 	int32	lpad[13];	/* padding to reach size of ERG */
 };
 
-extern	struct	lentry	locktab[];	/* spinlock table */
+extern	struct	lentry	locktab[];	/* lock table */
 
 #define	isbadlid(l)	((int32)(l) < 0 || (l) >= NSLK)

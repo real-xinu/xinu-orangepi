@@ -1,16 +1,16 @@
-/* armlock.S - arm_lock, arm_unlock */
+/* spinlock.S - spin_lock, spin_unlock */
 
 #include <cache.h>
 
 .text
-.globl arm_lock
-.globl arm_unlock
+.globl spin_lock
+.globl spin_unlock
 
 /*------------------------------------------------------------------------
- * arm_lock  -  Lock a spinlock using arm exclusive monitors
+ * spin_lock  -  Lock a spinlock using arm exclusive monitors
  *------------------------------------------------------------------------
  */
-arm_lock:
+spin_lock:
 		ldr r1, =LOCKED
 spin:	ldrex r2, [r0]
 		cmp r2, r1 	/* Test if mutex is locked or unlocked */
@@ -23,10 +23,10 @@ spin:	ldrex r2, [r0]
 		bx lr
 
 /*------------------------------------------------------------------------
- * arm_unlock  -  Unlock a spinlock using arm exclusive monitors
+ * spin_unlock  -  Unlock a spinlock using arm exclusive monitors
  *------------------------------------------------------------------------
  */
-arm_unlock:
+spin_unlock:
 		ldr r1, =UNLOCKED
 		dmb				/* Required before releasing protected resource */
 		str r1, [r0]	/* Unlock mutex */

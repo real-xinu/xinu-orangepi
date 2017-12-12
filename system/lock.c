@@ -1,17 +1,17 @@
-/* spinlock.c - lock, unlock, newlock */
+/* lock.c - lock, unlock, newlock */
 
 #include <xinu.h>
 
-struct	lentry	locktab[NSLK];	/* Spinlock Table				*/
+struct	lentry	locktab[NSLK];	/* Lock Table				*/
 
 /*------------------------------------------------------------------------
- *  lock  -  Cause current process to lock a spinlock
+ *  lock  -  Cause current process to lock a lock
  *------------------------------------------------------------------------
  */
 status lock(
-		lid32	lid		/* id of spinlock to lock */
+		lid32	lid		/* id of lock to lock */
 	){
-	struct lentry* lockptr;	/* Ptr to spinlock table entry */
+	struct lentry* lockptr;	/* Ptr to lock table entry */
 	pid32 cpid;				/* ID of process currently executing
 	                           on this core */
 
@@ -27,7 +27,7 @@ status lock(
 		return OK;
 	}
 
-	arm_lock(&(lockptr->lock));
+	spin_lock(&(lockptr->lock));
 	lockptr->lowner = cpid;
 	lockptr->lcount++;
 
@@ -35,14 +35,14 @@ status lock(
 }
 
 /*------------------------------------------------------------------------
- *  unlock  -  Cause current process to unlock a spinlock
+ *  unlock  -  Cause current process to unlock a lock
  *------------------------------------------------------------------------
  */
 status unlock(
-		lid32	lid		/* id of spinlock to unlock */
+		lid32	lid		/* id of lock to unlock */
 	){
 
-	struct lentry* lockptr;	/* Ptr to spinlock table entry */
+	struct lentry* lockptr;	/* Ptr to lock table entry */
 
 	if (isbadlid(lid)) {
 		return SYSERR;
@@ -52,14 +52,14 @@ status unlock(
 
 	if(--lockptr->lcount == 0){
 		lockptr->lowner = SLK_NONE;
-		arm_unlock(&(lockptr->lock));
+		spin_unlock(&(lockptr->lock));
 	}
 
 	return OK;
 }
 
 /*------------------------------------------------------------------------
- *  newlock  -  Allocate and initialize a lock in the spinlock table
+ *  newlock  -  Allocate and initialize a lock in the lock table
  *------------------------------------------------------------------------
  */
 lid32	newlock(void)
