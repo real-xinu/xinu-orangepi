@@ -56,6 +56,7 @@ struct procent {		/* Entry in the process table		*/
 	int16	prdesc[NDESC];	/* Device descriptors for process	*/
 	lid32	prlock;		/* Process spinlock */
 	cid32	praff;		/* Process affinity */
+	cid32	prcpu;		/* core process is running on	*/
 };
 
 /* Hold current pid executing on each processor */

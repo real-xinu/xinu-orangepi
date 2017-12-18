@@ -45,3 +45,4 @@
 #include <cpu.h>
 #include <cache.h>
 #include <paging.h>
+#include <interrupt.h>
