@@ -4,6 +4,7 @@
 
 char* null_stack[NCORE];	/* null process stack for each core */
 lid32 proctablock;			/* lock on the process table */
+lid32 prcountlock;			/* lock on the global process count */
 
 /*------------------------------------------------------------------------
  *  procinit  - Initialize process variables
@@ -14,9 +15,10 @@ status procinit(void){
 	uint32 i;					/* iterator over proctab */
 	struct	procent	*prptr;		/* Ptr to process table entry	*/
 
-	/* Initialize the lock on the process table */
+	/* Initialize locks on the process table and global process count */
 
 	proctablock = newlock();
+	prcountlock = newlock();
 
 	/* Count the Null processes as the first processes in the system */
 
