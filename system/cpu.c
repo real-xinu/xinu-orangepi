@@ -96,6 +96,7 @@ void cpu_set_entry(void* entry){
  *------------------------------------------------------------------------
  */
 void secondary_run(void){
+	kprintf("Hello from core %d! (kprintf)\n", getcid());
 	//cache_set_prefetch(L1PF_DISABLED);
 	cache_inv(0); /* invalidate L1 data cache */
 	bp_inv();
@@ -142,13 +143,13 @@ void cpu_dump(void){
 	for(i = 0; i < 4; i++){
 		kprintf("\t      CPU %d RstCtrl:\t0x%08X\t0x%08X\n", i, &cpucfg->cpu[i].rstctrl, cpucfg->cpu[i].rstctrl);
 		kprintf("\t      CPU %d Control:\t0x%08X\t0x%08X\n", i, &cpucfg->cpu[i].ctrl,cpucfg->cpu[i].ctrl);
-		kprintf("\t      CPU %d Status :\t0x%08X\t0x%08X\n", i, &cpucfg->cpu[i].stat,cpucfg->cpu[i].stat);
+		kprintf("\t      CPU %d  Status:\t0x%08X\t0x%08X\n", i, &cpucfg->cpu[i].stat,cpucfg->cpu[i].stat);
 	}
 	printreg(	"sysrst", 						&cpucfg->sysrst		);
 	printreg(	"clock gating", 				&cpucfg->clkgating	);
 	printreg(	"general control", 				&cpucfg->genctrl	);
 	printreg(	"super standby flag", 			&cpucfg->supstanflg	);
-	printreg(	"secondary entry (private 0)", 	&cpucfg->pcstart	);
+	printreg(	"secondary entry", 				&cpucfg->pcstart	);
 	printreg(	"private 1", 					&cpucfg->private1	);
 	printreg(	"counter control", 				&cpucfg->cnt64ctrl	);
 	printreg(	"counter low", 					&cpucfg->cnt64low	);

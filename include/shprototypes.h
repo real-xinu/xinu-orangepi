@@ -13,6 +13,9 @@ extern	shellcmd  xsh_cat	(int32, char *[]);
 /* in file xsh_clear.c */
 extern	shellcmd  xsh_clear	(int32, char *[]);
 
+/* in file xsh_cpudump.c */
+extern	shellcmd  xsh_cpudump	(int32, char *[]);
+
 /* in file xsh_date.c */
 extern	shellcmd  xsh_date	(int32, char *[]);
 
