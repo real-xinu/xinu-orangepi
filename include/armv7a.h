@@ -9,7 +9,7 @@
 #define CPSR_USR	0x00000010	/* Processor Mode = User	*/
 #define CPSR_FIQ	0x00000011	/* Processor Mode = FIQ		*/
 #define CPSR_IRQ	0x00000012	/* Processor Mode = IRQ		*/
-#define CPSR_SPR	0x00000013	/* Processor Mode = Supervisor	*/
+#define CPSR_SPR	0x00000013	/* Processor Mode = Supervisor	*/ // TODO: 0x53? see create()
 #define CPSR_ABT	0x00000017	/* Processor Mode = Abort	*/
 #define CPSR_UND	0x0000001B	/* Processor Mode = Undefined	*/
 #define CPSR_SYS	0x0000001F	/* Processor Mode = System	*/

@@ -19,16 +19,19 @@ pri16	resume(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_beg(prptr->prlock);
+	mask = xsec_beg(readylock);
+	lock(prptr->prlock);
 
 	if (prptr->prstate != PR_SUSP) {
-		xsec_end(prptr->prlock, mask);
+		unlock(prptr->prlock);
+		xsec_end(readylock, mask);
 		return (pri16)SYSERR;
 	}
 
 	prio = prptr->prprio;		/* Record priority to return	*/
 	ready(pid);
 
-	xsec_end(prptr->prlock, mask);
+	unlock(prptr->prlock);
+	xsec_end(readylock, mask);
 	return prio;
 }
