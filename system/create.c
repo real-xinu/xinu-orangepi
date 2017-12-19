@@ -50,6 +50,7 @@ pid32	create(
 
 	/* initialize process table entry for new process */
 	prptr->prstate = PR_SUSP;	/* initial state is suspended	*/
+	prptr->prcpu = CPU_NONE;
 	prptr->prprio = priority;
 	prptr->prstkbase = (char *)saddr;
 	prptr->prstklen = ssize;
