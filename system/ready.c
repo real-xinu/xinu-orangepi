@@ -23,11 +23,7 @@ status	ready(
 
 	prptr = &proctab[pid];
 	prptr->prstate = PR_READY;
-
-	lock(readylock);
 	insert(pid, readylist, prptr->prprio);
-	unlock(readylock);
-
 	resched();
 
 	return OK;
