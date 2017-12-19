@@ -19,19 +19,19 @@ syscall suspend(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_beg(prptr->prlock);
+	mask = xsec_beg(readylock);
+	lock(prptr->prlock);
 
 	/* Only suspend a process that is current or ready */
 	if ((prptr->prstate != PR_CURR) && (prptr->prstate != PR_READY)){
-		xsec_end(prptr->prlock, mask);
+		unlock(prptr->prlock);
+		xsec_end(readylock, mask);
 		return SYSERR;
 	}
 
 	if (prptr->prstate == PR_READY){ 
-		lock(readylock);
 		getitem(pid); /* Remove a ready process	*/
 					  /*   from the ready list	*/
-		unlock(readylock);
 		prptr->prstate = PR_SUSP;
 	} else {
 		prptr->prstate = PR_SUSP; /* Mark the current process	*/
@@ -44,6 +44,7 @@ syscall suspend(
 
 	prio = prptr->prprio;
 
-	xsec_end(prptr->prlock, mask);
+	unlock(prptr->prlock);
+	xsec_end(readylock, mask);
 	return prio;
 }
