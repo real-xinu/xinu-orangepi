@@ -44,9 +44,7 @@ pid32	create(
 		return SYSERR;
 	}
 
-	lock(prcountlock);
-	prcount++; 
-	unlock(prcountlock);
+	prcount++; /* protected by proctablock */
 
 	prptr = &proctab[pid];
 
