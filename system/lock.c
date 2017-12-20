@@ -5,37 +5,36 @@
 struct	lentry	locktab[NSLK];	/* Lock Table				*/
 
 /*------------------------------------------------------------------------
- *  lock  -  Cause current process to lock a lock
+ *  lock  -  lock a spinlock
  *------------------------------------------------------------------------
  */
 status lock(
 		lid32	lid		/* id of lock to lock */
 	){
 	struct lentry* lockptr;	/* Ptr to lock table entry */
-	pid32 cpid;				/* ID of process currently executing
-	                           on this core */
+	cid32 thiscore;			/* ID of currently executing core */
 
 	if (isbadlid(lid)) {
 		return SYSERR;
 	}
 
 	lockptr = &locktab[lid];
-	cpid = currpid;
+	thiscore = getcid();
 
-	if(lockptr->lowner == cpid){
+	if(lockptr->lowner == thiscore){
 		lockptr->lcount++;
 		return OK;
 	}
 
 	spin_lock(&(lockptr->lock));
-	lockptr->lowner = cpid;
+	lockptr->lowner = thiscore;
 	lockptr->lcount++;
 
 	return OK;
 }
 
 /*------------------------------------------------------------------------
- *  unlock  -  Cause current process to unlock a lock
+ *  unlock  -  unlock a spinlock
  *------------------------------------------------------------------------
  */
 status unlock(
