@@ -24,7 +24,7 @@ struct	memblk	memlist;		/* List of free memory blocks	*/
 /* Active system status */
 
 int	prcount;		/* Total number of live processes	*/
-struct	cpident	cpidtab[NCORE];	/* IDs of currently executing processes */
+struct	cpuent	cputab[NCPU];	/* global state for each cpu */
 
 /* Control sequence to reset the console colors and cursor position	*/
 
@@ -169,9 +169,9 @@ static	void	sysinit()
 
 	/* Scheduling is not currently blocked */
 
-	for(i = 0; i < NCORE; i++){
-		defertab[i].ndefers = 0;
-		defertab[i].attempt = FALSE;
+	for(i = 0; i < NCPU; i++){
+		cputab[i].defer.ndefers = 0;
+		cputab[i].defer.attempt = FALSE;
 	}
 
 	/* Initialize process variables */

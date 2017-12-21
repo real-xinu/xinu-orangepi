@@ -1,6 +1,6 @@
 /* cpu.h */
 
-#define NCORE 4	/* number of cores in SMP system */
+#define NCPU 4	/* number of cores in SMP system */
 
 /* CPU Config Control and Status Registers */
 
@@ -36,7 +36,17 @@ struct cpucfg_csreg {
 	reg32 cnt64high;			/* 64-bit counter high register */
 };
 
+/* Hold current pid executing on each processor */
+
+struct cpuent {
+	pid32 cpid;					/* ID of currently executing process */
+	pid32 ppid;					/* ID of previously executing process */
+	struct deferent defer;	
+	int32 cpidpad[12];			/* Pad to size of ERG to avoid false sharing */
+};
+extern 	struct	cpuent	cputab[];
+
 #define CPU_NONE	-1
 
-#define isbadcid(x)	(x < 0 || x >= NCORE)
+#define isbadcid(x)	(x < 0 || x >= NCPU)
 

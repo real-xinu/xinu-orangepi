@@ -2,8 +2,6 @@
 
 #include <xinu.h>
 
-struct	deferent	defertab[NCORE];
-
 /*------------------------------------------------------------------------
  *  resched  -  Reschedule processor to highest priority eligible process
  *------------------------------------------------------------------------
@@ -13,12 +11,10 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	struct procent *ptold;		/* Ptr to table entry for old process	*/
 	struct procent *ptnew;		/* Ptr to table entry for new process	*/
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
-	struct cpident *cpidptr;	/* Ptr to current pid entry				*/
-	cid32 thiscore;				/* ID of currently running core			*/
+	struct cpuent *cpuptr;		/* Ptr to cpu entry						*/
 
-	thiscore = getcid();
-	cpidptr = &cpidtab[thiscore];
-	dfrptr = &defertab[thiscore];
+	cpuptr = &cputab[getcid()];
+	dfrptr = &cpuptr->defer;
 
 	/* If rescheduling is deferred, record attempt and return */
 
@@ -28,26 +24,44 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	}
 
 	/* Point to process table entry for the current (old) process */
-	ptold = &proctab[cpidptr->cpid];
+	ptold = &proctab[cpuptr->cpid];
+
+	lock(readylock);
+	lock(ptold->prlock);
 
 	if (ptold->prstate == PR_CURR) {  /* Process remains eligible */
 		if (ptold->prprio > firstkey(readylist)) {
+			unlock(ptold->prlock);
+			unlock(readylock);
 			return;
 		}
 
 		/* Old process will no longer remain current */
 
 		ptold->prstate = PR_READY;
-		insert(cpidptr->cpid, readylist, ptold->prprio);
+		insert(cpuptr->cpid, readylist, ptold->prprio);
 	}
 
 	/* Force context switch to highest priority ready process */
-
-	cpidptr->cpid = dequeue(readylist);
-	ptnew = &proctab[cpidptr->cpid];
+	cpuptr->ppid = cpuptr->cpid;
+	cpuptr->cpid = dequeue(readylist);
+	ptnew = &proctab[cpuptr->cpid];
+	lock(ptnew->prlock);
 	ptnew->prstate = PR_CURR;
 	preempt = QUANTUM;		/* Reset time slice for process	*/
+
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
+	/* at this point a new process is running with a different stack */
+
+	/* restore update pointers on new process stack */
+	cpuptr = &cputab[getcid()];
+	ptnew = &proctab[cpuptr->cpid];
+	ptold = &proctab[cpuptr->ppid];
+
+	/* unlock locks locked by previous process still held by this cpu */
+	unlock(ptnew->prlock);
+	unlock(ptold->prlock);
+	unlock(readylock);
 
 	/* Old process returns here when resumed */
 
@@ -64,7 +78,7 @@ status	resched_cntl(		/* Assumes interrupts are disabled	*/
 {
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
 
-	dfrptr = &defertab[getcid()];
+	dfrptr = &cputab[getcid()].defer;
 
 	switch (defer) {
 

@@ -11,9 +11,6 @@ struct	deferent	{
 	int32	ndefers;	/* Number of outstanding defers 	*/
 	int32	attempt;	/* Was resched called during the	*/
 						/*   deferral period?			*/
-	int32	pad[14];	/* Pad to size of ERG to avoid false sharing */
 };
 
-extern	struct	deferent	defertab[];
-
-#define	Defer	(defertab[getcid()])
+#define	Defer	(cputab[getcid()].defer)

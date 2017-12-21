@@ -34,7 +34,7 @@
 			  ((pid32)(x) >= NPROC) )
 
 #define	isnullpid(x) ( ((pid32)(x) >= 0) && \
-			  ((pid32)(x) < NCORE) )
+			  ((pid32)(x) < NCPU) )
 
 /* Number of device descriptors a process can have open */
 
@@ -59,20 +59,12 @@ struct procent {		/* Entry in the process table		*/
 	cid32	prcpu;		/* core process is running on	*/
 };
 
-/* Hold current pid executing on each processor */
-
-struct cpident {
-	pid32 cpid;					/* ID of currently executing process */
-	int32 cpidpad[15];			/* Pad to size of ERG to avoid false sharing */
-};
-
 /* Marker for the top of a process stack (used to help detect overflow)	*/
 #define	STACKMAGIC	0x0A0AAAA9
 
 extern	struct	procent proctab[];
-extern 	struct	cpident	cpidtab[];
 extern	int32	prcount;		/* Currently active processes		*/
 extern	lid32	proctablock;	/* Lock on the process table and global process count		*/
 
 /* id of process currently executing on this core */
-#define	currpid		(cpidtab[getcid()].cpid)
+#define	currpid		(cputab[getcid()].cpid)

@@ -9,7 +9,7 @@ bool8 core_up[4];
 
 void test_init_cores(void){
 	uint32 core;
-	for (core = 0; core < NCORE; core++){
+	for (core = 0; core < NCPU; core++){
 		core_func[core] = NULL;
 		core_up[core] = FALSE;
 	}
@@ -17,7 +17,7 @@ void test_init_cores(void){
 }
 
 status test_core_init(uint32 core){
-	if(core < 1 || core >= NCORE){
+	if(core < 1 || core >= NCPU){
 		return SYSERR;
 	}
 

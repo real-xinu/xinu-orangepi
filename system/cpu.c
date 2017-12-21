@@ -18,7 +18,7 @@ void cpuinit(void){
 	cpu_set_entry(secondary_start);
 
 	/* wake up secondary cores */
-	for(i = 1; i < NCORE; i++){
+	for(i = 1; i < NCPU; i++){
 		cpu_enable(i);
 	}
 

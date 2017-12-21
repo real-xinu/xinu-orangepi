@@ -11,7 +11,7 @@ result startcores_test(void){
 
 	EXPECT_EQ("getcid()", getcid(), 0, DEC);
 
-	for(core = 1; core < NCORE; core++){
+	for(core = 1; core < NCPU; core++){
 		print_info("starting core %d...\n", core);
 		cpu_set_entry(startcoretest);
 		core_func[core] = test_core_wakeup;

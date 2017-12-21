@@ -2,7 +2,7 @@
 
 #include <xinu.h>
 
-char* null_stack[NCORE];	/* null process stack for each core */
+char* null_stack[NCPU];		/* null process stack for each cpu */
 lid32 proctablock;			/* lock on the process table */
 
 /*------------------------------------------------------------------------
@@ -20,7 +20,7 @@ status procinit(void){
 
 	/* Count the Null processes as the first processes in the system */
 
-	prcount = NCORE;
+	prcount = NCPU;
 
 	/* Initialize process table entries free */
 
@@ -37,7 +37,7 @@ status procinit(void){
 
 	/* Initialize the Null process entries */
 
-	for(i = 0; i < NCORE; i++){
+	for(i = 0; i < NCPU; i++){
 		prptr = &proctab[i];
 		prptr->prstate = PR_CURR;
 		prptr->prprio = 0;
@@ -47,7 +47,7 @@ status procinit(void){
 		prptr->prstkbase = null_stack[i];
 		prptr->prstklen = NULLSTK;
 		prptr->prstkptr = 0;
-		cpidtab[i].cpid = i;
+		cputab[i].cpid = i;
 		prptr->praff = i;
 		prptr->prcpu = i;
 	}
