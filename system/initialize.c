@@ -165,15 +165,6 @@ static	void	sysinit()
 	
 	meminit();
 
-	/* Initialize system variables */
-
-	/* Scheduling is not currently blocked */
-
-	for(i = 0; i < NCPU; i++){
-		cputab[i].defer.ndefers = 0;
-		cputab[i].defer.attempt = FALSE;
-	}
-
 	/* Initialize process variables */
 
 	procinit();

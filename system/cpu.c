@@ -8,7 +8,8 @@ extern uint32 exp_vector[];
  *------------------------------------------------------------------------
  */
 void cpuinit(void){
-	uint32 i;
+	uint32 i;				/* iterator over cores */
+	struct cpuent* cpuptr;	/* pointer to cpu entry */
 
 	//TODO: set csrs
 	//cpucfg->genctrl = 0x40; /* set snoop interface active */
@@ -17,8 +18,18 @@ void cpuinit(void){
 	/* set secondary entry point */
 	cpu_set_entry(secondary_start);
 
-	/* wake up secondary cores */
 	for(i = 1; i < NCPU; i++){
+		cpuptr = &cputab[i];
+
+		/* Scheduling is not currently blocked */
+		cpuptr->defer.ndefers = 0;
+		cpuptr->defer.attempt = FALSE;
+
+		/* Initialize current and previous processes */
+		cpuptr->cpid = i;
+		cpuptr->ppid = i;
+
+		/* wake up auxiliary cores */
 		cpu_enable(i);
 	}
 
