@@ -12,8 +12,10 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	struct procent *ptnew;		/* Ptr to table entry for new process	*/
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
 	struct cpuent *cpuptr;		/* Ptr to cpu entry						*/
+	cid32 thiscore;
 
-	cpuptr = &cputab[getcid()];
+	thiscore = getcid();
+	cpuptr = &cputab[thiscore];
 	dfrptr = &cpuptr->defer;
 
 	/* If rescheduling is deferred, record attempt and return */
@@ -51,12 +53,17 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	preempt = QUANTUM;		/* Reset time slice for process	*/
 
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
+
 	/* at this point a new process is running with a different stack */
 
-	/* restore update pointers on new process stack */
-	cpuptr = &cputab[getcid()];
+	/* update pointers on new process stack */
+	thiscore = getcid();
+	cpuptr = &cputab[thiscore];
 	ptnew = &proctab[cpuptr->cpid];
 	ptold = &proctab[cpuptr->ppid];
+
+	ptnew->prcpu = thiscore;
+	ptold->prcpu = CPU_NONE;
 
 	/* unlock locks locked by previous process still held by this cpu */
 	unlock(ptnew->prlock);
