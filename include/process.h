@@ -55,8 +55,8 @@ struct procent {		/* Entry in the process table		*/
 	bool8	prhasmsg;	/* Nonzero iff msg is valid		*/
 	int16	prdesc[NDESC];	/* Device descriptors for process	*/
 	lid32	prlock;		/* Process spinlock */
-	cid32	praff;		/* Process affinity */
 	cid32	prcpu;		/* core process is running on	*/
+	byte pad[2];		/* pad to multiple of 32 bits	*/
 };
 
 /* Marker for the top of a process stack (used to help detect overflow)	*/

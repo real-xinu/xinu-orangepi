@@ -31,7 +31,6 @@ status procinit(void){
 		prptr->prstkbase = NULL;
 		prptr->prprio = 0;
 		prptr->prlock = newlock();
-		prptr->praff = CPU_NONE;
 		prptr->prcpu = CPU_NONE;
 	}
 
@@ -48,7 +47,6 @@ status procinit(void){
 		prptr->prstklen = NULLSTK;
 		prptr->prstkptr = 0;
 		cputab[i].cpid = i;
-		prptr->praff = i;
 		prptr->prcpu = i;
 	}
 
