@@ -19,10 +19,12 @@ syscall	wait(
 	}
 	semptr = &semtab[sem];
 
-	mask = xsec_beg(semptr->slock);
+	mask = xsec_beg();
+	lock(semptr->slock);
 
 	if (semptr->sstate == S_FREE) {
-		xsec_end(semptr->slock, mask);
+		unlock(semptr->slock);
+		xsec_end(mask);
 		return SYSERR;
 	}
 
@@ -34,6 +36,7 @@ syscall	wait(
 		resched();						/*   and reschedule	*/
 	}
 
-	xsec_end(semptr->slock, mask);
+	unlock(semptr->slock);
+	xsec_end(mask);
 	return OK;
 }

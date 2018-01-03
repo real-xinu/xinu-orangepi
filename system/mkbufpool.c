@@ -18,12 +18,14 @@ bpid32	mkbufpool(
 	struct	bpentry	*bpptr;		/* Pointer to entry in buftab	*/
 	char	*buf;			/* Pointer to memory for buffer	*/
 
-	mask = xsec_beg(buftablock);
+	mask = xsec_beg();
+	lock(buftablock);
 
 	if (bufsiz<BP_MINB || bufsiz>BP_MAXB
 	    || numbufs<1 || numbufs>BP_MAXN
 	    || nbpools >= NBPOOLS) {
-		xsec_end(buftablock, mask);
+		unlock(buftablock);
+		xsec_end(mask);
 		return (bpid32)SYSERR;
 	}
 
@@ -33,7 +35,8 @@ bpid32	mkbufpool(
 
 	buf = (char *)getmem( numbufs * (bufsiz+sizeof(bpid32)) );
 	if ((int32)buf == SYSERR) {
-		xsec_end(buftablock, mask);
+		unlock(buftablock);
+		xsec_end(mask);
 		return (bpid32)SYSERR;
 	}
 	poolid = nbpools++;
@@ -45,7 +48,8 @@ bpid32	mkbufpool(
 		) {
 		freemem(buf, numbufs * (bufsiz+sizeof(bpid32)) );
 		nbpools--;
-		xsec_end(buftablock, mask);
+		unlock(buftablock);
+		xsec_end(mask);
 		return (bpid32)SYSERR;
 	}
 	bufsiz+=sizeof(bpid32);
@@ -57,6 +61,7 @@ bpid32	mkbufpool(
 	bpptr = (struct bpentry *)buf;
 	bpptr->bpnext = (struct bpentry *)NULL;
 
-	xsec_end(buftablock, mask);
+	unlock(buftablock);
+	xsec_end(mask);
 	return poolid;
 }

@@ -8,9 +8,7 @@
  *  xsec_beg  -  Begin XINU kernel critical section
  *------------------------------------------------------------------------
  */
-intmask xsec_beg(
-		lid32 lid	/* id of spinlock to lock */
-		){
+intmask xsec_beg(){
 	intmask mask;	/* Saved interrupt mask	*/
 
 	/* Disable interrupts to prevent handler deadlocks */
@@ -21,9 +19,6 @@ intmask xsec_beg(
 	 */
 	resched_cntl(DEFER_START);
 
-	/* Lock the spinlock necessary to protect XINU critical section */
-	lock(lid);
-
 	return mask;
 }
 
@@ -32,11 +27,8 @@ intmask xsec_beg(
  *------------------------------------------------------------------------
  */
 status xsec_end(
-		lid32 lid,		/* id of spinlock to lock */
 		intmask mask	/* saved interrupt mask to restore */
 		){
-
-	unlock(lid);
 
 	resched_cntl(DEFER_STOP);
 

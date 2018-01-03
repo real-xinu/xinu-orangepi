@@ -19,15 +19,18 @@ syscall	getprio(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_beg(prptr->prlock);
+	mask = xsec_beg();
+	lock(prptr->prlock);
 
 	if(prptr->prstate == PR_FREE){
-		xsec_end(prptr->prlock, mask);
+		unlock(prptr->prlock);
+		xsec_end(mask);
 		return SYSERR;
 	}
 
 	prio = prptr->prprio;
-
-	xsec_end(prptr->prlock, mask);
+	
+	unlock(prptr->prlock);
+	xsec_end(mask);
 	return prio;
 }

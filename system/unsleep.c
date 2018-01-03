@@ -24,31 +24,37 @@ status	unsleep(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_beg(prptr->prlock);
+	mask = xsec_beg();
+	lock(sleepqlock);
+	lock(prptr->prlock);
 
 	if(prptr->prstate == PR_FREE){
-		xsec_end(prptr->prlock, mask);
+		unlock(prptr->prlock);
+		unlock(sleepqlock);
+		xsec_end(mask);
 		return SYSERR;
 	}
 
 	/* Verify that candidate process is on the sleep queue */
 
 	if ((prptr->prstate!=PR_SLEEP) && (prptr->prstate!=PR_RECTIM)) {
-		xsec_end(prptr->prlock, mask);
+		unlock(prptr->prlock);
+		unlock(sleepqlock);
+		xsec_end(mask);
 		return SYSERR;
 	}
 
 	/* Increment delay of next process if such a process exists */
 
-	lock(sleepqlock);
 	pidnext = queuetab[pid].qnext;
 	if (pidnext < NPROC) {
 		queuetab[pidnext].qkey += queuetab[pid].qkey;
 	}
 
 	getitem(pid);			/* Unlink process from queue */
-	unlock(sleepqlock);
 
-	xsec_end(prptr->prlock, mask);
+	unlock(prptr->prlock);
+	unlock(sleepqlock);
+	xsec_end(mask);
 	return OK;
 }
