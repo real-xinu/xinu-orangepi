@@ -63,9 +63,7 @@ extern void startcoretest(void);
 
 /*************** Tests ******************/
 result startcores_test(void);
-result spinlock_test(void);
-result armmutex_test(void);
-result armmutexERG_test(void);
+result argstack_test(void);
 result cache_test(void);
 
 #endif /* INCLUDE_TEST_H_ */
