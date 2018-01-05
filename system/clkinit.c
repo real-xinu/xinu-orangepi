@@ -26,8 +26,6 @@ void	clkinit(void)
 	sleepqlock = newlock();	/* Allocate a lock to protect acces to
 							   the sleep queue */
 
-	preempt = QUANTUM;	/* Set the preemption time		*/
-
 	clktime = 0;		/* Start counting seconds		*/
 
 	/* Reset the timer module */

@@ -41,9 +41,11 @@ struct cpucfg_csreg {
 struct cpuent {
 	pid32 cpid;					/* ID of currently executing process */
 	pid32 ppid;					/* ID of previously executing process */
-	struct deferent defer;	
-	int32 cpidpad[12];			/* Pad to size of ERG to avoid false sharing */
+	struct deferent defer;		/* Deferred scheduling for cpu */
+	uint32 preempt;				/* count 1000 ms for cpu */ 
+	int32 cpidpad[11];			/* Pad to size of ERG to avoid false sharing */
 };
+
 extern 	struct	cpuent	cputab[];
 
 #define CPU_NONE	-1

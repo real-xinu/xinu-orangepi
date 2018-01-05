@@ -9,8 +9,12 @@
 void	clkhandler()
 {
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
-
 	struct timer_csreg* csrptr = (struct timer_csreg*)TIMER_BASE;
+	struct cpuent* cpuptr;			/* pointer to cpu entry		*/
+	uint32 thiscore;				/* cid of this core			*/
+
+	thiscore = getcid();
+	cpuptr = &cputab[thiscore];
 
 	/* If there is no interrupt, return */
 
@@ -22,33 +26,34 @@ void	clkhandler()
 
 	csrptr->irqstat &= 0x1;
 
-	/* Decrement 1000ms counter */
+	/* cpu 0 handles global timer state */
+	if(thiscore == 0){
+		/* Decrement 1000ms counter */
+		count1000--;
 
-	count1000--;
+		/* After 1 sec, increment clktime */
+		if(count1000 == 0) {
+			clktime++;
+			count1000 = 1000;
+		}
 
-	/* After 1 sec, increment clktime */
+		/* check if sleep queue is empty */
 
-	if(count1000 == 0) {
-		clktime++;
-		count1000 = 1000;
-	}
+		if(!isempty(sleepq)) {
+			/* sleepq nonempty, decrement the key of */
+			/* topmost process on sleepq		 */
 
-	/* check if sleep queue is empty */
-
-	if(!isempty(sleepq)) {
-		/* sleepq nonempty, decrement the key of */
-		/* topmost process on sleepq		 */
-
-		if((--queuetab[firstid(sleepq)].qkey) == 0) {
-			wakeup();
+			if((--queuetab[firstid(sleepq)].qkey) == 0) {
+				wakeup();
+			}
 		}
 	}
 
 	/* Decrement the preemption counter */
 	/* Reschedule if necessary	    */
 
-	if((--preempt) == 0) {
-		preempt = QUANTUM;
+	if((--(cpuptr->preempt)) == 0) {
+		cpuptr->preempt = QUANTUM;
 		resched();
 	}
 }

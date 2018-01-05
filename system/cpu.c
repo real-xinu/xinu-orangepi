@@ -29,6 +29,9 @@ void cpuinit(void){
 		cpuptr->cpid = i;
 		cpuptr->ppid = i;
 
+		/* Set initial preemption time */
+		cpuptr->preempt = 1000;
+
 		/* wake up auxiliary cores */
 		cpu_enable(i);
 	}
