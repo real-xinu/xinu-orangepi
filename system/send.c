@@ -14,18 +14,19 @@ syscall	send(
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	procent *prptr;		/* Ptr to process's table entry	*/
 
-	mask = disable();
 	if (isbadpid(pid)) {
 		restore(mask);
 		return SYSERR;
 	}
-	// TODO: check for PR_FREE
-
 	prptr = &proctab[pid];
-	if (prptr->prhasmsg) {
-		restore(mask);
+
+	mask = xsec_begn(3, sleepqlock, readylock, prptr->prlock);
+
+	if (prptr->prstate == PR_FREE || prptr->prhasmsg) {
+		xsec_endn(mask, 3, sleepqlock, readylock, prptr->prlock);
 		return SYSERR;
 	}
+
 	prptr->prmsg = msg;		/* Deliver message		*/
 	prptr->prhasmsg = TRUE;		/* Indicate message is waiting	*/
 
@@ -37,6 +38,7 @@ syscall	send(
 		unsleep(pid);
 		ready(pid);
 	}
-	restore(mask);		/* Restore interrupts */
+
+	xsec_endn(mask, 3, sleepqlock, readylock, prptr->prlock);
 	return OK;
 }
