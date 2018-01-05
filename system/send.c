@@ -15,7 +15,6 @@ syscall	send(
 	struct	procent *prptr;		/* Ptr to process's table entry	*/
 
 	if (isbadpid(pid)) {
-		restore(mask);
 		return SYSERR;
 	}
 	prptr = &proctab[pid];
