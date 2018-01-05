@@ -20,20 +20,17 @@ pri16	chprio(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_beg();
-	lock(prptr->prlock);
+	mask = xsec_beg(prptr->prlock);
 
 	if(prptr->prstate == PR_FREE){
-		unlock(prptr->prlock);
-		xsec_end(mask);
+		xsec_end(mask, prptr->prlock);
 		return SYSERR;
 	}
 
 	oldprio = prptr->prprio;
 	prptr->prprio = newprio;
 
-	unlock(prptr->prlock);
-	xsec_end(mask);
+	xsec_end(mask, prptr->prlock);
 	
 	return oldprio;
 }

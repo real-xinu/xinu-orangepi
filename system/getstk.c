@@ -18,8 +18,7 @@ char  	*getstk(
 		return (char *)SYSERR;
 	}
 
-	mask = xsec_beg();
-	lock(memlock);
+	mask = xsec_beg(memlock);
 
 	nbytes = (uint32) roundmb(nbytes);	/* Use mblock multiples	*/
 
@@ -38,8 +37,7 @@ char  	*getstk(
 	}
 
 	if (fits == NULL) {			/* No block was found	*/
-		unlock(memlock);
-		xsec_end(mask);
+		xsec_end(mask, memlock);
 		return (char *)SYSERR;
 	}
 
@@ -51,7 +49,6 @@ char  	*getstk(
 	}
 	memlist.mlength -= nbytes;
 
-	unlock(memlock);
-	xsec_end(mask);
+	xsec_end(mask, memlock);
 	return (char *)((uint32) fits + nbytes - sizeof(uint32));
 }

@@ -9,9 +9,10 @@ extern	void	_doprnt(char *, va_list, int (*)(int), int);
 extern int strcmp(char*, char*);
 
 struct test tests[] = {
-		// {"cache_test", cache_test},
+		{"cache_test", cache_test},
 		// {"startcores_test", startcores_test},
-		{"argstack_test", argstack_test},
+		// {"argstack_test", argstack_test},
+		{"xsec_test", xsec_test},
 		/* null terminate list of tests for easy iterating */
 		{"null", NULL}
 };

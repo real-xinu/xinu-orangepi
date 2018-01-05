@@ -19,8 +19,7 @@ char  	*getmem(
 
 	nbytes = (uint32) roundmb(nbytes);	/* Use memblk multiples	*/
 
-	mask = xsec_beg();
-	lock(memlock);
+	mask = xsec_beg(memlock);
 
 	prev = &memlist;
 	curr = memlist.mnext;
@@ -28,8 +27,7 @@ char  	*getmem(
 		if (curr->mlength == nbytes) {	/* Block is exact match	*/
 			prev->mnext = curr->mnext;
 			memlist.mlength -= nbytes;
-			unlock(memlock);
-			xsec_end(mask);
+			xsec_end(mask, memlock);
 			return (char *)(curr);
 
 		} else if (curr->mlength > nbytes) { /* Split big block	*/
@@ -39,8 +37,7 @@ char  	*getmem(
 			leftover->mnext = curr->mnext;
 			leftover->mlength = curr->mlength - nbytes;
 			memlist.mlength -= nbytes;
-			unlock(memlock);
-			xsec_end(mask);
+			xsec_end(mask, memlock);
 			return (char *)(curr);
 		} else {			/* Move to next block	*/
 			prev = curr;
@@ -48,7 +45,6 @@ char  	*getmem(
 		}
 	}
 
-	unlock(memlock);
-	xsec_end(mask);
+	xsec_end(mask, memlock);
 	return (char *)SYSERR;
 }

@@ -15,20 +15,17 @@ sid32	semcreate(
 	intmask	mask;			/* Saved interrupt mask		*/
 	sid32	sem;			/* Semaphore ID to return	*/
 
-	mask = xsec_beg();
-	lock(semtablock);
+	mask = xsec_beg(semtablock);
 
 	if (count < 0 || ((sem=newsem())==SYSERR)) {
-		unlock(semtablock);
-		xsec_end(mask);
+		xsec_end(mask, semtablock);
 		return SYSERR;
 	}
 
 	semtab[sem].scount = count;	/* Initialize table entry	*/
 
 	unlock(semtab[sem].slock); /* locked in newsem */
-	unlock(semtablock);
-	xsec_end(mask);
+	xsec_end(mask, semtablock);
 	return sem;
 }
 

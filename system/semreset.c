@@ -21,12 +21,10 @@ syscall	semreset(
 	}
 	semptr = &semtab[sem];
 
-	mask = xsec_beg();
-	lock(semptr->slock);
+	mask = xsec_beg(semptr->slock);
 
 	if (semptr->sstate==S_FREE) {
-		unlock(semptr->slock);
-		xsec_end(mask);
+		xsec_end(mask, semptr->slock);
 		return SYSERR;
 	}
 
@@ -38,7 +36,6 @@ syscall	semreset(
 
 	semptr->scount = count;		/* Reset count as specified */
 
-	unlock(semptr->slock);
-	xsec_end(mask);
+	xsec_end(mask, semptr->slock);
 	return OK;
 }

@@ -35,14 +35,12 @@ pid32	create(
 		return SYSERR;
 	}
 
-	mask = xsec_beg();
-	lock(proctablock);
+	mask = xsec_beg(proctablock);
 
 	/* newpid() locks the new process if successful */
 	if((pid=newpid()) == SYSERR){
 		freestk(saddr, ssize);
-		unlock(proctablock);
-		xsec_end(mask);
+		xsec_end(mask, proctablock);
 		return SYSERR;
 	}
 
@@ -92,8 +90,7 @@ pid32	create(
 	prptr->prstkptr = (char *)saddr;
 
 	unlock(prptr->prlock);	/* locked in newpid	*/
-	unlock(proctablock);
-	xsec_end(mask);
+	xsec_end(mask, proctablock);
 	return pid;
 }
 

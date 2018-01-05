@@ -26,9 +26,7 @@ char    *getbuf(
 		return (char *)SYSERR;
 	}
 
-	mask = xsec_beg();
-	lock(bpptr->bplock);
-
+	mask = xsec_beg(bpptr->bplock);
 
 	bufptr = bpptr->bpnext;
 
@@ -41,7 +39,6 @@ char    *getbuf(
 	*(bpid32 *)bufptr = poolid;
 	bufptr = (struct bpentry *)(sizeof(bpid32) + (char *)bufptr);
 
-	unlock(bpptr->bplock);
-	xsec_end(mask);
+	xsec_end(mask, bpptr->bplock);
 	return (char *)bufptr;
 }

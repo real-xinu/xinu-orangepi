@@ -23,8 +23,7 @@ syscall	freemem(
 	nbytes = (uint32) roundmb(nbytes);	/* Use memblk multiples	*/
 	block = (struct memblk *)blkaddr;
 
-	mask = xsec_beg();
-	lock(memlock);
+	mask = xsec_beg(memlock);
 
 	prev = &memlist;			/* Walk along free list	*/
 	next = memlist.mnext;
@@ -43,8 +42,7 @@ syscall	freemem(
 
 	if (((prev != &memlist) && (uint32) block < top)
 	    || ((next != NULL)	&& (uint32) block+nbytes>(uint32)next)) {
-		unlock(memlock);
-		xsec_end(mask);
+		xsec_end(mask, memlock);
 		return SYSERR;
 	}
 
@@ -68,7 +66,6 @@ syscall	freemem(
 		block->mnext = next->mnext;
 	}
 
-	unlock(memlock);
-	xsec_end(mask);
+	xsec_end(mask, memlock);
 	return OK;
 }

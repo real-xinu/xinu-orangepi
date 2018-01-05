@@ -7,7 +7,6 @@ uint32 varargfunc(uint32 retarg, uint32 nargs, ...);
  *  argstack_test  -  verify order of arguments in variadic functions
  *------------------------------------------------------------------------
  */
-
 result argstack_test(void){
     EXPECT_EQ("varargfunc(0, 2, 1,2)", varargfunc(0, 2, 1,2), 1,DEC);
     EXPECT_EQ("varargfunc(1, 2, 1,2)", varargfunc(1, 2, 1,2), 2,DEC);

@@ -28,14 +28,12 @@ syscall	freebuf(
 	bpptr = &buftab[poolid];
 
 	/* Insert buffer into list and signal semaphore */
-	mask = xsec_beg();
-	lock(bpptr->bplock);
+	mask = xsec_beg(bpptr->bplock);
 
 	((struct bpentry *)bufaddr)->bpnext = bpptr->bpnext;
 	bpptr->bpnext = (struct bpentry *)bufaddr;
 
-	unlock(bpptr->bplock);
-	xsec_end(mask);
+	xsec_end(mask, bpptr->bplock);
 
 	signal(bpptr->bpsem);
 

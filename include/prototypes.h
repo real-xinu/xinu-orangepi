@@ -663,8 +663,10 @@ extern	syscall	write(did32, char *, uint32);
 extern	void	xdone(void);
 
 /* in file xsec.c */
-extern	intmask	xsec_beg();
-extern	status	xsec_end(intmask);
+extern	intmask	xsec_beg(lid32);
+extern	status	xsec_end(intmask, lid32);
+extern	intmask	xsec_begn(uint32, ...);
+extern	status	xsec_endn(intmask, uint32, ...);
 
 /* in file yield.c */
 extern	syscall	yield(void);
