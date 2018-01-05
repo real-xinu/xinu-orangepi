@@ -18,22 +18,22 @@ syscall	wait(
 		return SYSERR;
 	}
 	semptr = &semtab[sem];
+	prptr = &proctab[currpid];
 
-	mask = xsec_beg(semptr->slock);
+	mask = xsec_begn(2, semptr->slock, prptr->prlock);
 
-	if (semptr->sstate == S_FREE) {
-		xsec_end(mask, semptr->slock);
+	if (semptr->sstate == S_FREE || prptr->prstate != PR_CURR) {
+		xsec_endn(mask, 2, semptr->slock, prptr->prlock);
 		return SYSERR;
 	}
 
 	if (--(semptr->scount) < 0) {		/* If caller must block	*/
-		prptr = &proctab[currpid];
 		prptr->prstate = PR_WAIT;		/* Set state to waiting	*/
 		prptr->prsem = sem;				/* Record semaphore ID	*/
 		enqueue(currpid,semptr->squeue);/* Enqueue on semaphore	*/
 		resched();						/*   and reschedule	*/
 	}
 
-	xsec_end(mask, semptr->slock);
+	xsec_endn(mask, 2, semptr->slock, prptr->prlock);
 	return OK;
 }

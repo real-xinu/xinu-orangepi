@@ -14,17 +14,27 @@ status	ready(
 	)
 {
 	register struct procent *prptr;
+	intmask mask;	
 
-	if (isbadpid(pid) || proctab[pid].prstate == PR_FREE) {
+	if (isbadpid(pid)) {
 		return SYSERR;
 	}
+	prptr = &proctab[pid];
+
+	mask = xsec_begn(mask, 2, readylock, prptr->prlock);
+
+	if (prptr->prstate == PR_FREE){
+		xsec_endn(mask, 2, readylock, prptr->prlock);
+		return SYSERR;
+	}
+	
 
 	/* Set process state to indicate ready and add to ready list */
 
-	prptr = &proctab[pid];
 	prptr->prstate = PR_READY;
 	insert(pid, readylist, prptr->prprio);
 	resched();
 
+	xsec_endn(mask, 2, readylock, prptr->prlock);
 	return OK;
 }
