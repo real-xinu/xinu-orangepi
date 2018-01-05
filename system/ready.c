@@ -21,7 +21,7 @@ status	ready(
 	}
 	prptr = &proctab[pid];
 
-	mask = xsec_begn(mask, 2, readylock, prptr->prlock);
+	mask = xsec_begn(2, readylock, prptr->prlock);
 
 	if (prptr->prstate == PR_FREE){
 		xsec_endn(mask, 2, readylock, prptr->prlock);
