@@ -21,10 +21,14 @@ syscall	semreset(
 	}
 	semptr = &semtab[sem];
 
-	mask = xsec_beg(semptr->slock);
+	/* 	We are adding multiple processes to ready queue, so temporarily 
+	*   stop other cores from rescheduling until all processes are added 
+	*	by locking the readylock.
+	*/ 
+	mask = xsec_begn(2, semptr->slock, readylock);
 
 	if (semptr->sstate==S_FREE) {
-		xsec_end(mask, semptr->slock);
+		xsec_endn(mask, 2, semptr->slock, readylock);
 		return SYSERR;
 	}
 
@@ -36,6 +40,6 @@ syscall	semreset(
 
 	semptr->scount = count;		/* Reset count as specified */
 
-	xsec_end(mask, semptr->slock);
+	xsec_endn(mask, 2, semptr->slock, readylock);
 	return OK;
 }
