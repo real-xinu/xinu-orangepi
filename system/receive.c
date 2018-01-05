@@ -16,7 +16,8 @@ umsg32	receive(void)
 
 	mask = xsec_beg(prptr->prlock);
 
-	if(prptr->prstate != PR_CURR){
+	/* Check for state changed by another processor */
+	if(prptr->prstate != PR_CURR){ 
 		xsec_end(mask, prptr->prlock);
 		return SYSERR;
 	}
