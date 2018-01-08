@@ -2,9 +2,6 @@
 
 #define NSLK	(NSEM + 2*NPROC + NDEVS)	/* Number of locks */
 
-#define	SLK_FREE		0		/* Spinlock table entry is available */
-#define	SLK_USED		1		/* Spinlock table entry is available */
-
 #define SLK_NONE		(-1)	/* Spinlock currently not owned. */
 
 /* Spinlock table entry: each entry must be equal to the size of the ERG
