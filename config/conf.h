@@ -19,7 +19,6 @@ struct	dentry	{
 	void    *dvcsr;
 	void    (*dvintr)(void);
 	byte    dvirq;
-	lid32   dvlock;
 };
 
 extern	struct	dentry	devtab[]; /* one entry per device */
