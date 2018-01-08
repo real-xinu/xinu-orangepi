@@ -14,13 +14,12 @@ syscall	getc(
 	struct dentry	*devptr;	/* Entry in device switch table	*/
 	int32		retval;		/* Value to return to caller	*/
 
-	mask = disable();
 	if (isbaddev(descrp)) {
-		restore(mask);
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	mask = xsec_beg(devptr->dvlock);
 	retval = (*devptr->dvgetc) (devptr);
-	restore(mask);
+	xsec_end(mask, devptr->dvlock);
 	return retval;
 }
