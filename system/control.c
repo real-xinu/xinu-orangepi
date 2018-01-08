@@ -17,13 +17,12 @@ syscall	control(
 	struct dentry	*devptr;	/* Entry in device switch table	*/
 	int32		retval;		/* Value to return to caller	*/
 
-	mask = disable();
 	if (isbaddev(descrp)) {
-		restore(mask);
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	mask = xsec_beg(devptr->dvlock);
 	retval = (*devptr->dvcntl) (devptr, func, arg1, arg2);
-	restore(mask);
+	xsec_end(mask, devptr->dvlock);
 	return retval;
 }
