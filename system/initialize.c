@@ -189,6 +189,7 @@ static	void	sysinit()
 	/* Initialize devices */
 
 	for (i = 0; i < NDEVS; i++) {
+		devtab[i].dvlock = newlock();
 		init(i);
 	}
 

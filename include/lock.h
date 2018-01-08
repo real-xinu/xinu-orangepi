@@ -1,6 +1,6 @@
 /* lock.h: definitions and data structures for locks */
 
-#define NSLK	2*NSEM + NPROC	/* Number of locks */
+#define NSLK	(NSEM + 2*NPROC + NDEVS)	/* Number of locks */
 
 #define	SLK_FREE		0		/* Spinlock table entry is available */
 #define	SLK_USED		1		/* Spinlock table entry is available */

@@ -10,7 +10,7 @@
 /************************************************************************/
 
 %token	DEFBRK IFBRK COLON OCTAL INTEGER IDENT CSR IRQ INTR INIT OPEN
-	CLOSE READ WRITE SEEK CONTROL IS ON GETC PUTC
+	CLOSE READ WRITE SEEK CONTROL IS ON GETC PUTC 
 %{
 #include <stdlib.h>
 #include <stdio.h>
@@ -105,6 +105,7 @@ char *devstab[] = {
 	"\tvoid    *dvcsr;",
 	"\tvoid    (*dvintr)(void);",
 	"\tbyte    dvirq;",
+	"\tlid32   dvlock;",
 	"};\n",
 	"extern	struct	dentry	devtab[]; /* one entry per device */",
 	NULL
@@ -387,14 +388,15 @@ int main(int argc, char **argv) {
 	if (ndevs > 0)
 	{
 		fprintf(confc, "struct	dentry	devtab[NDEVS] =\n{\n");
-		fprintf(confc, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n",
+		fprintf(confc, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n",
 			"/**",
 			" * Format of entries is:",
 			" * dev-number, minor-number, dev-name,",
 			" * init, open, close,",
 			" * read, write, seek,",
 			" * getc, putc, control,",
-			" * dev-csr-address, intr-handler, irq",
+			" * dev-csr-address, intr-handler, irq,",
+			" * dev-lock",
 			" */");
 	}
 
@@ -408,8 +410,9 @@ int main(int argc, char **argv) {
 			s->read, s->write, s->seek);
 		fprintf(confc, "\t  (void *)%s, (void *)%s, (void *)%s,\n",
 			s->getc, s->putc, s->control);
-		fprintf(confc, "\t  (void *)0x%x, (void *)%s, %d }",
+		fprintf(confc, "\t  (void *)0x%x, (void *)%s, %d,\n",
 			s->csr, s->intr, s->irq);
+		fprintf(confc, "\t	SLK_NONE }");
 		if (i< ndevs-1) {
 			fprintf(confc, ",\n\n");
 		} else {
