@@ -45,32 +45,31 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	}
 
 	/* Force context switch to highest priority ready process */
-	cpuptr->ppid = cpuptr->cpid;
-	cpuptr->cpid = dequeue(readylist);
-	ptnew = &proctab[cpuptr->cpid];
+	cpuptr->ppid = cpuptr->cpid;		/* record previous process		*/
+	cpuptr->cpid = dequeue(readylist);	/* get and record new process	*/
+	ptnew = &proctab[cpuptr->cpid];		
 	lock(ptnew->prlock);
-	ptnew->prstate = PR_CURR;
-	preempt = QUANTUM;		/* Reset time slice for process	*/
+	ptnew->prstate = PR_CURR;			/* set new process as current	*/
+	preempt = QUANTUM;					/* Reset time slice for process	*/
 
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
 
-	/* at this point a new process is running with a different stack */
+	/* Old process returns here when resumed */
 
 	/* update pointers on new process stack */
-	thiscore = getcid();
+	thiscore = getcid();				
 	cpuptr = &cputab[thiscore];
 	ptnew = &proctab[cpuptr->cpid];
 	ptold = &proctab[cpuptr->ppid];
 
-	ptnew->prcpu = thiscore;
+	/* record where processes are running in their table entries	*/
+	ptnew->prcpu = thiscore;			
 	ptold->prcpu = CPU_NONE;
 
 	/* unlock locks locked by previous process still held by this cpu */
 	unlock(ptnew->prlock);
 	unlock(ptold->prlock);
 	unlock(readylock);
-
-	/* Old process returns here when resumed */
 
 	return;
 }
