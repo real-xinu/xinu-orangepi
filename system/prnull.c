@@ -10,9 +10,10 @@
 process	prnull(void){
 
 	while(TRUE){
-		if(firstkey(readylist) > 0){
-			resched();
-		}
+		// if(firstkey(readylist) > 0){
+		// 	resched();
+		// }
+		// TODO: wfi?
 	}
 
 	return SYSERR;

@@ -15,6 +15,8 @@ status	ready(
 {
 	register struct procent *prptr;
 	intmask mask;	
+	uint32 i;	
+	cid32 thiscore;
 
 	if (isbadpid(pid)) {
 		return SYSERR;
@@ -33,7 +35,16 @@ status	ready(
 
 	prptr->prstate = PR_READY;
 	insert(pid, readylist, prptr->prprio);
-	resched();
+	thiscore = getcid();
+	for(i = 0; i < NCPU; i++){
+		if(i == thiscore){
+			resched();
+		} else {
+			sendintr(i, RESCHED);
+		}
+	}
+
+	
 
 	xsec_endn(mask, 2, readylock, prptr->prlock);
 	return OK;
