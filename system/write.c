@@ -22,7 +22,9 @@ syscall	write(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	wait(devptr->dvmtx);
 	retval = (*devptr->dvwrite) (devptr, buffer, count);
+	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

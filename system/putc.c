@@ -21,7 +21,9 @@ syscall	putc(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	wait(devptr->dvmtx);
 	retval = (*devptr->dvputc) (devptr, ch);
+	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

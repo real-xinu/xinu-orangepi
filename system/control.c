@@ -23,7 +23,9 @@ syscall	control(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	wait(devptr->dvmtx);
 	retval = (*devptr->dvcntl) (devptr, func, arg1, arg2);
+	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

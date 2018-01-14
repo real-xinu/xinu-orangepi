@@ -22,7 +22,9 @@ syscall	open(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	wait(devptr->dvmtx);
 	retval = (*devptr->dvopen) (devptr, name, mode);
+	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

@@ -21,7 +21,9 @@ syscall	seek(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
+	wait(devptr->dvmtx);
 	retval = (*devptr->dvseek) (devptr, pos);
+	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

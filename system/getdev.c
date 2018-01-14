@@ -13,13 +13,18 @@ did32	getdev(
 {
 	intmask		mask;		/* Saved interrupt mask		*/
 	did32		id;		/* Value to return to caller	*/
+	struct dentry	*devptr;	/* Entry in device switch table	*/
 
 	mask = disable();
 	for (id = 0; id < NDEVS; id++) {
-		if (strncmp(devname, devtab[id].dvname, DEVNAMLEN)) {
+		devptr = (struct dentry *) &devtab[id];
+		wait(devptr->dvmtx);
+		if (strncmp(devname, devptr->dvname, DEVNAMLEN)) {
+			signal(devptr->dvmtx);
 			restore(mask);
 			return id;
 		}
+		signal(devptr->dvmtx);
 	}
 	restore(mask);
 	return (did32) SYSERR;
