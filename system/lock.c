@@ -49,6 +49,10 @@ status unlock(
 
 	lockptr = &locktab[lid];
 
+	if(lockptr->lowner != getcid()){
+		return SYSERR;
+	}
+
 	if(--lockptr->lcount == 0){
 		lockptr->lowner = SLK_NONE;
 		spin_unlock(&(lockptr->lock));
