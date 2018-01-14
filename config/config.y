@@ -105,6 +105,7 @@ char *devstab[] = {
 	"\tvoid    *dvcsr;",
 	"\tvoid    (*dvintr)(void);",
 	"\tbyte    dvirq;",
+	"\tbyte    dvmtx;",
 	"};\n",
 	"extern	struct	dentry	devtab[]; /* one entry per device */",
 	NULL
@@ -394,7 +395,8 @@ int main(int argc, char **argv) {
 			" * init, open, close,",
 			" * read, write, seek,",
 			" * getc, putc, control,",
-			" * dev-csr-address, intr-handler, irq",
+			" * dev-csr-address, intr-handler, irq,",
+			" * dev-mutex"
 			" */");
 	}
 
@@ -408,8 +410,9 @@ int main(int argc, char **argv) {
 			s->read, s->write, s->seek);
 		fprintf(confc, "\t  (void *)%s, (void *)%s, (void *)%s,\n",
 			s->getc, s->putc, s->control);
-		fprintf(confc, "\t  (void *)0x%x, (void *)%s, %d }",
+		fprintf(confc, "\t  (void *)0x%x, (void *)%s, %d,\n",
 			s->csr, s->intr, s->irq);
+		fprintf(confc, "\t	-1 }");
 		if (i< ndevs-1) {
 			fprintf(confc, ",\n\n");
 		} else {
