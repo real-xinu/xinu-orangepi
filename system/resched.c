@@ -12,7 +12,7 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	struct procent *ptnew;		/* Ptr to table entry for new process	*/
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
 	struct cpuent *cpuptr;		/* Ptr to cpu entry						*/
-	cid32 thiscore;
+	cid32 thiscore;				/* id of currently executing core		*/
 
 	thiscore = getcid();
 	cpuptr = &cputab[thiscore];
@@ -66,10 +66,19 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	ptnew->prcpu = thiscore;			
 	ptold->prcpu = CPU_NONE;
 
+	/* handle dying process	*/
+	if (ptold->prstate == PR_DEAD){
+		freestk(ptold->prstkbase, ptold->prstklen);
+		ptold->prstate = PR_FREE;
+	}
+
+	// TODO: acknowledge and clear sgi resched interrupt somewhere around here
+
 	/* unlock locks locked by previous process still held by this cpu */
 	unlock(ptnew->prlock);
 	unlock(ptold->prlock);
 	unlock(readylock);
+
 
 	return;
 }

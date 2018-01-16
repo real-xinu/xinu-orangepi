@@ -18,7 +18,6 @@ status	insert(
 	if (isbadqid(q) || isbadpid(pid)) {
 		return SYSERR;
 	}
-	// TODO: add check for PR_FREE
 
 	curr = firstid(q);
 	while (queuetab[curr].qkey >= key) {

@@ -26,11 +26,6 @@ status	unsleep(
 
 	mask = xsec_begn(2, sleepqlock, prptr->prlock);
 
-	if(prptr->prstate == PR_FREE){
-		xsec_endn(mask, 2, sleepqlock, prptr->prlock);
-		return SYSERR;
-	}
-
 	/* Verify that candidate process is on the sleep queue */
 
 	if ((prptr->prstate!=PR_SLEEP) && (prptr->prstate!=PR_RECTIM)) {

@@ -25,11 +25,10 @@ status	ready(
 
 	mask = xsec_begn(2, readylock, prptr->prlock);
 
-	if (prptr->prstate == PR_FREE){
+	if (prptr->prstate == PR_FREE || prptr->prstate == PR_DEAD){
 		xsec_endn(mask, 2, readylock, prptr->prlock);
 		return SYSERR;
 	}
-	
 
 	/* Set process state to indicate ready and add to ready list */
 

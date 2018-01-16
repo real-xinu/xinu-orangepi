@@ -21,7 +21,7 @@ syscall	getprio(
 
 	mask = xsec_beg(prptr->prlock);
 
-	if(prptr->prstate == PR_FREE){
+	if(prptr->prstate == PR_FREE || prptr->prstate == PR_DEAD){
 		xsec_end(mask, prptr->prlock);
 		return SYSERR;
 	}

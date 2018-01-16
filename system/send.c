@@ -21,7 +21,7 @@ syscall	send(
 
 	mask = xsec_begn(3, sleepqlock, readylock, prptr->prlock);
 
-	if (prptr->prstate == PR_FREE || prptr->prhasmsg) {
+	if (prptr->prstate == PR_FREE || prptr->prstate == PR_DEAD || prptr->prhasmsg) {
 		xsec_endn(mask, 3, sleepqlock, readylock, prptr->prlock);
 		return SYSERR;
 	}

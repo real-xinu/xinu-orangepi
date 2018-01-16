@@ -18,7 +18,6 @@ pid32	enqueue(
 	if (isbadqid(q) || isbadpid(pid)) {
 		return SYSERR;
 	}
-	// TODO: check for PR_FREE
 
 	tail = queuetail(q);
 	prev = queuetab[tail].qprev;
@@ -45,7 +44,6 @@ pid32	dequeue(
 	} else if (isempty(q)) {
 		return EMPTY;
 	}
-	// TODO: check for PR_FREE
 
 	pid = getfirst(q);
 	queuetab[pid].qprev = EMPTY;
