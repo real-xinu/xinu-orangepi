@@ -14,7 +14,13 @@ syscall	kill(
 	struct	procent *prptr;		/* Ptr to process's table entry	*/
 	int32	i;			/* Index into descriptors	*/
 
+	// TODO: add hook to handle common suicide case
+
+	// TODO: if I set state to PR_DEAD, then I need to save descriptors
+	//		 so I can close them later...
+
 	mask = disable();
+
 	if (isbadpid(pid) || (pid == NULLPROC)
 	    || ((prptr = &proctab[pid])->prstate) == PR_FREE) {
 		restore(mask);
@@ -56,5 +62,8 @@ syscall	kill(
 	}
 
 	restore(mask);
+
+	// TODO: somewhere down here, after ksec_end, now close descriptors!
+
 	return OK;
 }
