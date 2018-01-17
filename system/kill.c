@@ -2,6 +2,11 @@
 
 #include <xinu.h>
 
+// TODO: another algorithm...
+// lock just process, check what state its in and set appropriate flag,
+// set process state to DEAD, then unlock process and lock whatever
+// you need to lock to remove the process from wherever...
+
 /*------------------------------------------------------------------------
  *  kill  -  Kill a process and remove it from the system
  *------------------------------------------------------------------------
@@ -49,7 +54,7 @@ syscall	kill(
 		prptr->prstate = PR_FREE;
 		break;
 
-	case PR_WAIT:
+	case PR_WAIT: // TODO: flag if waiting, signal sem later...
 		semtab[prptr->prsem].scount++;
 		/* Fall through */
 
