@@ -60,7 +60,7 @@ syscall	kill(
 		prptr->prstate = PR_DEAD;
 		break;
 
-	case PR_WAIT:
+	case PR_WAIT: // TODO: flag if waiting, signal sem later...
 		semtab[prptr->prsem].scount++;
 		/* Fall through */
 
