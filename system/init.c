@@ -20,9 +20,7 @@ syscall	init(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
-	wait(devptr->dvmtx);
 	retval = (*devptr->dvinit) (devptr);
-	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }

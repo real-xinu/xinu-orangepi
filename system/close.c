@@ -20,9 +20,7 @@ syscall	close(
 		return SYSERR;
 	}
 	devptr = (struct dentry *) &devtab[descrp];
-	wait(devptr->dvmtx);
 	retval = (*devptr->dvclose) (devptr);
-	signal(devptr->dvmtx);
 	restore(mask);
 	return retval;
 }
