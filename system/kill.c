@@ -3,8 +3,8 @@
 #include <xinu.h>
 
 /* functions used for kill locking */
-status ksec_beg(pid32);
-status ksec_end(pid32);
+intmask ksec_beg(lid32);
+status ksec_end(intmask, lid32);
 
 /*------------------------------------------------------------------------
  *  kill  -  Kill a process and remove it from the system
@@ -17,7 +17,6 @@ syscall	kill(
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	procent *prptr;	/* Ptr to process's table entry	*/
 	int32	i;				/* Index into descriptors	*/
-	int16	prdesc[3];	/* Saved descriptors	*/
 
 	// TODO: add hook to handle common suicide case
 
@@ -26,12 +25,10 @@ syscall	kill(
 	}
 	prptr = &proctab[pid];
 
-	mask = disable();
-	ksec_beg(pid); 
+	mask = ksec_beg(prptr->prlock); 
 
 	if(prptr->prstate == PR_FREE || prptr->prstate == PR_DEAD){
-		ksec_end(pid);
-		restore(mask);
+		ksec_end(mask, prptr->prlock);
 		return SYSERR;
 	}
 
@@ -41,7 +38,7 @@ syscall	kill(
 
 	send(prptr->prparent, pid);
 	for (i=0; i<3; i++) {
-		prdesc[i] = prptr->prdesc[i];
+		close(prptr->prdesc[i]);
 	}
 
 	switch (prptr->prstate) {
@@ -60,7 +57,7 @@ syscall	kill(
 		prptr->prstate = PR_DEAD;
 		break;
 
-	case PR_WAIT: // TODO: flag if waiting, signal sem later...
+	case PR_WAIT: 
 		semtab[prptr->prsem].scount++;
 		/* Fall through */
 
@@ -71,11 +68,8 @@ syscall	kill(
 	default:
 		prptr->prstate = PR_DEAD;
 	}
-	ksec_end(pid);
 
-	for (i=0; i<3; i++) {
-		close(prdesc[i]);
-	}
+	ksec_end(mask, prptr->prlock);
 
 	restore(mask);
 
@@ -87,10 +81,14 @@ syscall	kill(
  * 					in the appropriate nested/layered order
  *------------------------------------------------------------------------
  */
-status ksec_beg(
-		pid32 pid	/* id of the process we are attempting to kill */
+intmask ksec_beg(
+		lid32 plock	/* lid of process' lock */
 		){
 	sid32 s;	/* index into semtab */
+	intmask mask;	/* Saved interrupt mask	*/
+
+	/* Disable interrupts to prevent handler deadlocks */
+	mask = disable();
 
 	/* prevent resched while holding locks */
 	resched_cntl(DEFER_START);
@@ -103,9 +101,9 @@ status ksec_beg(
 	}
 	lock(readylock);
 	lock(proctablock);
-	lock(proctab[pid].prlock);
+	lock(plock);
 
-	return OK;
+	return mask;
 }
 
 /*------------------------------------------------------------------------
@@ -114,7 +112,8 @@ status ksec_beg(
  *------------------------------------------------------------------------
  */
 status ksec_end(
-		pid32 pid	/* id of the process we are attempting to kill */
+		intmask mask,	/* saved interrupt mask	*/
+		pid32 pid		/* lid of process' lock */
 		){
 	sid32 s;	/* index into semtab */
 
@@ -130,6 +129,8 @@ status ksec_end(
 
 	/* allow resched now that no locks are held */
 	resched_cntl(DEFER_STOP);
+
+	restore(mask);
 
 	return OK;
 }
