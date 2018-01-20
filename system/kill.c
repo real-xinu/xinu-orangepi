@@ -18,8 +18,6 @@ syscall	kill(
 	struct	procent *prptr;	/* Ptr to process's table entry	*/
 	int32	i;				/* Index into descriptors	*/
 
-	// TODO: add hook to handle common suicide case
-
 	if (isbadpid(pid) || isnullpid(pid)) {
 		return SYSERR;
 	}
