@@ -15,11 +15,11 @@ syscall	ptcreate(
 	int32	ptnum;			/* Candidate port number to try	*/
 	struct	ptentry	*ptptr;		/* Pointer to port table entry	*/
 
-	mask = disable();
-	if (count < 0) {
-		restore(mask);
+	if (count < 0){
 		return SYSERR;
 	}
+
+	mask = xsec_beg(pttablock);
 
 	for (i=0 ; i<NPORTS ; i++) {	/* Count all table entries	*/
 		ptnum = ptnextid;	/* Get an entry to check	*/
@@ -30,6 +30,7 @@ syscall	ptcreate(
 		/* Check table entry that corresponds to ID ptnum */
 
 		ptptr= &porttab[ptnum];
+		lock(ptptr->ptlock);
 		if (ptptr->ptstate == PT_FREE) {
 			ptptr->ptstate = PT_ALLOC;
 			ptptr->ptssem = semcreate(count);
@@ -37,10 +38,13 @@ syscall	ptcreate(
 			ptptr->pthead = ptptr->pttail = NULL;
 			ptptr->ptseq++;
 			ptptr->ptmaxcnt = count;
-			restore(mask);
+			unlock(ptptr->ptlock);
+			xsec_end(mask, pttablock);
 			return ptnum;
 		}
+		unlock(ptptr->ptlock);
 	}
-	restore(mask);
+	
+	xsec_end(mask, pttablock);
 	return SYSERR;
 }
