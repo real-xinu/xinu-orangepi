@@ -4,8 +4,8 @@
 
 /*------------------------------------------------------------------------
  *  _ptclear  -  Used by ptdelete and ptreset to clear or reset a port
- *		   (internal function assumes interrupts disabled and
- *		   arguments have been checked for validity)
+ *		   (internal function assumes arguments have been checked for 
+            validity)
  *------------------------------------------------------------------------
  */
 void	_ptclear(
@@ -15,6 +15,9 @@ void	_ptclear(
 	 )
 {
 	struct	ptnode	*walk;		/* Pointer to walk message list	*/
+	intmask	mask;				/* Saved interrupt mask	*/
+	
+	mask = xsec_beg(ptptr->ptlock);
 
 	/* Place port in limbo state while waiting processes are freed */
 
@@ -28,14 +31,14 @@ void	_ptclear(
 		/* Walk message list and dispose of each message */
 
 		for( ; walk!=NULL ; walk=walk->ptnext) {
-                        (*dispose)( walk->ptmsg );
+            (*dispose)( walk->ptmsg );
 		}
 
 		/* Link entire message list into the free list */
 
-                (ptptr->pttail)->ptnext = ptfree;
-                ptfree = ptptr->pthead;
-        }
+            (ptptr->pttail)->ptnext = ptfree;
+            ptfree = ptptr->pthead;
+    }
 
 	if (newstate == PT_ALLOC) {
 		ptptr->pttail = ptptr->pthead = NULL;
@@ -46,5 +49,7 @@ void	_ptclear(
 		semdelete(ptptr->ptrsem);
 	}
 	ptptr->ptstate = newstate;
+
+	xsec_end(mask, ptptr->ptlock);
 	return;
 }
