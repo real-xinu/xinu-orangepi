@@ -20,8 +20,6 @@ void	ttyhandle_in (
 
 	ch = csrptr->buffer;
 
-	lock(typtr->tylock);	/* exclusive access to ty control block */
-
 	/* Compute chars available */
 
 	avail = semcount(typtr->tyisem);
@@ -30,9 +28,9 @@ void	ttyhandle_in (
 	}
 
 	/* Handle raw mode */
+
 	if (typtr->tyimode == TY_IMRAW) {
 		if (avail >= TY_IBUFLEN) { /* No space => ignore input	*/
-			unlock(typtr->tylock);
 			return;
 		}
 
@@ -47,10 +45,7 @@ void	ttyhandle_in (
 		}
 
 		/* Signal input semaphore and return */
-		resched_cntl(DEFER_START); /* don't resched while holding tylock */
 		signal(typtr->tyisem);
-		unlock(typtr->tylock);
-		resched_cntl(DEFER_STOP);
 		return;
 	}
 
@@ -66,11 +61,9 @@ void	ttyhandle_in (
 		if (ch == typtr->tyostart) {	    /* ^Q starts output	*/
 			typtr->tyoheld = FALSE;
 			ttykickout(csrptr);
-			unlock(typtr->tylock);
 			return;
 		} else if (ch == typtr->tyostop) {  /* ^S stops	output	*/
 			typtr->tyoheld = TRUE;
-			unlock(typtr->tylock);
 			return;
 		}
 	}
@@ -83,8 +76,6 @@ void	ttyhandle_in (
 
 		if (avail >= TY_IBUFLEN) {
 			eputc(typtr->tyifullc, typtr, csrptr);
-			unlock(typtr->tylock);
-			return;
 		} else {	/* Input buffer has space for this char */
 			*typtr->tyitail++ = ch;
 
@@ -96,12 +87,9 @@ void	ttyhandle_in (
 			if (typtr->tyiecho) {	/* Are we echoing chars?*/
 				echoch(ch, typtr, csrptr);
 			}
-			resched_cntl(DEFER_START); /* don't resched while holding tylock */
 			signal(typtr->tyisem);
-			unlock(typtr->tylock);
-			resched_cntl(DEFER_STOP);
-			return;
 		}
+		return;
 
 	} else {	/* Just cooked mode (see common code above) */
 
@@ -115,7 +103,6 @@ void	ttyhandle_in (
 			typtr->tyicursor = 0;
 			eputc(TY_RETURN, typtr, csrptr);
 			eputc(TY_NEWLINE, typtr, csrptr);
-			unlock(typtr->tylock);
 			return;
 		}
 
@@ -127,7 +114,6 @@ void	ttyhandle_in (
 				typtr->tyicursor--;
 				erase1(typtr, csrptr);
 			}
-			unlock(typtr->tylock);
 			return;
 		}
 
@@ -142,11 +128,8 @@ void	ttyhandle_in (
 				typtr->tyitail = typtr->tyibuff;
 			}
 			/* Make entire line (plus \n or \r) available */
-			resched_cntl(DEFER_START);	/* don't resched while holding tylock */
 			signaln(typtr->tyisem, typtr->tyicursor + 1);
 			typtr->tyicursor = 0; 	/* Reset for next line	*/
-			unlock(typtr->tylock);
-			resched_cntl(DEFER_STOP);
 			return;
 		}
 
@@ -159,7 +142,6 @@ void	ttyhandle_in (
 		}
 		if ((avail + typtr->tyicursor) >= TY_IBUFLEN-1) {
 			eputc(typtr->tyifullc, typtr, csrptr);
-			unlock(typtr->tylock);
 			return;
 		}
 
@@ -171,14 +153,10 @@ void	ttyhandle_in (
 				echoch(ch, typtr, csrptr);
 			}
 			if (typtr->tyicursor != 0) {
-				unlock(typtr->tylock);
 				return;
 			}
 			*typtr->tyitail++ = ch;
-			resched_cntl(DEFER_START);	/* don't resched while holding tylock */
 			signal(typtr->tyisem);
-			unlock(typtr->tylock);
-			resched_cntl(DEFER_STOP);
 			return;
 		}
 
@@ -199,7 +177,6 @@ void	ttyhandle_in (
 		if (typtr->tyitail >= &typtr->tyibuff[TY_IBUFLEN]) {
 			typtr->tyitail = typtr->tyibuff;
 		}
-		unlock(typtr->tylock);
 		return;
 	}
 }
