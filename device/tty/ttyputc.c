@@ -36,11 +36,11 @@ devcall	ttyputc(
 	if (typtr->tyotail >= &typtr->tyobuff[TY_OBUFLEN]) {
 		typtr->tyotail = typtr->tyobuff;
 	}
+	unlock(typtr->tylock);
 
 	/* Start output in case device is idle */
 
 	ttykickout((struct uart_csreg *)devptr->dvcsr);
 
-	unlock(typtr->tylock);
 	return OK;
 }
