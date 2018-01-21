@@ -19,13 +19,12 @@ struct	ptentry	{			/* Entry in the port table	*/
 	int32	ptseq;			/* Sequence changed at creation	*/
 	struct	ptnode	*pthead;	/* List of message pointers	*/
 	struct	ptnode	*pttail;	/* Tail of message list		*/
-	lid32	ptlock;
 };
 
 extern	struct	ptnode	*ptfree;	/* List of free nodes		*/
 extern	struct	ptentry	porttab[];	/* Port table			*/
 extern	int32	ptnextid;		/* Next port ID to try when	*/
 					/*   looking for a free slot	*/
-extern	lid32	pttablock;	/* lock on global port table	*/
+extern	lid32	portlock;	/* lock on global port table	*/
 
 #define	isbadport(portid)	( (portid)<0 || (portid)>=NPORTS )

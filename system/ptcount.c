@@ -25,10 +25,10 @@ int32	ptcount(
 	}
 	ptptr= &porttab[portid];
 
-	mask = xsec_beg(ptptr->ptlock);
+	mask = xsec_beg(portlock);
 
 	if (ptptr->ptstate != PT_ALLOC){
-		xsec_end(mask, ptptr->ptlock);
+		xsec_end(mask, portlock);
 		return SYSERR;
 	}
 
@@ -49,6 +49,6 @@ int32	ptcount(
 
 	unlock(semtab[ptptr->ptrsem].slock);
 
-	xsec_end(mask, ptptr->ptlock);
+	xsec_end(mask, portlock);
 	return count;
 }

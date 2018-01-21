@@ -19,16 +19,16 @@ syscall	ptdelete(
 	}
 	ptptr = &porttab[portid];
 
-	mask = xsec_begn(2, pttablock, ptptr->ptlock);
+	mask = xsec_beg(portlock);
 
 	if(ptptr->ptstate != PT_ALLOC){
-		xsec_endn(mask, 2, pttablock, ptptr->ptlock);
+		xsec_end(mask, portlock);
 		return SYSERR;
 	}
 
 	_ptclear(ptptr, PT_FREE, disp);
 	ptnextid = portid;
 
-	xsec_endn(mask, 2, pttablock, ptptr->ptlock);
+	xsec_end(mask, portlock);
 	return OK;
 }

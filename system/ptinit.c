@@ -5,7 +5,7 @@
 struct	ptnode	*ptfree;		/* List of free message nodes	*/
 struct	ptentry	porttab[NPORTS];	/* Port table			*/
 int32	ptnextid;			/* Next table entry to try	*/
-lid32	pttablock;	/* lock on global port table	*/
+lid32	portlock;			/* lock on global port table	*/
 
 /*------------------------------------------------------------------------
  *  ptinit  -  Initialize all ports
@@ -30,7 +30,6 @@ syscall	ptinit(
 	for (i=0 ; i<NPORTS ; i++) {
 		porttab[i].ptstate = PT_FREE;
 		porttab[i].ptseq = 0;
-		porttab[i].ptlock = newlock();
 	}
 	ptnextid = 0;
 
@@ -44,9 +43,9 @@ syscall	ptinit(
 
 	curr->ptnext = NULL;
 
-	/* Initialize spinlock on global port table */
+	/* Initialize spinlock on all ports and port structures */
 
-	pttablock = newlock();
+	portlock = newlock();
 
 	return OK;
 }
