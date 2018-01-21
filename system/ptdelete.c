@@ -14,14 +14,21 @@ syscall	ptdelete(
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	ptentry	*ptptr;		/* Pointer to port table entry	*/
 
-	mask = disable();
-	if ( isbadport(portid) ||
-	     (ptptr= &porttab[portid])->ptstate != PT_ALLOC ) {
-		restore(mask);
+	if (isbadport(portid)){
 		return SYSERR;
 	}
+	ptptr = &porttab[portid];
+
+	mask = xsec_begn(2, pttablock, ptptr->ptlock);
+
+	if(ptptr->ptstate != PT_ALLOC){
+		xsec_endn(mask, 2, pttablock, ptptr->ptlock);
+		return SYSERR;
+	}
+
 	_ptclear(ptptr, PT_FREE, disp);
 	ptnextid = portid;
-	restore(mask);
+
+	xsec_endn(mask, 2, pttablock, ptptr->ptlock);
 	return OK;
 }
