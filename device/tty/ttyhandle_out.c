@@ -19,10 +19,14 @@ void	ttyhandle_out(
 	int32	uspace;			/* Space left in onboard UART	*/
 					/*   output FIFO		*/
 	uint32 	ier = 0;
+	intmask mask;		/* dummy interrupt mask for xsec	*/
+
+	mask = xsec_beg(typtr->tylock);		/* exclusive access to control block */
 
 	/* If output is currently held, simply ignore the call */
 
 	if (typtr->tyoheld) {
+		xsec_end(mask, typtr->tylock);
 		return;
 	}
 
@@ -32,6 +36,7 @@ void	ttyhandle_out(
 	     (semcount(typtr->tyosem) >= TY_OBUFLEN) ) {
 		ier = csrptr->ier;
 		csrptr->ier = ier & ~UART_IER_ETBEI;
+		xsec_end(mask, typtr->tylock);
 		return;
 	}
 	
@@ -73,5 +78,6 @@ void	ttyhandle_out(
 		ier = csrptr->ier;
 		csrptr->ier = (ier & ~UART_IER_ETBEI);
 	}
+	xsec_end(mask, typtr->tylock);
 	return;
 }
