@@ -53,7 +53,7 @@ int32	gicinit()
  */
 void gic_enable(void){
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	giccpuif += getcid(); // TODO: is this right?
+	giccpuif += getcid(); 
 	giccpuif->ctrl = GIC_ENABLE;
 }
 

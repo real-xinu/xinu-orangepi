@@ -17,7 +17,7 @@ void	irq_dispatch()
 	interrupt (*handler)(); /* Pointer to handler function	*/
 
 	/* Get the interrupt number from the Interrupt controller */
-
+	giccpuif += getcid(); 
 	xnum = giccpuif->intack & 0x1FF;
 
 	/* Defer scheduling until interrupt is acknowledged */
