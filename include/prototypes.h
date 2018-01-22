@@ -70,9 +70,8 @@ extern	int32	ethread(struct dentry *, void *, uint32);
 extern	int32	ethwrite(struct dentry *, void *, uint32);
 
 /* in file evec.c */
-extern	int32	initintc(void);
-extern	int32	set_evec(uint32, uint32);
-extern	void	trap(int32);
+extern	void	defexp_handler(void);
+extern	void	initevec(void);
 
 /* in file exception.c */
 extern  void exception(int32, int32*);
@@ -114,6 +113,12 @@ extern	status	gettime(uint32 *);
 
 /* in file getutime.c */
 extern	status	getutime(uint32 *);
+
+/* in file gic.c */
+extern	int32	gicinit(void);
+extern	int32	set_irq_handler(uint32, uint32);
+extern	void	gic_dump(void);
+extern	void	gic_enable(void);
 
 /* in file gpiocontrol.c */
 extern	devcall	gpiocontrol(struct dentry *, int32, int32, int32);
@@ -162,9 +167,7 @@ extern	status	insertd(pid32, qid16, int32);
 extern	intmask	disable(void);
 extern	void	enable(void);
 extern	void	expjmpinstr(void);
-extern	void	defexp_handler(void);
 extern 	void	irq_except(void);
-extern	int32	initevec(void);
 
 /* in file ioerr.c */
 extern	devcall	ioerr(void);

@@ -1,5 +1,8 @@
 /* gpioinit.c - gpioinit */
 
+
+/* gpioinit.c - gpioinit */
+
 #include <xinu.h>
 
 struct	gpiocblk	gpiotab[NGPIO];
@@ -36,8 +39,8 @@ devcall	gpioinit(
 		intptr->intsta= 0x0;
 		
 		/* Set interrupt handler in GIC */
-		set_evec( devptr->dvirq, (uint32)devptr->dvintr );
-		kprintf("after set_evec()...\n");
+		set_irq_handler( devptr->dvirq, (uint32)devptr->dvintr );
+		kprintf("after set_irq_handler()...\n");
 	}
 	else if(csrptr == GPIOG_BASE)	{
 		intptr = (struct gpio_intreg *)(GPIOG_INT_BASE);
@@ -51,7 +54,7 @@ devcall	gpioinit(
 		intptr->intsta= 0x0;
 
 		/* ToDo: Set interrupt handler in GIC */
-		set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+		set_irq_handler( devptr->dvirq, (uint32)devptr->dvintr );
 	}
 	
 	/* Set all pins as IO disabled */

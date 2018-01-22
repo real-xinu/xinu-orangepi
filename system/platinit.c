@@ -42,7 +42,7 @@ void	platinit(void)
 
 	/* Initialize the Interrupt Controller */
 
-	initintc();
+	gicinit();
 
 	/* Initialize the Performance Counters */
 

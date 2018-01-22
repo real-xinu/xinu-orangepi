@@ -28,6 +28,6 @@
 /* Exception Vector Addresses */
 #define ARMV7A_EV_START	exp_vector	/* Exception vector start addr	*/
 #define ARMV7A_EH_OFFSET 0x20		/* Exception handler offset */
-#define ARMV7A_IRQH_OFFSET 0x30		/* IRQ exception offset */
+#define ARMV7A_IRQH_OFFSET 0x38		/* IRQ exception handler offset */
 #define ARMV7A_EV_SIZE 0x40			/* Size of exception vector */
-
+#define ARMV7A_IRQH_IND 14			/* IRQ exception handler index */

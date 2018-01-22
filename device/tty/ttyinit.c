@@ -63,7 +63,7 @@ devcall	ttyinit(
 
 	/* Register the interrupt dispatcher for the tty device */
 
-	set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+	set_irq_handler( devptr->dvirq, (uint32)devptr->dvintr );
 
 	/* Enable interrupts on the device: reset the transmit and	*/
 	/*   receive FIFOS, and set the interrupt trigger level		*/

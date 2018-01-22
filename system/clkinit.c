@@ -18,7 +18,7 @@ void	clkinit(void)
 
 	/* Set interrupt vector for clock to invoke clkint */
 
-	set_evec(TMR0_IRQ, (uint32)clkhandler);
+	set_irq_handler(TMR0_IRQ, (uint32)clkhandler);
 
 	sleepq = newqueue();	/* Allocate a queue to hold the delta	*/
 				/*   list of sleeping processes		*/

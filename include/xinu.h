@@ -15,7 +15,7 @@
 #include <tty.h>
 #include <gpio.h>
 #include <device.h>
-#include <interrupt.h>
+#include <gic.h>
 #include <file.h>
 #include <rfilesys.h>
 #include <rdisksys.h>

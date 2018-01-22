@@ -36,28 +36,14 @@ extern	struct	dentry	devtab[]; /* one entry per device */
 #define NULLDEV              8	/* type null     */
 #define ETHER0               9	/* type eth      */
 #define NAMESPACE           10	/* type nam      */
-#define RDISK               11	/* type rds      */
-#define RAM0                12	/* type ram      */
-#define RFILESYS            13	/* type rfs      */
-#define RFILE0              14	/* type rfl      */
-#define RFILE1              15	/* type rfl      */
-#define RFILE2              16	/* type rfl      */
-#define RFILE3              17	/* type rfl      */
-#define RFILE4              18	/* type rfl      */
-#define RFILE5              19	/* type rfl      */
-#define RFILE6              20	/* type rfl      */
-#define RFILE7              21	/* type rfl      */
-#define RFILE8              22	/* type rfl      */
-#define RFILE9              23	/* type rfl      */
-#define LFILESYS            24	/* type lfs      */
-#define LFILE0              25	/* type lfl      */
-#define LFILE1              26	/* type lfl      */
-#define LFILE2              27	/* type lfl      */
-#define LFILE3              28	/* type lfl      */
-#define LFILE4              29	/* type lfl      */
-#define LFILE5              30	/* type lfl      */
-#define SPI0                31	/* type spi      */
-#define SPI1                32	/* type spi      */
+#define RAM0                11	/* type ram      */
+#define LFILESYS            12	/* type lfs      */
+#define LFILE0              13	/* type lfl      */
+#define LFILE1              14	/* type lfl      */
+#define LFILE2              15	/* type lfl      */
+#define LFILE3              16	/* type lfl      */
+#define LFILE4              17	/* type lfl      */
+#define LFILE5              18	/* type lfl      */
 
 /* Control block sizes */
 
@@ -65,16 +51,12 @@ extern	struct	dentry	devtab[]; /* one entry per device */
 #define	Ngpio	7
 #define	Ntty	1
 #define	Neth	1
-#define	Nrds	1
 #define	Nram	1
-#define	Nrfs	1
-#define	Nrfl	10
 #define	Nlfs	1
 #define	Nlfl	6
 #define	Nnam	1
-#define	Nspi	2
 
-#define NDEVS 33
+#define NDEVS 19
 
 
 /* Configuration and Size Constants */

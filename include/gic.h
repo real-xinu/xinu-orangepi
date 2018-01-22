@@ -1,4 +1,14 @@
-/* interrupt.h */
+/* gic.h : definition for the Generic Interrupt Controller */
+
+#define GIC_BASE 0x01C80000	/* Generic Interrupt Controller Base Address */
+#define GIC_DIST_BASE (0x01C80000+0x1000) /* GIC Distributor Base Address */
+#define GIC_CPUIF_BASE (0x01C80000 + 0x2000) /* GIC CPU Interface Base Address */
+
+#define GIC_DISABLE 0x00000000
+#define GIC_ENABLE 0x00000001
+
+#define GIC_IRQ_MAX	156 /* size of exception vector */
+#define GIC_NIRQ (GIC_IRQ_MAX+1)
 
 struct gic_cpuifreg {	/* GIC CPU Interface Registers */
 	reg32 ctrl;			/* CPU Interface Control Register */
@@ -64,15 +74,3 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 pid3;			/* Peripheral ID 3 Register */
 	reg32 cid[4];		/* Component ID Registers */
 };
-
-extern uint32 exp_vector[];
-
-#define GIC_BASE 0x01C80000	/* Generic Interrupt Controller Base Address */
-#define GIC_DIST_BASE (0x01C80000+0x1000) /* GIC Distributor Base Address */
-#define GIC_CPUIF_BASE (0x01C80000 + 0x2000) /* GIC CPU Interface Base Address */
-
-#define GIC_DISABLE 0x00000000
-#define GIC_ENABLE 0x00000001
-
-#define GIC_IRQ_MAX	156 /* size of exception vector */
-#define GIC_NIRQ (GIC_IRQ_MAX+1)

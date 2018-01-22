@@ -1,130 +1,10 @@
-/* evec.c -- initintc, set_evec, irq_dispatch */
+/* evec.c -- gic_init, set_evec, irq_dispatch */
 
 #include <xinu.h>
 #include <stdio.h>
 
-uint32	intc_vector[GIC_NIRQ];	/* Interrupt vector	*/
-uint32 	exp_vector[16];
-char	expmsg1[] = "Unhandled exception. Link Register: 0x%x";
-char	expmsg2[] = "**** EXCEPTION ****";
-
-/*------------------------------------------------------------------------
- * gic_dump - Dump the contents of the GIC control and status registers
- * 			  for debugging.
- *------------------------------------------------------------------------
- */
-void gic_dump(struct gic_distreg* gicdist, struct gic_cpuifreg* giccpuif){
-	kprintf("expjmpinstr = 0x%08X\n", expjmpinstr);
-	kprintf("defexp_handler = 0x%08X\n", defexp_handler);
-	kprintf("irq_except = 0x%08X\n", irq_except);
-	kprintf("GIC_CPUIF_BASE = %08X\n", GIC_CPUIF_BASE);
-	kprintf("sizeof(struct gic_cpuifreg) = %X\n", sizeof(struct gic_cpuifreg));
-	kprintf("&giccpuif->ahpripnd - GIC_CPUIF_BASE = 0x%X (0x28 ?)\n", (int32)&giccpuif->ahpripnd - GIC_CPUIF_BASE);
-	kprintf("&giccpuif->actpri - GIC_CPUIF_BASE = 0x%X (0xD0 ?)\n", (int32)&giccpuif->actpri - GIC_CPUIF_BASE);
-	kprintf("&giccpuif->nsactpir - GIC_CPUIF_BASE = 0x%X (0xE0 ?)\n", (int32)&giccpuif->nsactpri - GIC_CPUIF_BASE);
-	kprintf("&giccpuif->iid - GIC_CPUIF_BASE = 0x%X (0xFC ?)\n", (int32)&giccpuif->iid - GIC_CPUIF_BASE);
-	kprintf("&giccpuif->deactint - GIC_CPUIF_BASE = 0x%X (0x1000 ?)\n\n", (int32)&giccpuif->deactint - GIC_CPUIF_BASE);
-
-	kprintf("sizeof(struct gic_distreg) = %X\n", sizeof(struct gic_distreg));
-	kprintf("&gicdist->group[0] - GIC_DIST_BASE = 0x%X (0x80 ?)\n", (int32)&gicdist->group[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->seten[0] - GIC_DIST_BASE = 0x%X (0x100 ?)\n", (int32)&gicdist->seten[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->clren[0] - GIC_DIST_BASE = 0x%X (0x180 ?)\n", (int32)&gicdist->clren[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->setpnd[0] - GIC_DIST_BASE = 0x%X (0x200 ?)\n", (int32)&gicdist->setpnd[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->clrpnd[0] - GIC_DIST_BASE = 0x%X (0x280 ?)\n", (int32)&gicdist->clrpnd[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->setact[0] - GIC_DIST_BASE = 0x%X (0x300 ?)\n", (int32)&gicdist->setact[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->clract[0] - GIC_DIST_BASE = 0x%X (0x380 ?)\n", (int32)&gicdist->clract[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->pri[0] - GIC_DIST_BASE = 0x%X (0x400 ?)\n", (int32)&gicdist->pri[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->pctgt[0] - GIC_DIST_BASE = 0x%X (0x800 ?)\n", (int32)&gicdist->pctgt[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->config[0] - GIC_DIST_BASE = 0x%X (0xC00 ?)\n", (int32)&gicdist->config[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->status[0] - GIC_DIST_BASE = 0x%X (0xD00 ?)\n", (int32)&gicdist->status[0] - GIC_DIST_BASE);
-	kprintf("&gicdist->sgi - GIC_DIST_BASE = 0x%X (0xF00 ?)\n", (int32)&gicdist->sgi - GIC_DIST_BASE);
-	kprintf("&gicdist->pid4 - GIC_DIST_BASE = 0x%X (0xFD0 ?)\n", (int32)&gicdist->pid4 - GIC_DIST_BASE);
-	kprintf("&gicdist->cid[3] - GIC_DIST_BASE = 0x%X (0xFFC ?)\n", (int32)&gicdist->cid[3] - GIC_DIST_BASE);
-
-	kprintf("Distributor Type Register Contents: 0x%08X\n", gicdist->type);
-
-	kprintf("giccpuif->ctl = %X\n", giccpuif->ctrl);
-	kprintf("gicdist->ctl = %X\n", giccpuif->ctrl);
-
-	int i;
-	for (i = 0; i < 16; i++){
-		kprintf("exp_vector[i] = 0x%08X\n", exp_vector[i]);
-	}
-}
-
-/*------------------------------------------------------------------------
- * initintc - Initialize the Interrupt Controller
- *------------------------------------------------------------------------
- */
-int32	initintc()
-{
-	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
-	int i;	/* index into GIC arrays */
-
-	/* Reset the interrupt controller */
-	giccpuif->ctrl = GIC_DISABLE;
-	gicdist->ctrl = GIC_DISABLE;
-
-	/* Initialize Distributor */
-
-	/* set all interrupts to group 0 */
-	for(i = 0; i < 16; i++){ gicdist->group[i] = 0; }
-	/* clear enable bit for all interrupts */
-	for(i = 0; i < 16; i++){ gicdist->clren[i] = 0xFFFFFFFF; }
-	/* clear pending bit for all interrupts */
-	for(i = 0; i < 16; i++){ gicdist->clrpnd[i] = 0xFFFFFFFF; }
-	/* clear active bit for all interrupts */
-	for(i = 0; i < 16; i++){ gicdist->clract[i] = 0xFFFFFFFF; }
-	/* FIXME: for now, set all interrupt priorities to the same max value */
-	for(i = 0; i < 128; i++){ gicdist->pri[i] = 0; }
-	/* FIXME: for now, forward all interrupts to cpu interface 0*/
-	for(i = 0; i < 128; i++){ gicdist->pctgt[i] = 0xFFFFFFFF/*TODO:0x01010101*/; }
-	/* make all interrupts level-sensitive */
-	for(i = 0; i < 32; i++){ gicdist->config[i] = 0; }
-
-	/* Initialize CPU Interface */
-
-	/* Set priority filter to accept all priority levels */
-	giccpuif->primask = 0xFFFFFFFF;
-
-	return OK;
-}
-
-/*------------------------------------------------------------------------
- * set_evec - set exception vector to point to an exception handler
- *------------------------------------------------------------------------
- */
-int32	set_evec(uint32 xnum, uint32 handler)
-{
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
-	uint32	bank;	/* bank number in int controller	*/
-	uint32	mask;	/* used to set bits in bank		*/
-
-	/* There are only 127 interrupts allowed 0-126 */
-
-	if(xnum > GIC_IRQ_MAX) {
-		return SYSERR;
-	}
-
-	/* Install the handler */
-
-	intc_vector[xnum] = handler;
-
-	/* Get the bank number based on interrupt number */
-
-	bank = (xnum/32);
-
-	/* Get the bit inside the bank */
-
-	mask = (0x00000001 << (xnum%32));
-
-	/* Reset the bit to enable that interrupt number */
-
-	gicdist->seten[bank] |= mask;
-
-	return OK;
-}
+uint32	irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
+uint32 	exp_vector[ARMV7A_EV_SIZE];
 
 /*-------------------------------------------------------------------------
  * irq_dispatch - call the handler for specific interrupt
@@ -150,8 +30,8 @@ void	irq_dispatch()
 
 	/* If a handler is set for the interrupt, call it */
 
-	if(intc_vector[xnum]) {
-		handler = ( interrupt(*)() )intc_vector[xnum];
+	if(irq_vector[xnum]) {
+		handler = ( interrupt(*)() )irq_vector[xnum];
 		handler(xnum);
 	}
 
@@ -162,4 +42,54 @@ void	irq_dispatch()
 	/* Resume scheduling */
 
 	resched_cntl(DEFER_STOP);
+}
+
+/*------------------------------------------------------------------------
+ * initevec - Initialize the exception vector
+ *------------------------------------------------------------------------
+ */
+void initevec(void){
+	int i;	/* index into exception vector */
+	uint32* jmp = (uint32*)expjmpinstr;	/* pointer to exception jump */
+
+	/* Set exception vector base address */
+	asm volatile (
+		"mrc	p15, 0, r0, c1, c0, 0\n"	/* Read the c1-control register	*/
+		"bic	r0, r0, #0x00002000\n"		/* V bit = 0, normal exp. base	*/
+		"mcr	p15, 0, r0, c1, c0, 0 \n"	/* Write the c1-control register	*/
+		"ldr	r0, =exp_vector\n"	  		/* Exception base address		*/
+		"mcr	p15, 0, r0, c12, c0, 0\n"	/* Store excp. base addr. in c12	*/
+		"isb\n"
+		:		/* Output	*/
+		:		/* Input	*/
+		: "r0"	/* Clobber	*/
+	);
+
+	/* lower entries of exception vector jump to higher entries */
+
+	for(i = 0; i < 8; i++){
+		exp_vector[i] = (uint32)(*jmp);
+	}
+
+	/* higher entries of exception vector point to exception handlers */
+
+	for(i = 8; i < ARMV7A_EV_SIZE; i++){
+		exp_vector[i] = (uint32)defexp_handler;
+	}
+
+	exp_vector[ARMV7A_IRQH_IND] = (uint32)irq_except;
+}
+
+/*------------------------------------------------------------------------
+ * defexp_handler - Default Exception handler
+ *------------------------------------------------------------------------
+ */
+void defexp_handler(void){
+	uint32 lr;	/* link register */
+
+	/* get link register */
+	asm volatile ( "mov %0, lr\n" : "=r"(lr));
+
+	kprintf("Unhandled exception. Link Register: 0x%x", lr);
+	panic("**** EXCEPTION ****");
 }

@@ -76,10 +76,7 @@ void	nulluser()
 
 	/* Enable interrupts */
 	enable();
-	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
-	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
-	gicdist->ctrl = GIC_ENABLE;
-	giccpuif->ctrl = GIC_ENABLE;
+	gic_enable();
 
 	/* Initialize the network stack and start processes */
 
