@@ -60,6 +60,22 @@ process	main(void)
 
 #endif
 
+	/* Interrupt Test */
+	control(GPIOA, GPIO_OUTPUT_MODE,10, PIN_MODE_1);
+	control(GPIOA, GPIO_PULL_SELECT,10, PIN_PULL_DOWN);
+	control(GPIOA, GPIO_INPUT_MODE,9, PIN_MODE_0);
+	control(GPIOA, GPIO_PULL_SELECT,9, PIN_PULL_DOWN);
+	control(GPIOA, GPIO_INTERRUPT_CTL,GPIO_INT_ENABLE|GPIO_INT_RISE_TRIG, 9);
+	control(GPIOA, GPIO_REG_INT_HANDLER, (int32)hooksample, 0);
+
+	while(1){
+		vwrite = 0;
+		write(GPIOA,(char*)&vwrite,GPIO_PIN_10);
+		sleepms(500);
+		vwrite = GPIO_PIN_10;
+		write(GPIOA,(char*)&vwrite,GPIO_PIN_10);
+		sleepms(500);
+	}
 
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 /*	//struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
@@ -99,7 +115,7 @@ for(i=0;i<2000000;i++);
 	//control(GPIOA, GPIO_PULL_SELECT,8, PIN_PULL_DISABLE);
 	//control(GPIOA, GPIO_PULL_SELECT,9, PIN_PULL_DISABLE);
 	//control(GPIOA, GPIO_PULL_SELECT,14, PIN_PULL_DISABLE);
-	vwrite = 0;
+	
 	write(GPIOA,(char*)&vwrite,(GPIO_PIN_07|GPIO_PIN_08|GPIO_PIN_09));
 	kprintf("STARTING LED CRAWL\n");
 	while(1)	{
