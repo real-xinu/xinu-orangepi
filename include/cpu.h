@@ -49,6 +49,7 @@ struct cpuent {
 extern 	struct	cpuent	cputab[];
 
 #define CPU_NONE	-1
+#define CPU_ALL		-2
 
 #define isbadcid(x)	(x < 0 || x >= NCPU)
 

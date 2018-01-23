@@ -57,9 +57,9 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 res7[16];
 	reg32 clract[16];	/* Interrupt Clear-Active Registers */
 	reg32 res8[16];
-	reg32 pri[128];		/* Interrupt Priority Registers */
+	reg8  pri[512];		/* Interrupt Priority Registers (byte addressable) */
 	reg32 res9[128];
-	reg32 pctgt[128];	/* Interrupt Processor Targets Registers */
+	reg8  pctgt[512];	/* Interrupt Processor Targets Registers (byte addressable) */
 	reg32 res10[128];
 	reg32 config[32];	/* Interrupt Configuration Registers */
 	reg32 res11[32];

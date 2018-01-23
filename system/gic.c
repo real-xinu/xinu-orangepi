@@ -6,7 +6,7 @@
  * gicinit - Initialize the Interrupt Controller
  *------------------------------------------------------------------------
  */
-int32	gicinit()
+status	gicinit()
 {
 	struct gic_cpuifreg* giccpuif = (struct gic_cpuifreg*)GIC_CPUIF_BASE;
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
@@ -29,10 +29,10 @@ int32	gicinit()
 	for(i = 0; i < 16; i++){ gicdist->clrpnd[i] = 0xFFFFFFFF; }
 	/* clear active bit for all interrupts */
 	for(i = 0; i < 16; i++){ gicdist->clract[i] = 0xFFFFFFFF; }
-	/* FIXME: for now, set all interrupt priorities to the same max value */
-	for(i = 0; i < 128; i++){ gicdist->pri[i] = 0; }
-	/* FIXME: for now, forward all interrupts to cpu interface 0*/
-	for(i = 0; i < 128; i++){ gicdist->pctgt[i] = 0xFFFFFFFF/*TODO:0x01010101*/; }
+	/* set all interrupt priorities to the same max value */
+	for(i = 0; i < 512; i++){ gicdist->pri[i] = 0; }
+	/* forward all interrupts to cpu interface 0*/
+	for(i = 0; i < 512; i++){ gicdist->pctgt[i] = 1; }
 	/* make all interrupts level-sensitive */
 	for(i = 0; i < 32; i++){ gicdist->config[i] = 0; }
 
@@ -66,13 +66,11 @@ void gic_enable(void){
  * set_irq_handler - set irq vector to point to an interrupt handler
  *------------------------------------------------------------------------
  */
-int32	set_irq_handler(uint32 xnum, uint32 handler)
+status set_irq_handler(uint32 xnum, uint32 handler)
 {
 	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
 	uint32	bank;	/* bank number in int controller	*/
 	uint32	mask;	/* used to set bits in bank		*/
-
-	/* There are only 127 interrupts allowed 0-126 */
 
 	if(xnum > GIC_IRQ_MAX) {
 		return SYSERR;
@@ -93,6 +91,35 @@ int32	set_irq_handler(uint32 xnum, uint32 handler)
 	/* Reset the bit to enable that interrupt number */
 
 	gicdist->seten[bank] |= mask;
+
+	return OK;
+}
+
+/*------------------------------------------------------------------------
+ * set_irq_target - set gic distributor to forward irq to target cpu
+ *------------------------------------------------------------------------
+ */
+status set_irq_target(uint32 xnum, cid32 cpu)
+{
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+	int32 pctgt = 0;	/* target mask */
+	int32 i;		/* iterator over target mask */
+
+	if(xnum > GIC_IRQ_MAX) {
+		return SYSERR;
+	}
+
+	if(cpu == CPU_ALL){	/* forward irq to all cores */
+		for (i = 0; i < NCPU; i++){
+			pctgt |= (1 << i);
+		}
+	} else if (isbadcid(cpu)) {
+		return SYSERR;
+	} else {
+		pctgt = (1 << cpu);
+	}
+
+	gicdist->pctgt[xnum] = pctgt;
 
 	return OK;
 }
