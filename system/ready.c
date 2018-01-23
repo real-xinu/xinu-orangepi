@@ -15,8 +15,6 @@ status	ready(
 {
 	register struct procent *prptr;
 	intmask mask;	
-	uint32 i;	
-	cid32 thiscore;
 
 	if (isbadpid(pid)) {
 		return SYSERR;
@@ -34,16 +32,10 @@ status	ready(
 
 	prptr->prstate = PR_READY;
 	insert(pid, readylist, prptr->prprio);
-	thiscore = getcid();
-	for(i = 0; i < NCPU; i++){ // TODO: change to reschedbroadcast sgi
-		if(i == thiscore){
-			resched();
-		} else {
-			sendsgi(GIC_SGI_RESCHED, i);
-		}
-	}
 
-	
+	/* Enforce scheduling invariant	*/
+	resched();
+	bcastsgi(GIC_SGI_RESCHED);
 
 	xsec_endn(mask, 2, readylock, prptr->prlock);
 	return OK;

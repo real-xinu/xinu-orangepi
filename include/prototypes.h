@@ -137,6 +137,7 @@ extern	status	getutime(uint32 *);
 extern	int32	gicinit(void);
 extern	int32	set_irq_handler(uint32, uint32);
 extern	status	sendsgi(int32 sgi, cid32 core);
+extern	status	bcastsgi(int32 sgi);
 extern	void	gic_dump(void);
 extern	void	gic_enable(void);
 

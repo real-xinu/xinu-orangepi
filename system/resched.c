@@ -72,9 +72,6 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 		ptold->prstate = PR_FREE;
 	}
 
-	// TODO: acknowledge and clear sgi resched interrupt somewhere around here
-	// TODO: send resched int to other cores?
-
 	/* unlock locks locked by previous process still held by this cpu */
 	unlock(ptnew->prlock);
 	unlock(ptold->prlock);

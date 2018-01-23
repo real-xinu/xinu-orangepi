@@ -120,6 +120,28 @@ status sendsgi(
 }
 
 /*------------------------------------------------------------------------
+ *  bcastsgi  -  broadcast software generated interrupt on all cores 
+ * 					 except caller
+ *------------------------------------------------------------------------
+ */
+status bcastsgi(
+    int32 sgi	/* interrupt number to generate */
+    )
+{
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+
+    if(isbadsgi(sgi)){
+        return SYSERR;
+    }
+
+	sgi |= (1<<24);	/* set target filter to all cpus but caller */
+    
+	gicdist->sgi = sgi;
+
+    return OK;
+}
+
+/*------------------------------------------------------------------------
  * gic_dump - Dump the contents of the GIC control and status registers
  * 			  for debugging.
  *------------------------------------------------------------------------
