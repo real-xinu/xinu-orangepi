@@ -35,11 +35,11 @@ status	ready(
 	prptr->prstate = PR_READY;
 	insert(pid, readylist, prptr->prprio);
 	thiscore = getcid();
-	for(i = 0; i < NCPU; i++){
+	for(i = 0; i < NCPU; i++){ // TODO: change to reschedbroadcast sgi
 		if(i == thiscore){
 			resched();
 		} else {
-			sendintr(i, RESCHED);
+			sendsgi(GIC_SGI_RESCHED, i);
 		}
 	}
 

@@ -13,7 +13,7 @@ int32	gicinit()
 	int i;	/* index into GIC arrays */
 
 	/* Reset the interrupt controller */
-	giccpuif->ctrl = GIC_DISABLE;
+	for(i = 0; i < NCPU; i++){giccpuif[i].ctrl = GIC_DISABLE;}
 	gicdist->ctrl = GIC_DISABLE;
 
 	/* Clear irq_vector */
@@ -40,6 +40,11 @@ int32	gicinit()
 
 	/* Set priority filter to accept all priority levels */
 	giccpuif->primask = 0xFFFFFFFF;
+
+	/* Set resched() SGI	*/
+	set_irq_handler(GIC_SGI_RESCHED, (uint32)resched);
+
+	/* TODO: Route timer interrupt to all cores */
 
 	/* Enable the distributor */
 	gicdist->ctrl = GIC_ENABLE;
@@ -90,6 +95,28 @@ int32	set_irq_handler(uint32 xnum, uint32 handler)
 	gicdist->seten[bank] |= mask;
 
 	return OK;
+}
+
+/*------------------------------------------------------------------------
+ *  sendsgi  -  Generate software generated interrupt on given core
+ *------------------------------------------------------------------------
+ */
+status sendsgi(
+    int32 sgi,	/* interrupt number to generate */
+    cid32 core	/* core on which to generate interrupt */
+    )
+{
+	struct gic_distreg* gicdist = (struct gic_distreg*)GIC_DIST_BASE;
+
+    if(isbadcid(core) || isbadsgi(sgi)){
+        return SYSERR;
+    }
+
+	sgi |= (core << 16); /* fill in Target CPU field */
+    
+	gicdist->sgi = sgi;
+
+    return OK;
 }
 
 /*------------------------------------------------------------------------

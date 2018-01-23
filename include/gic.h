@@ -10,6 +10,12 @@
 #define GIC_IRQ_MAX	156 /* size of exception vector */
 #define GIC_NIRQ (GIC_IRQ_MAX+1)
 
+#define GIC_NSGI 16	/* number of software generated interrupts */
+#define GIC_SGI_RESCHED 1
+
+extern uint32 exp_vector[];
+extern uint32 irq_vector[GIC_NIRQ];	/* Interrupt vector	*/
+
 struct gic_cpuifreg {	/* GIC CPU Interface Registers */
 	reg32 ctrl;			/* CPU Interface Control Register */
 	reg32 primask;		/* Interrupt Priority Mask Register */
@@ -74,3 +80,5 @@ struct gic_distreg {	/* GIC Distributor Registers */
 	reg32 pid3;			/* Peripheral ID 3 Register */
 	reg32 cid[4];		/* Component ID Registers */
 };
+
+#define isbadsgi(x) (x < 0 || x >= GIC_NSGI)

@@ -136,6 +136,7 @@ extern	status	getutime(uint32 *);
 /* in file gic.c */
 extern	int32	gicinit(void);
 extern	int32	set_irq_handler(uint32, uint32);
+extern	status	sendsgi(int32 sgi, cid32 core);
 extern	void	gic_dump(void);
 extern	void	gic_enable(void);
 
@@ -567,9 +568,6 @@ extern	syscall	semreset(sid32, int32);
 
 /* in file send.c */
 extern	syscall	send(pid32, umsg32);
-
-/* in file sendintr.c */
-extern	status	sendintr(cid32, int32);
 
 /* in file shell.c */
 extern 	process shell(did32);

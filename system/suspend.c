@@ -36,7 +36,7 @@ syscall suspend(
 		if(pid == currpid){ /* process currently on this core */
 			resched();				  /*   suspended and resched.	*/
 		} else { /* process on a different core */
-			sendintr(prptr->prcpu, RESCHED);
+			sendsgi(GIC_SGI_RESCHED, prptr->prcpu);
 		}
 	}
 
