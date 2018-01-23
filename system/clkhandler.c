@@ -28,11 +28,12 @@ void	clkhandler()
 		/* After 1 sec, increment clktime */
 		if(count1000 == 0) {
 			clktime++;
+			asm volatile("dmb\n"); /* flush clktime update */
 			count1000 = 1000;
 		}
 
 		/* check if sleep queue is empty */
-
+		lock(sleepqlock); 
 		if(!isempty(sleepq)) {
 			/* sleepq nonempty, decrement the key of */
 			/* topmost process on sleepq		 */
@@ -41,6 +42,7 @@ void	clkhandler()
 				wakeup();
 			}
 		}
+		unlock(sleepqlock);
 	}
 
 	/* Decrement the preemption counter */
