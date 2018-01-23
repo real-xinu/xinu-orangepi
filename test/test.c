@@ -13,6 +13,7 @@ struct test tests[] = {
 		// {"startcores_test", startcores_test},
 		// {"argstack_test", argstack_test},
 		{"xsec_test", xsec_test},
+		{"sgi_test", sgi_test},
 		/* null terminate list of tests for easy iterating */
 		{"null", NULL}
 };

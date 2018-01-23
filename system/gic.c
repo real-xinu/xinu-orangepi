@@ -112,7 +112,7 @@ status sendsgi(
         return SYSERR;
     }
 
-	sgi |= (core << 16); /* fill in Target CPU field */
+	sgi |= ((1 << core) << 16); /* fill in Target CPU field */
     
 	gicdist->sgi = sgi;
 
