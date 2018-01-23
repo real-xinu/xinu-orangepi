@@ -50,7 +50,7 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	ptnew = &proctab[cpuptr->cpid];		
 	lock(ptnew->prlock);
 	ptnew->prstate = PR_CURR;			/* set new process as current	*/
-	preempt = QUANTUM;					/* Reset time slice for process	*/
+	cpuptr->preempt = QUANTUM;			/* Reset time slice for process	*/
 
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
 

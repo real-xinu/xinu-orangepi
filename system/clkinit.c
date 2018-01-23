@@ -2,10 +2,9 @@
 
 #include <xinu.h>
 
-uint32	clktime;		/* Seconds since boot			*/ // TODO: should this be volatile?
-qid16	sleepq;			/* Queue of sleeping processes		*/
-lid32	sleepqlock;		/* Lock on the sleep queue */
-uint32	preempt;		/* Preemption counter			*/ // TODO: one per core, move to cputab
+uint32	clktime;	/* Seconds since boot			*/ 
+qid16	sleepq;				/* Queue of sleeping processes		*/
+lid32	sleepqlock;			/* Lock on the sleep queue */
 
 /*------------------------------------------------------------------------
  * clkinit  -  Initialize the clock and sleep queue at startup
