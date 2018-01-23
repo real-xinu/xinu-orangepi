@@ -16,12 +16,6 @@ void	clkhandler()
 	thiscore = getcid();
 	cpuptr = &cputab[thiscore];
 
-	/* If there is no interrupt, return */
-
-	if((csrptr->irqstat & 0x1) == 0) {
-		return;
-	}
-
 	/* Acknowledge the interrupt */
 
 	csrptr->irqstat &= 0x1;
