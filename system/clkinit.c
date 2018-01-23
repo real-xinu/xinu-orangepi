@@ -5,6 +5,7 @@
 uint32	clktime;	/* Seconds since boot			*/ 
 qid16	sleepq;				/* Queue of sleeping processes		*/
 lid32	sleepqlock;			/* Lock on the sleep queue */
+uint32  dummy;	/* TODO: not referenced, but removing causes FIQ somehow... */
 
 /*------------------------------------------------------------------------
  * clkinit  -  Initialize the clock and sleep queue at startup

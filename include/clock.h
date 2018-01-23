@@ -6,7 +6,6 @@ extern	qid16	sleepq;		/* queue for sleeping processes		*/
 extern	lid32	sleepqlock;	/* lock for sleep queue		*/
 extern	int32	slnonempty;	/* nonzero if sleepq is nonempty	*/
 extern	int32	*sltop;		/* ptr to key in first item on sleepq	*/
-extern	uint32	preempt;	/* preemption counter			*/
 
 struct timer_csreg {
 	reg32 irqen;		/* IRQ Enable Register */
