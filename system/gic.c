@@ -31,7 +31,7 @@ status	gicinit()
 	for(i = 0; i < 16; i++){ gicdist->clract[i] = 0xFFFFFFFF; }
 	/* set all interrupt priorities to the same max value */
 	for(i = 0; i < 512; i++){ gicdist->pri[i] = 0; }
-	/* forward all interrupts to cpu interface 0*/
+	/* forward all interrupts to cpu interface 0 by default */
 	for(i = 0; i < 512; i++){ gicdist->pctgt[i] = 1; }
 	/* make all interrupts level-sensitive */
 	for(i = 0; i < 32; i++){ gicdist->config[i] = 0; }
@@ -44,7 +44,10 @@ status	gicinit()
 	/* Set resched() SGI	*/
 	set_irq_handler(GIC_SGI_RESCHED, (uint32)resched);
 
-	/* TODO: Route timer interrupt to all cores */
+	/* Route timer interrupt to all cores */
+	set_irq_target(TMR0_IRQ, CPU_ALL);
+
+	/* TODO: Route other device interrupts elsewhere */
 
 	/* Enable the distributor */
 	gicdist->ctrl = GIC_ENABLE;
