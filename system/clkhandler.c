@@ -11,17 +11,15 @@ void	clkhandler()
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 	struct timer_csreg* csrptr = (struct timer_csreg*)TIMER_BASE;
 	struct cpuent* cpuptr;			/* pointer to cpu entry		*/
-	uint32 thiscore;				/* cid of this core			*/
 
-	thiscore = getcid();
-	cpuptr = &cputab[thiscore];
+	cpuptr = &cputab[getcid()];
 
 	/* Acknowledge the interrupt */
 
 	csrptr->irqstat &= 0x1;
 
 	/* cpu 0 handles global timer state */
-	if(thiscore == 0){
+	if(getcid() == 0){
 		/* Decrement 1000ms counter */
 		count1000--;
 

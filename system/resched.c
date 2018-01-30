@@ -12,10 +12,8 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	struct procent *ptnew;		/* Ptr to table entry for new process	*/
 	struct deferent *dfrptr;	/* Ptr to defer entry for this core		*/
 	struct cpuent *cpuptr;		/* Ptr to cpu entry						*/
-	cid32 thiscore;				/* id of currently executing core		*/
 
-	thiscore = getcid();
-	cpuptr = &cputab[thiscore];
+	cpuptr = &cputab[getcid()];
 	dfrptr = &cpuptr->defer;
 
 	/* If rescheduling is deferred, record attempt and return */
@@ -56,14 +54,13 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 
 	/* Old process returns here when resumed */
 
-	/* update pointers on new process stack */
-	thiscore = getcid();				
-	cpuptr = &cputab[thiscore];
+	/* update pointers on new process stack */			
+	cpuptr = &cputab[getcid()];
 	ptnew = &proctab[cpuptr->cpid];
 	ptold = &proctab[cpuptr->ppid];
 
 	/* record where processes are running in their table entries	*/
-	ptnew->prcpu = thiscore;			
+	ptnew->prcpu = getcid();			
 	ptold->prcpu = CPU_NONE;
 
 	/* handle dying process	*/

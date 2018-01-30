@@ -12,22 +12,20 @@ status lock(
 		lid32	lid		/* id of lock to lock */
 	){
 	struct lentry* lockptr;	/* Ptr to lock table entry */
-	cid32 thiscore;			/* ID of currently executing core */
 
 	if (isbadlid(lid)) {
 		return SYSERR;
 	}
 
 	lockptr = &locktab[lid];
-	thiscore = getcid();
 
-	if(lockptr->lowner == thiscore){
+	if(lockptr->lowner == getcid()){
 		lockptr->lcount++;
 		return OK;
 	}
 
 	spin_lock(&(lockptr->lock));
-	lockptr->lowner = thiscore;
+	lockptr->lowner = getcid();
 	lockptr->lcount++;
 
 	return OK;
