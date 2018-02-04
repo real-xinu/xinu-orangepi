@@ -5,7 +5,7 @@
 
 process	main(void)
 {
-	run_all_tests();
+	// run_all_tests();
 //	cpu_dump();
 //	int i;
 //	uint32* ptable = (uint32*)0x7DFF0000;

@@ -1,6 +1,6 @@
 /* cpu.h */
 
-#define NCPU 4	/* number of cores in SMP system */
+#define NCPU 2	/* number of cores in SMP system */
 
 /* CPU Config Control and Status Registers */
 

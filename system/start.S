@@ -54,20 +54,24 @@ bexit:	mov	pc, lr			/* Return to caller		*/
 	.globl	secondary_start			/* Declare entry point global	*/
 
 secondary_start:
+	bl bputc
 
 	/* Disable interrupts */
 	cpsid	iaf
+	bl bputc
 
 	/* Disable thumb exception, AFE, TRE */
-	//mrc	p15, 0, r0, c1, c0, 0
-	//bic	r0, #SCTLR_TE
-	//bic	r0, #SCTLR_AFE
-	//bic	r0, #SCTLR_TRE
-	//mcr	p15, 0, r0, c1, c0, 0
+	mrc	p15, 0, r0, c1, c0, 0
+	bic	r0, #SCTLR_TE
+	bic	r0, #SCTLR_AFE
+	bic	r0, #SCTLR_TRE
+	mcr	p15, 0, r0, c1, c0, 0
+	bl bputc
 
 	/* change to supervisor mode */
 	cps #CPSR_SPR
 	msr cpsr, #CPSR_SPR
+	bl bputc
 
 	/* set actlr bits, including smp bit */
 	/* from TRM - this bit must be enable before any TLB or cache
@@ -78,23 +82,45 @@ secondary_start:
 	isb
 	dsb
 	dmb
+	bl bputc
+
+	ldr r0, =page_table
+	bl mmu_set_ttbr
+	bl bputc
+
+	ldr r0, =exp_vector
+	bl evec_set_addr
+	bl bputc
+
+	bl bp_inv
+	bl bputc
+	bl tlb_inv_all
+	bl bputc
+	bl cache_enable_all
+	bl bputc
+
+	ldr r0, =0xFFFFFFFF
+	bl mmu_set_dacr
+	bl bputc
+
+	bl mmu_enable
+	bl bputc
 
 	/* get stack to run on */
 	mrc p15, 0, r11, c0, c0, 5 	/* r11 = cpu id register */
 	and r11, r11, #0x03		   	/* r11 = cid of this core */
 	ldr r0, =null_stack 		/* r0 = null_stack[] */
 	ldr r1, [r0, +r11]			/* r1 = null_stack[cid]	*/
-	mov sp, r1					/* sp = null_stack[cid] */
-	isb
-	dsb
-	dmb
+	mov sp, r0					/* sp = null_stack[cid] */
+	bl bputc
 
 	/* clear the fcseidr */
-	ldr r0, =0x0
-	mcr p15, 0, r0, c13, c0, 0
-	isb
-	dsb
-	dmb
+	//ldr r0, =0x0
+	//mcr p15, 0, r0, c13, c0, 0
+	//isb
+	//dsb
+	//dmb
+	//bl bputc
 
 	bl secondary_run	/* never returns */
 

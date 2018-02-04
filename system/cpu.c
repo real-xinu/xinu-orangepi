@@ -110,16 +110,16 @@ void cpu_set_entry(void* entry){
  *------------------------------------------------------------------------
  */
 void secondary_run(void){
-	kprintf("Hello from core %d! (kprintf)\n", getcid());
+	// kprintf("Hello from core %d! (kprintf)\n", getcid());
 	//cache_set_prefetch(L1PF_DISABLED);
-	cache_inv(0); /* invalidate L1 data cache */
-	bp_inv();
-	tlb_inv_all();
+	// evec_set_addr((void*)exp_vector);
+	cache_inv(1); /* invalidate L1 data cache */
+	// bp_inv();
+	// tlb_inv_all();
 	cache_enable_all();
-	mmu_enable();
-	evec_set_addr((void*)exp_vector);
-	mmu_set_dacr(0xFFFFFFFF);
-	mmu_set_ttbr(page_table);
+	// mmu_set_dacr(0xFFFFFFFF);
+	// mmu_set_ttbr(page_table);
+	// mmu_enable();
 //	cache_set_prefetch(L1PF_3);
 //	cpu_wfe();
 	kprintf("Hello from core %d! (kprintf)\n", getcid());
