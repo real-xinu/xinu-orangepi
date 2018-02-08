@@ -591,8 +591,8 @@ extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 extern	int32	spiinit(struct dentry *);
 
 /* in file spinlock.S */
-extern	void	spin_lock(int32*);
-extern	void	spin_unlock(int32*);
+extern	void	spin_lock(volatile int32*);
+extern	void	spin_unlock(volatile int32*);
 
 /* in file start.S */
 extern	void 	secondary_start(void);
