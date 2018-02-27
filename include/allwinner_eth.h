@@ -309,3 +309,6 @@ struct eth_aw_tx_desc {
 /* rx next holds the address of the next descriptor, 32 bit aligned */
 
 #define ETH_ALLWINNER_INIT_DELAY	1000000
+
+#define ETH_AW_RXINT		41
+#define ETH_AW_TXINT		42

@@ -390,8 +390,8 @@ int32	ethinit	(
 //	csrptr->sl->macctrl |= ETH_AM335X_SLCTL_EN;
 //
 //	/* Set interrupt vectors */
-//	set_evec(ETH_AM335X_TXINT, (uint32)devptr->dvintr);
-//	set_evec(ETH_AM335X_RXINT, (uint32)devptr->dvintr);
+//	set_evec(ETH_AW_TXINT, (uint32)devptr->dvintr);
+//	set_evec(ETH_AW_RXINT, (uint32)devptr->dvintr);
 //
 //	/* Enable the CPDMA interrupts */
 //	csrptr->cpdma->tx_intmask_set = 0x1;
