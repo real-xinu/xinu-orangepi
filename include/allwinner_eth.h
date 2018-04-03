@@ -219,6 +219,7 @@ struct eth_aw_csreg {
 #define ETH_AW_MII_BUSY		0x00000001	/* true for w/r in progress */
 
 /* mii_data holds data in bits 0-15 that can be written or read from the selected PHY register */
+#define ETH_AW_MII_DATA		0x0000ffff	/* use to read and write data */
 
 /* addrX_high holds the upper 16 bits of the Xth mac address in bits 0-15 */
 /* addrX_low holds the lower 32 bits of the Xth mac address */

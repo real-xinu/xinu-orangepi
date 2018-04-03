@@ -2,7 +2,7 @@
 
 #include <xinu.h>
 
-struct	eth_a_csreg eth_a_regs;
+struct	eth_aw_csreg eth_aw_regs;
 
 struct	ethcblk ethertab[1];
 
@@ -11,7 +11,8 @@ struct	ethcblk ethertab[1];
  *-----------------------------------------------------------------------
  */
 int32	eth_phy_read (
-		volatile struct	eth_a_mdio *mdio,/* MDIO CSR pointer	*/
+		volatile struct	eth_aw_csreg *csrptr,/* MDIO CSR pointer	*/
+		print_list(list, len);
 		byte	regadr,	/* PHY Register number	*/
 		byte	phyadr,	/* PHY address		*/
 		uint32	*value	/* Pointer to value 	*/
@@ -20,39 +21,40 @@ int32	eth_phy_read (
 
 	/* Ethernet PHY has only 32 registers */
 // TODO
-//	if(regadr > 31) {
-//		return SYSERR;
-//	}
-//
-//	/* Only 32 possible PHY addresses */
-//
-//	if(phyadr > 31) {
-//		return SYSERR;
-//	}
-//
-//	/* Wait for the previous access to complete */
-//
-//	while( (mdio->useraccess0 & ETH_AM335X_MDIOUA_GO) != 0 );
-//
-//	/* Start the access */
-//
-//	mdio->useraccess0 = (ETH_AM335X_MDIOUA_GO) |
-//			    (regadr << 21) |
-//			    (phyadr << 16);
-//
-//	/* Wait until the access is complete */
-//
-//	while( (mdio->useraccess0 & ETH_AM335X_MDIOUA_GO) != 0 );
-//
-//	/* Check if the access was successful */
-//
+	if(regadr > 31) {
+		return SYSERR;
+	}
+
+	/* Only 32 possible PHY addresses */
+
+	if(phyadr > 31) {
+		return SYSERR;
+	}
+
+	/* Wait for the previous access to complete */
+
+	while( (csrptr->mii_cmd & ETH_AW_MII_BUSY) != 0 );
+
+	/* Start the access */
+
+	csrptr->mii_cmd = (regadr << 4) |
+			(phyadr << 12) &~
+			(ETH_AW_MII_WR) |
+			ETH_AW_MII_BUSY;
+
+	(*value) = csrptr->mii_data & ETH_AW_MII_DATA;
+
+	/* Wait until the access is complete */
+
+	while( (csrptr->mii_cmd & ETH_AW_MII_BUSY) != 0 );
+
+	/* Check if the access was successful */
+
 //	if( (mdio->useraccess0 & ETH_AM335X_MDIOUA_ACK) == 0 ) {
 //		return SYSERR;
 //	}
 //
-//	/* Copy the value read */
-//
-//	(*value) = mdio->useraccess0 & ETH_AM335X_MDIOUA_DM;
+	/* Copy the value read */
 
 	return OK;
 }
@@ -62,40 +64,41 @@ int32	eth_phy_read (
  *-----------------------------------------------------------------------
  */
 int32	eth_phy_write (
-		volatile struct	eth_a_mdio *mdio, /* MDIO CSR pointer	*/
+		volatile struct	eth_aw_csreg * csrptr, /* MDIO CSR pointer	*/
 		byte	regadr,	/* PHY register number	*/
 		byte	phyadr,	/* PHY address		*/
 		uint32	value	/* Value to be written	*/
 	)
 {
 // TODO
-//	/* There are only 32 PHY registers */
-//
-//	if(regadr > 31) {
-//		return SYSERR;
-//	}
-//
-//	/* There are only 32 possible PHY addresses */
-//
-//	if(phyadr > 31) {
-//		return SYSERR;
-//	}
-//
-//	/* Wait for the previous access to complete */
-//
-//	while( (mdio->useraccess0 & ETH_AM335X_MDIOUA_GO) != 0);
-//
-//	/* Start the access */
-//
-//	mdio->useraccess0 = ETH_AM335X_MDIOUA_GO |
-//			    ETH_AM335X_MDIOUA_WR |
-//			    (regadr << 21) |
-//			    (phyadr << 16) |
-//			    (value & 0xffff);
-//
-//	/* Wait for the access to complete */
-//
-//	while( (mdio->useraccess0 & ETH_AM335X_MDIOUA_GO) != 0);
+	/* There are only 32 PHY registers */
+
+	if(regadr > 31) {
+		return SYSERR;
+	}
+
+	/* There are only 32 possible PHY addresses */
+
+	if(phyadr > 31) {
+		return SYSERR;
+	}
+
+	/* Wait for the previous access to complete */
+
+	while( (csrptr->mii_cmd & ETH_AW_MII_BUSY) != 0);
+
+	/* Start the access */
+
+	csrptr->mii_cmd = ETH_AW_MII_WR |
+			(regadr << 4) |
+			(phyadr << 12) |
+			ETH_AW_MII_BUSY;
+
+	csrptr->mii_data = value & ETH_AW_MII_DATA;
+
+	/* Wait for the access to complete */
+
+	while( (csrptr->mii_cmd & ETH_AW_MII_BUSY) != 0);
 
 	return OK;
 }
@@ -168,7 +171,7 @@ int32	eth_phy_reset (
 }
 
 /*-----------------------------------------------------------------------
- * ethinit - initialize the TI AM335X ethernet hardware
+ * ethinit - initialize the Allwinner ethernet hardware
  *-----------------------------------------------------------------------
  */
 int32	ethinit	(
