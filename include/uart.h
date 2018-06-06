@@ -52,10 +52,11 @@ struct	uart_csreg
 
 /* Divisor values for baud rate */
 
-#define	UART_DLL	26	/* value for low byte of divisor latch	*/
-				/*	DLAB=0				*/
-#define UART_DLM	0	/* value for high byte of divisor latch	*/
-				/*	DLAB=1				*/
+#define DLL_57600	26
+#define DLL_115200	13
+
+#define	UART_DLL	DLL_115200	/* value for low byte of divisor latch	*/
+#define UART_DLM	0		/* value for high byte of divisor latch	*/
 
 /* Line control bits */
 
