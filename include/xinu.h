@@ -38,6 +38,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <am335x_control.h>
-#include <am335x_eth.h>
+#include <allwinner_eth.h>
 #include <am335x_watchdog.h>
 #include <armv7a.h>

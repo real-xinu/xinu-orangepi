@@ -66,12 +66,12 @@ struct eth_aw_csreg {
 						/* true = 'register & signal' */
 /* int_sta signals (off or 0 by default) */
 
-#define ETH_AW_RGMII_LINK_STA_INT
+#define ETH_AW_RGMII_LINK_STA_INT	\
 				0x00010000	/* true if link status of RGMII has changed */
 #define ETH_AW_RX_EARLY_INT	0x00002000	/* true if RX DMA has filled the first buffer */
 #define ETH_AW_RX_OVERFLOW_INT	0x00001000	/* true if RX FIFO overflowed */
 #define ETH_AW_RX_TIMEOUT_INT	0x00000800	/* true if the received frame is too long */
-#define ETH_AW_RX_DMA_STOPPED_INT
+#define ETH_AW_RX_DMA_STOPPED_INT	\
 				0x00000400	/* true if RX DMA FSM is stopped */
 #define ETH_AW_RX_BUF_UA_INT	0x00000200	/* true if RX DMA is suspended */
 #define ETH_AW_RX_INT		0x00000100	/* true if frame reception is completed */
@@ -79,28 +79,28 @@ struct eth_aw_csreg {
 #define ETH_AW_TX_UNDERFLOW_INT	0x00000010	/* true if TX FIFO underflowed */
 #define ETH_AW_TX_TIMEOUT_INT	0x00000008	/* true if TX has timed out */
 #define ETH_AW_TX_BUF_UA_INT	0x00000004	/* true if TX DMA is suspended */
-#define ETH_AW_TX_DMA_STOPPED_INT
+#define ETH_AW_TX_DMA_STOPPED_INT	\
 				0x00000002	/* true if TX DMA FSM is stopped */
 #define ETH_AW_TX_INT		0x00000001	/* true for frame completion */
 
 /* int_en signals  (off or 0 by default) */
 
 #define ETH_AW_RX_EARLY_INT_EN	0x00002000	/* toggle early receive interrupt enable */
-#define ETH_AW_RX_OVERFLOW_INT_EN
+#define ETH_AW_RX_OVERFLOW_INT_EN	\
 				0x00001000	/* toggle overflow interrupts */
-#define ETH_AW_RX_TIMEOUT_INT_EN
+#define ETH_AW_RX_TIMEOUT_INT_EN	\
 				0x00000800	/* toggle receive timeout interrupts */
-#define ETH_AW_RX_DMA_STOPPED_INT_EN
+#define ETH_AW_RX_DMA_STOPPED_INT_EN	\
 				0x00000400	/* toggle receive DMA FSM stopped interrupts */
 #define ETH_AW_RX_BUF_UA_INT_EN	0x00000200	/* toggle receive buffer unavailable interrupts */
 #define ETH_AW_RX_INT_EN	0x00000100	/* toggle receive interrupts */
 #define ETH_AW_TX_EARLY_INT_EN	0x00000020	/* toggle early transmit interrupts */
-#define ETH_AW_TX_UNDERFLOW_INT_EN
+#define ETH_AW_TX_UNDERFLOW_INT_EN	\
 				0x00000010	/* toggle underflow interrupts */
-#define ETH_AW_TX_TIMEOUT_INT_EN
+#define ETH_AW_TX_TIMEOUT_INT_EN	\
 				0x00000008	/* toggle transmit timeout interrupts */
 #define ETH_AW_TX_BUF_UA_INT_EN	0x00000004	/* toggle transmit buffer available interrupts */
-#define ETH_AW_TX_DMA_STOPPED_INT_EN
+#define ETH_AW_TX_DMA_STOPPED_INT_EN	\
 				0x00000002	/* toggle transmit DMA FSM stopped interrupts */
 #define ETH_AW_TX_INT_EN	0x00000001	/* toggle transmit interrupts */
 
@@ -131,7 +131,7 @@ struct eth_aw_csreg {
 /* must be false before writing to this register again */
 
 /* PAUSE_FRM_SLOT is acquired by using & with this mask then right shifting 20: */
-#define ETH_AW_TX_PAUSE_FRM_SLOT
+#define ETH_AW_TX_PAUSE_FRM_SLOT	\
 				0x00300000	/* threshold of pause timer, should be less than PAUSE_TIME */
 #define ETH_AW_PAUSE_TIME	0x000FFFF0	/* mask used to read the pause time in the control frame */
 #define ETH_AW_ZQP_FRM_EN	0x00000002	/* toggle functionality to generate Zero-Quanta Pause control frame */
@@ -154,21 +154,21 @@ struct eth_aw_csreg {
 #define ETH_AW_RX_DMA_START	0x80000000	/* set to start the RX DMA FSM */
 #define ETH_AW_RX_DMA_EN	0x40000000	/* set to start and run the RX DMA, clear to stop the RX DMA after the current frame is received */
 #define ETH_AW_RX_FIFO_FLOW_CTL	0x01000000	/* toggle rx flow control */
-#define ETH_AW_RX_FLOW_CTL_TH_DEACT_1
+#define ETH_AW_RX_FLOW_CTL_TH_DEACT_1	\
 				0x00C00000	/* clear for 1 */
-#define ETH_AW_RX_FLOW_CTL_TH_DEACT_2
+#define ETH_AW_RX_FLOW_CTL_TH_DEACT_2	\
 				0x00400000	/* set for 2 */
-#define ETH_AW_RX_FLOW_CTL_TH_DEACT_3
+#define ETH_AW_RX_FLOW_CTL_TH_DEACT_3	\
 				0x00800000	/* set for 3 */
-#define ETH_AW_RX_FLOW_CTL_TH_DEACT_4
+#define ETH_AW_RX_FLOW_CTL_TH_DEACT_4	\
 				0x00C00000	/* set for 4 */
-#define ETH_AW_RX_FLOW_CTL_TH_ACT_1
+#define ETH_AW_RX_FLOW_CTL_TH_ACT_1	\
 				0x00300000	/* clear for 1 */
-#define ETH_AW_RX_FLOW_CTL_TH_ACT_2
+#define ETH_AW_RX_FLOW_CTL_TH_ACT_2	\
 				0x00100000	/* set for 2 */
-#define ETH_AW_RX_FLOW_CTL_TH_ACT_3
+#define ETH_AW_RX_FLOW_CTL_TH_ACT_3	\
 				0x00200000	/* set for 3 */
-#define ETH_AW_RX_FLOW_CTL_TH_ACT_4
+#define ETH_AW_RX_FLOW_CTL_TH_ACT_4	\
 				0x00300000	/* set for 4 */
 #define ETH_AW_RX_TH_64		0x00000030	/* clear for 64 */
 #define ETH_AW_RX_TH_32		0x00000010	/* set for 32 */
@@ -186,11 +186,11 @@ struct eth_aw_csreg {
 #define ETH_AW_DIS_ADDR_FILTER	0x80000000	/* toggle to disable address filter */
 #define ETH_AW_DIS_BROADCAST	0x00020000	/* toggle to drop all broadcast frames */
 #define ETH_AW_RX_ALL_MULTICAST	0x00010000	/* toggle to receive all multicast frames */
-#define ETH_AW_CTL_FRM_FILTER_DROP
+#define ETH_AW_CTL_FRM_FILTER_DROP	\
 				0x00003000	/* clear to drop all control frames */
-#define ETH_AW_CTL_FRM_FILTER_RECEIVE
+#define ETH_AW_CTL_FRM_FILTER_RECEIVE	\
 				0x00002000	/* set to receive all control frames */
-#define ETH_AW_CTL_FRM_FILTER_PASS
+#define ETH_AW_CTL_FRM_FILTER_PASS	\
 				0x00003000	/* set to receive control frames that pass the address filter*/
 #define ETH_AW_HASH_MULTICAST	0x00000200	/* see documentation */
 #define ETH_AW_HASH_UNICAST	0x00000100	/* '' */
@@ -205,13 +205,13 @@ struct eth_aw_csreg {
 /* rx_hash_1 is a register that holds the lower 32 bits of the hash table for the receive frame filter */
 
 /* mii_cmd signals */
-#define ETH_AW_MDC_DIV_RATIO_M_16
+#define ETH_AW_MDC_DIV_RATIO_M_16	\
 				0x00700000	/* clear for 16 */
-#define ETH_AW_MDC_DIV_RATIO_M_32
+#define ETH_AW_MDC_DIV_RATIO_M_32	\
 				0x00100000	/* set for 32 */
-#define ETH_AW_MDC_DIV_RATIO_M_64
+#define ETH_AW_MDC_DIV_RATIO_M_64	\
 				0x00200000	/* set for 64 */
-#define ETH_AW_MDC_DIV_RATIO_M_128
+#define ETH_AW_MDC_DIV_RATIO_M_128	\
 				0x00300000	/* set for 128 */
 /* bits 12-16 are for selecting a PHY device */
 /* bits 4-8 are for selecting a register in that PHY device */
@@ -248,18 +248,18 @@ struct eth_aw_rx_desc {
 	uint32 status;
 	uint32 buf_len;
 	uint32 buf_addr;
-	eth_aw_rx_desc * next;
+	struct eth_aw_rx_desc * next;
 };
 
 /* rx status signals */
 #define ETH_AW_RX_DESC_CTL	0x80000000	/* true for usable by DMA */
 #define ETH_AW_RX_DAF_FAIL	0x40000000	/* true if frame failed DA filter */
 #define ETH_AW_RX_FRM_LEN	0x3FFF0000	/* & and right shift 16 for 14 bit frame length */
-#define ETH_AW_RX_NO_ENOUGH_BUF_ERR
+#define ETH_AW_RX_NO_ENOUGH_BUF_ERR	\
 				0x00004000	/* true for not enough buffer for the frame */
 #define ETH_AW_RX_SAF_FAIL	0x00002000	/* true for frame failed SA filter */
 #define ETH_AW_RX_OVERFLOW_ERR	0x00000800	/* buffer overflow error occurred */
-#define ETH_AW_RX_FIR_DESC		0x00000200	/* true for first descriptor */
+#define ETH_AW_RX_FIR_DESC	0x00000200	/* true for first descriptor */
 #define ETH_AW_RX_LAST_DESC	0x00000100	/* true for last descriptor */
 #define ETH_AW_RX_HEADER_ERR	0x00000080	/* true for wrong checksum */
 #define ETH_AW_RX_COL_ERR	0x00000040	/* true for late collision */
@@ -281,7 +281,7 @@ struct eth_aw_tx_desc {
 	uint32 status;
 	uint32 buf_len;
 	uint32 buf_addr;
-	eth_aw_tx_desc * next;
+	struct eth_aw_tx_desc * next;
 };
 
 /* tx status signals */

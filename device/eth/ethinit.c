@@ -2,7 +2,7 @@
 
 #include <xinu.h>
 
-struct	eth_a_csreg eth_a_regs;
+struct	eth_aw_csreg eth_aw_regs;
 
 struct	ethcblk ethertab[1];
 
@@ -11,7 +11,7 @@ struct	ethcblk ethertab[1];
  *-----------------------------------------------------------------------
  */
 int32	eth_phy_read (
-		volatile struct	eth_a_mdio *mdio,/* MDIO CSR pointer	*/
+		volatile struct	eth_aw_csreg *mdio,/* MDIO CSR pointer	*/
 		byte	regadr,	/* PHY Register number	*/
 		byte	phyadr,	/* PHY address		*/
 		uint32	*value	/* Pointer to value 	*/
@@ -62,7 +62,7 @@ int32	eth_phy_read (
  *-----------------------------------------------------------------------
  */
 int32	eth_phy_write (
-		volatile struct	eth_a_mdio *mdio, /* MDIO CSR pointer	*/
+		volatile struct	eth_aw_csreg *mdio, /* MDIO CSR pointer	*/
 		byte	regadr,	/* PHY register number	*/
 		byte	phyadr,	/* PHY address		*/
 		uint32	value	/* Value to be written	*/
@@ -105,7 +105,7 @@ int32	eth_phy_write (
  *-----------------------------------------------------------------------
  */
 int32	eth_phy_reset (
-		volatile struct	eth_a_mdio *mdio, /* MDIO CSR pointer	*/
+		volatile struct	eth_aw_csreg *mdio, /* MDIO CSR pointer	*/
 		byte	phyadr			  /* PHY Address	*/
 	)
 {
