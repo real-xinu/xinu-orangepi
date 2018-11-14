@@ -1,42 +1,42 @@
 /* allwinner_eth.h - Ethernet device definitions for Allwinner SoC */
 
-	/*register name		 offset	description*/
+	/*register name			offset	description*/
 struct __attribute__((packed)) eth_aw_csreg {
 	reg32 basic_ctl_0;	/* 0x00	Basic control 0 */
 	reg32 basic_ctl_1;	/* 0x04	Basic control 1 */
-	reg32 int_sta;		/* 0x08	Interrupt status */
-	reg32 int_en;		/* 0x0C	Interrupt enable */
-	reg32 tx_ctl_0;		/* 0x10	Transmit control 0 */
-	reg32 tx_ctl_1;		/* 0x14	Transmit control 1 */
+	reg32 int_sta;			/* 0x08	Interrupt status */
+	reg32 int_en;				/* 0x0C	Interrupt enable */
+	reg32 tx_ctl_0;			/* 0x10	Transmit control 0 */
+	reg32 tx_ctl_1;			/* 0x14	Transmit control 1 */
 	byte res0[4];
 	reg32 tx_flow_ctl;	/* 0x1C	Transmit flow control */
 	reg32 tx_dma_desc_list;	/* 0x20	Transmit descriptor list address */
-	reg32 rx_ctl_0;		/* 0x24	Receive control 0 */
-	reg32 rx_ctl_1;		/* 0x28	Receive control 1 */
+	reg32 rx_ctl_0;			/* 0x24	Receive control 0 */
+	reg32 rx_ctl_1;			/* 0x28	Receive control 1 */
 	byte res1[8];
 	reg32 rx_dma_desc_list;	/* 0x34	Receive descriptor list address */
-	reg32 rx_frm_flt;	/* 0x38	Receive frame filter */
+	reg32 rx_frm_flt;		/* 0x38	Receive frame filter */
 	byte res2[4];
-	reg32 rx_hash_0;	/* 0x40	Hash table 0 */
-	reg32 rx_hash_1;	/* 0x44	Hash table 1 */
-	reg32 mii_cmd;		/* 0x48	Management interface command */
-	reg32 mii_data;		/* 0x4C	Management interface data */
-	reg32 addr0_high;	/* 0x50	MAC address high 0 */
-	reg32 addr0_low;	/* 0x54	MAC address low 0 */
-	reg32 addr1_high;	/* 0x58	MAC address high 1 */
-	reg32 addr1_low;	/* 0x5C	MAC address low 1 */
-	reg32 addr2_high;	/* 0x60	MAC address high 2 */
-	reg32 addr2_low;	/* 0x64	MAC address low 2 */
-	reg32 addr3_high;	/* 0x68	MAC address high 3 */
-	reg32 addr3_low;	/* 0x6C	MAC address low 3 */
-	reg32 addr4_high;	/* 0x70	MAC address high 4 */
-	reg32 addr4_low;	/* 0x74	MAC address low 4 */
-	reg32 addr5_high;	/* 0x78	MAC address high 5 */
-	reg32 addr5_low;	/* 0x7C	MAC address low 5 */
-	reg32 addr6_high;	/* 0x80	MAC address high 6 */
-	reg32 addr6_low;	/* 0x84	MAC address low 6 */
-	reg32 addr7_high;	/* 0x88	MAC address high 7 */
-	reg32 addr7_low;	/* 0x8C	MAC address low 7 */
+	reg32 rx_hash_0;		/* 0x40	Hash table 0 */
+	reg32 rx_hash_1;		/* 0x44	Hash table 1 */
+	reg32 mii_cmd;			/* 0x48	Management interface command */
+	reg32 mii_data;			/* 0x4C	Management interface data */
+	reg32 addr0_high;		/* 0x50	MAC address high 0 */
+	reg32 addr0_low;		/* 0x54	MAC address low 0 */
+	reg32 addr1_high;		/* 0x58	MAC address high 1 */
+	reg32 addr1_low;		/* 0x5C	MAC address low 1 */
+	reg32 addr2_high;		/* 0x60	MAC address high 2 */
+	reg32 addr2_low;		/* 0x64	MAC address low 2 */
+	reg32 addr3_high;		/* 0x68	MAC address high 3 */
+	reg32 addr3_low;		/* 0x6C	MAC address low 3 */
+	reg32 addr4_high;		/* 0x70	MAC address high 4 */
+	reg32 addr4_low;		/* 0x74	MAC address low 4 */
+	reg32 addr5_high;		/* 0x78	MAC address high 5 */
+	reg32 addr5_low;		/* 0x7C	MAC address low 5 */
+	reg32 addr6_high;		/* 0x80	MAC address high 6 */
+	reg32 addr6_low;		/* 0x84	MAC address low 6 */
+	reg32 addr7_high;		/* 0x88	MAC address high 7 */
+	reg32 addr7_low;		/* 0x8C	MAC address low 7 */
 	byte res3[32];
 	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */
 	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */
@@ -205,8 +205,11 @@ struct __attribute__((packed)) eth_aw_csreg {
 #define ETH_AW_MDC_DIV_RATIO_M_128	\
 				0x00300000	/* Set for 128 */
 /* bits 12-16 are for selecting a PHY device */
+#define ETH_AW_MII_ADDR		12
+#define ETH_AW_MII_REG		4
+#define ETH_AW_PHY_ADDR		1
 /* bits 4-8 are for selecting a register in that PHY device */
-#define ETH_AW_MII_WR		0x00000002	/* Reading or Write PHY register */
+#define ETH_AW_MII_WR			0x00000002	/* Reading or Write PHY register */
 #define ETH_AW_MII_BUSY		0x00000001	/* R/W in progress */
 
 /* mii_data holds data in bits 0-15 that can be written or read from the selected PHY register */
@@ -300,7 +303,7 @@ struct eth_aw_tx_desc {
 
 /* rx next holds the address of the next descriptor, 32 bit aligned */
 
-#define ETH_ALLWINNER_INIT_DELAY	1000000
+#define ETH_AW_INIT_DELAY	1000000
 
 #define ETH_AW_RXINT		41
 #define ETH_AW_TXINT		42
