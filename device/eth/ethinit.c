@@ -17,14 +17,17 @@ int32	eth_phy_read (
 {
 
 	/* Ethernet PHY has only 32 registers */
+// 	kprintf("eth_phy_read 1\n");
 
 	if(regadr > 31) {
+// 		kprintf("eth_phy_read failure 1\n");
 		return SYSERR;
 	}
 
 	/* Only 32 possible PHY addresses */
 
 	if(phyadr > 31) {
+// 		kprintf("eth_phy_read failure 2\n");
 		return SYSERR;
 	}
 
@@ -55,11 +58,13 @@ int32	eth_phy_read (
 	while(csr->mii_cmd & ETH_AW_MII_BUSY);
 
 	/* Check if the access was successful */
-
+/*
 	if( (csr->mii_data & ETH_AW_MII_DATA) == 0 ) {
+		kprintf("eth_phy_read failure 3\n");
 		return SYSERR;
-	}
-	kprintf("Here!\n");
+	}*/
+
+// 	kprintf("Here!\n");
 
 	/* Copy the value read */
 
@@ -67,6 +72,7 @@ int32	eth_phy_read (
 
 	return OK;
 }
+
 
 /*-----------------------------------------------------------------------
  * eth_phy_write - write a PHY register
@@ -112,6 +118,43 @@ int32	eth_phy_write (
 }
 
 /*-----------------------------------------------------------------------
+ * eth_phy_autonegotiate - Auto-negotiate ethernet link
+ * Based on Tom Trebisky's Kyu ethernet autonegotiation code
+ * https://github.com/trebisky/Kyu/blob/master/orange_pi/emac_phy.c
+ *-----------------------------------------------------------------------
+ */
+static void eth_phy_autonegotiate (
+		volatile struct	eth_aw_csreg *csr, /* CSR pointer	*/
+		byte	phyadr			  /* PHY Address	*/
+								   ) {
+	uint32 reg;
+	int tmo = ANEG_TIMEOUT;
+
+	eth_phy_read(csr, ETH_PHY_CTLREG, phyadr, &reg);
+	kprintf ( "autonegotiation starting, BMCR = %04x\n", reg );
+	reg |= BMCR_ANEG_ENA;
+	eth_phy_write(csr, ETH_PHY_CTLREG, phyadr, reg);
+
+	reg |= BMCR_ANEG;
+	eth_phy_write(csr, ETH_PHY_CTLREG, phyadr, reg);
+	eth_phy_read(csr, ETH_PHY_STATREG, phyadr, &reg);
+	kprintf ( "autonegotiation started: BMSR  = %04x\n", reg );
+
+	while (tmo-- && ! (reg & BMSR_ANEGCOMPLETE)) {
+		DELAY(ETH_AW_INIT_DELAY);
+		eth_phy_read(csr, ETH_PHY_STATREG, phyadr, &reg);
+	}
+
+	if (!(reg & BMSR_ANEGCOMPLETE)) {
+		kprintf("Autonegotiation Failed\n");
+	}
+	else {
+	    kprintf ( "autonegotion done: BMSR  = %04x\n", reg);
+	    kprintf ( "PHY autonegotion done in %d milliseconds\n", 2*(ANEG_TIMEOUT-tmo) );
+	}
+}
+
+/*-----------------------------------------------------------------------
  * eth_phy_reset - Reset an Ethernet PHY
  *-----------------------------------------------------------------------
  */
@@ -140,6 +183,7 @@ int32	eth_phy_reset (
 
 	for(retries = 0; retries < 10; retries++) {
 		if(eth_phy_read(csr, ETH_PHY_CTLREG, phyadr, &phyreg) == SYSERR) {
+			kprintf("eth_phy_reset failure 1\n");
 			return SYSERR;
 		}
 		if((phyreg & ETH_PHY_CTLREG_RESET) == 0) {
@@ -152,16 +196,23 @@ int32	eth_phy_reset (
 		}
 	}
 	if(retries >= 3) {
+		kprintf("eth_phy_reset failure 2\n");
 		return SYSERR;
 	}
+
+	//Do link auto-negotiation
+	eth_phy_autonegotiate(csr, phyadr);
 
 	/* Check if the Link is established */
 
 	for(retries = 0; retries < 10; retries++) {
 		if(eth_phy_read(csr, ETH_PHY_STATREG, phyadr, &phyreg) == SYSERR) {
+			kprintf("eth_phy_reset failure 3\n");
 			return SYSERR;
 		}
+
 		if(phyreg & ETH_PHY_STATREG_LINK) {
+// 			kprintf("breaking on phyreg: %d\n", phyreg);
 			break;
 		}
 		else {
@@ -171,10 +222,41 @@ int32	eth_phy_reset (
 		}
 	}
 	if(retries >= 3) {
+		kprintf("eth_phy_reset failure 4 - retries: %d\n", retries);
 		return SYSERR;
 	}
 
 	return OK;
+}
+
+/* ------------------------------------------------------------ */
+/* Syscon stuff - from Kyu by Tom Trebisky (https://github.com/trebisky/Kyu/blob/master/orange_pi/emac_phy.c#L534) */
+/* ------------------------------------------------------------ */
+
+
+/* We probably inherit all of this from U-Boot, but we
+ * certainly aren't going to rely on that, are we?
+ * I see: Emac Syscon =     00148000 before and after
+ * the datasheet default is 00058000
+ * The "1" is the PHY ADDR
+ * The "5" going to "4" is clearing the shutdown bit.
+ *
+ * So even calling or having this is pointless, given what U-Boot
+ * passes to us, but it is just "clean living" to perform all
+ * of our own initialization.
+ */
+static void emac_syscon_setup ( void )
+{
+	volatile unsigned int *sc = EMAC_SYSCON;
+
+	// printf ( "Emac Syscon = %08x\n", *sc );
+
+	*sc = SYSCON_EPHY_INTERNAL | SYSCON_CLK24 | (ETH_AW_PHY_ADDR<<20);
+
+	// I try using the 25 Mhz clock and autonegotion simply fails.
+	// *sc = SYSCON_EPHY_INTERNAL | (ETH_AW_PHY_ADDR<<20);
+
+	// printf ( "Emac Syscon = %08x\n", *sc );
 }
 
 /*-----------------------------------------------------------------------
@@ -194,6 +276,8 @@ int32	ethinit	(
 	uint32	phyreg;			/* Variable to store PHY reg val*/
 	int32	retval;			/* Return value			*/
 	int32	i;			/* Index variable		*/
+
+	emac_syscon_setup();
 
 	/* Get the Ethernet control block address	*/
 	/* from the device table entry			*/
@@ -245,19 +329,19 @@ int32	ethinit	(
 	}
 
 //	/* Read the device MAC address */
-//	for(i = 0; i < 2; i++) {
-//		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
-//	}
-//	for(i = 0; i < 4; i++) {
-//		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
-//	}
+	for(i = 0; i < 2; i++) {
+		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
+	}
+	for(i = 0; i < 4; i++) {
+		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
+	}
 //
-//	kprintf("MAC Address is: ");
-//	for(i = 0; i < 5; i++) {
-//		kprintf("%02X:", ethptr->devAddress[i]);
-//	}
-//	kprintf("%02X\n", ethptr->devAddress[5]);
-//
+	kprintf("MAC Address is: ");
+	for(i = 0; i < 5; i++) {
+		kprintf("%02X:", ethptr->devAddress[i]);
+	}
+	kprintf("%02X\n", ethptr->devAddress[5]);
+
 //	/* Initialize the rx ring size field */
 //	ethptr->rxRingSize = ETH_AM335X_RX_RING_SIZE;
 //

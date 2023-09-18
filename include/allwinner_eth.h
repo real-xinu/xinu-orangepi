@@ -307,3 +307,30 @@ struct eth_aw_tx_desc {
 
 #define ETH_AW_RXINT		41
 #define ETH_AW_TXINT		42
+
+
+/* System configuration for EMAC based on Tom Trebisky's Kyu driver - https://github.com/trebisky/Kyu/blob/master/orange_pi/emac_phy.c#L534 */
+
+#define EMAC_SYSCON	((unsigned int *) 0x01c00030)
+
+/* Syscon is peculiar in that it is essentially dedicated to the EMAC
+ * It has this one register for controlling EMAC stuff,
+ *   along with a chip version register.
+ * This single 32 bit register controlls EMAC phy mux and such.
+ */
+/* These are only some of the bit definitions, but more than we need */
+
+#define SYSCON_CLK24		0x40000		/* set for 24 Mhz clock (else 25) */
+#define SYSCON_LEDPOL		0x20000		/* set for LED active low polarity */
+#define SYSCON_SHUTDOWN		0x10000		/* set to power down PHY */
+#define SYSCON_EPHY_INTERNAL	0x08000		/* set to use internal PHY */
+
+#define SYSCON_RXINV		0x10		/* set to invert Rx Clock */
+#define SYSCON_TXINV		0x8		/* set to invert Tx Clock */
+#define SYSCON_PIT		0x4		/* PHYS type, set for RGMII, else MII */
+
+/* TCS - Transmit Clock Source */
+#define SYSCON_TCS_MII		0		/* for MII (what we want) */
+#define SYSCON_TCS_EXT		1		/* External for GMII or RGMII */
+#define SYSCON_TCS_INT		2		/* Internal for GMII or RGMII */
+#define SYSCON_TCS_INVALID	3		/* invalid */
