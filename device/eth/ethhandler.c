@@ -2,46 +2,29 @@
 
 #include <xinu.h>
 
-// static int last_capture = 0;
-//
-// void capture_last ( int val )
-// {
-// 	last_capture = val;
-// }
-//
-static int last_stat;		/* last interrupt status */
-static int last_desc_stat;	/* last descriptor status */
-static int last_len = 0;
-static char last_buf[2048];
-static int prior_len;
-static char prior_buf[2048];
-
 //TODO Design/Implement proper handling of rx/tx with rings
 //TODO Convert netbuf to Xinu netbuf (netpacket?) format
-// static void rx_handler ( int stat, struct emac_desc *cur_rx_dma )
-// {
-// 	struct netbuf *nbp;
-// 	int len;
-// 	int tag = ' ';
-//
-// 	// printf ( "Rx interrupt, packet incoming (emac)\n" );
-// // 		et_rx ();
-//
-// 	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-// // 		emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-//
-// 	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
-// // 		int i_dma = (cur_rx_dma - rx_list);
-//
-// 		rx_count++;
+static void rx_handler ( int stat, struct emac_desc *cur_rx_dma, struct ethcblk	*ethptr )
+{
+	struct netbuf *nbp;
+	int len;
+	int tag = ' ';
+
+	printf ( "Rx interrupt, packet incoming (emac)\n" );
+// 		et_rx ();
+
+	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 		emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+
+	//TODO I think I'll do it like this: ethhandler just updates the pointers to the device's ring where the new info is stored, and ethread/write actually copy the packet data into a Xinu packet structure. This should eliminate the need for us to do allocation here.
+
+	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
+// 		int i_dma = (cur_rx_dma - rx_list);
+
 // 		len = (cur_rx_dma->status >> 16) & 0x3fff;
-// 		last_desc_stat = cur_rx_dma->status;
-//
-// 		if ( last_desc_stat & ~0x3fff0000 != 0x00000320 )
-// 			printf ( "Unusual desc status: %08x\n", cur_rx_dma->status );
-//
 // 		// nbp = netbuf_alloc ();
-// 		nbp = netbuf_alloc_i ();
+// 		nbp = (struct netpacket *)getbuf(netbufpool);
+// // 		nbp = netbuf_alloc_i ();
 //
 // 		if ( ! nbp )
 // 			return;     /* drop packet */
@@ -49,7 +32,8 @@ static char prior_buf[2048];
 // 		// pkt_arrive ();
 //
 // 		nbp->elen = len - 4;
-// 		memcpy ( (char *) nbp->eptr, cur_rx_dma->buf, len - 4 );
+// 		//Since the first 3 items of of struct netpacket should be identical to Tom's eth_hdr, this should be fine
+// 		memcpy ( (char *) nbp, cur_rx_dma->buf, len - 4 );
 //
 // 		if ( last_capture ) {
 // 			if ( last_len ) {
@@ -59,23 +43,26 @@ static char prior_buf[2048];
 // 			last_len = len - 4;
 // 			memcpy ( last_buf, cur_rx_dma->buf, len - 4 );
 // 		}
-//
-// 		// emac_show_packet ( tag, i_dma, nbp );
-// 		// tag = '*';
-//
-// 		cur_rx_dma->status = DS_ACTIVE;
-//
-// 		// flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+
+		// emac_show_packet ( tag, i_dma, nbp );
+		// tag = '*';
+
+		cur_rx_dma->status = DS_ACTIVE;
+
+		// flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 // 		emac_cache_flush ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-//
+
+		//TODO Update pointers to head/tail of ring so ethread/write know what to grab
 // 		net_rcv ( nbp );
-//
-// 		cur_rx_dma = cur_rx_dma->next;
-//
-// 		// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+		ethptr->rxTail += sizeof(struct emac_desc);
+
+
+		cur_rx_dma = cur_rx_dma->next;
+
+		// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 // 		emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-// 	}
-// }
+	}
+}
 
 /* Some notes on the cur and clean pointers ...
 * cur always points to the next available slot
@@ -126,10 +113,8 @@ static char prior_buf[2048];
 // 	}
 // }
 //
-static int int_count = 0;
-static int rx_int_count = 0;
-static int tx_int_count = 0;
-static int first_int = 1;
+
+//NOTE: WE CANNOT USE STATIC VARIABLES IN THIS FILE
 
 /*------------------------------------------------------------------------
  * ethhandler - Orange Pi (Allwinner H3) Ethernet Interrupt Handler (WIP)
@@ -143,18 +128,36 @@ interrupt ethhandler (
 	//TODO Comer says there may be an interrupt for every successful transmission/reception
 	//Doesn't have to do anything until the end of the ring is reached
 	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
-	kprintf("EMAC interrupt (ethhandler())\n");
-	return;
+// 	kprintf("EMAC interrupt (ethhandler())\n");
+// 	kprintf("eh1\n");
+	uint32	status;
+	struct  dentry  *devptr;        /* address of device control blk*/
+	struct 	ethcblk	*ethptr;	/* ptr to control block		*/
+
+	/* Initialize structure pointers */
+
+	devptr = (struct dentry *) &devtab[ETHER0];
+
+	/* Obtain a pointer to the tty control block */
+
+	ethptr = &ethertab[devptr->dvminor];
+// 	kprintf("eh2\n");
+
+	//TODO Comer says there may be an interrupt for every successful transmission/reception
+	//Doesn't have to do anything until the end of the ring is reached
+	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
+// 	kprintf("EMAC interrupt (ethhandler())\n");
 	struct eth_aw_csreg *ep = EMAC_BASE;
 	int stat;
 	int statx;
 	int stat2;
 
-	int_count++;
+// 	int_count++;
 
 	stat = ep->int_sta;
-	last_stat = stat;
+// 	last_stat = stat;
 
+// 	kprintf("eh3\n");
 	// printf ( "emac interrupt --   status:%08x\n", stat );
 
 	/* For now, we run this on each interrupt,
@@ -170,24 +173,19 @@ interrupt ethhandler (
 
 	// ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
 	if ( stat & INT_RX ) {
-	    ++rx_int_count;
-		kprintf("RX Interrupt\n");
-	    rx_handler ( stat, ep->rx_dma_desc_list );
+		kprintf("RX Interrupt (ethhandler.c)\n");
+	    rx_handler ( stat, ep->rx_dma_desc_list, ethptr );
 	}
 
 	if ( stat & INT_TX ) {
-	    ++tx_int_count;
-		kprintf("TX Interrupt\n");
-	    tx_handler ( stat, ep->tx_dma_desc_list );
+		kprintf("TX Interrupt (ethhandler.c)\n");
+		//Print contents of tx ring
+		kprintf("ethptr->txRing: %d\n", ethptr->txRing);
+// 	    tx_handler ( stat, ep->tx_dma_desc_list, ethptr );
 	}
 
 	if ( stat & INT_TX_UNDERFLOW ) {
 	    printf ( " *** TX underflow interrupt !!\n" );
-	}
-
-	if ( first_int ) {
-// 	    emac_show ();
-	    first_int = 0;
 	}
 
 	stat2 = ep->int_sta;

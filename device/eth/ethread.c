@@ -12,58 +12,56 @@ int32	ethread	(
 		uint32	count
 	)
 {
-//	struct	ethcblk *ethptr;	/* Ethernet ctl blk ptr	*/
-//	struct	eth_a_csreg *csrptr;	/* Ethernet CSR pointer	*/
-//	struct	eth_a_rx_desc *rdescptr;/* Rx Desc. pointer	*/
-//	struct	eth_a_rx_desc *prev;	/* Prev Rx desc pointer	*/
+	struct	ethcblk *ethptr;	/* Ethernet ctl blk ptr	*/
+	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer	*/
+	struct	eth_aw_rx_desc *rdescptr;/* Rx Desc. pointer	*/
+	struct	eth_aw_rx_desc *prev;	/* Prev Rx desc pointer	*/
 	uint32	retval = 0;			/* Num of bytes returned*/
 
-//	ethptr = &ethertab[devptr->dvminor];
+	ethptr = &ethertab[devptr->dvminor];
 
 	/* Get the pointer to Ethernet CSR */
-//	csrptr = (struct eth_a_csreg *)ethptr->csr;
+	csrptr = (struct eth_aw_csreg *)ethptr->csr;
 
 	/* Wait for a packet */
-//	wait(ethptr->isem);
+	wait(ethptr->isem);
 
 	/* Get pointer to the descriptor */
-//	rdescptr = (struct eth_a_rx_desc *)ethptr->rxRing +
-//						ethptr->rxHead;
+	rdescptr = (struct eth_aw_rx_desc *)ethptr->rxRing +
+						ethptr->rxHead;
 
 	/* Read the packet length */
-//	retval = rdescptr->packlen;
-//	if(retval > count) {
-//		retval = count;
-//	}
+	retval = rdescptr->buf_len;
+	if(retval > count) {
+		retval = count;
+	}
 
 	/* Copy the packet into user provided buffer */
-//	memcpy((char *)buf, (char *)rdescptr->buffer, retval);
+	memcpy((char *)buf, (char *)rdescptr->buf_addr, retval);
 
 	/* Initialize the descriptor for next packet */
-//	rdescptr->stat = ETH_AM335X_RDS_OWN;
-//	rdescptr->bufoff = 0;
-//	rdescptr->buflen = ETH_BUF_SIZE;
-//	rdescptr->packlen = 0;
-//	rdescptr->next = NULL;
+	rdescptr->status = DS_ACTIVE;
+	rdescptr->buf_len = ETH_BUF_SIZE;
+	rdescptr->next = NULL;
 
 	/* Insert the descriptor into Rx queue */
-//	prev = (struct eth_a_rx_desc *)csrptr->stateram->rx_hdp[0];
-//	if(prev == NULL) {
-//		kprintf("hdp 0, adding %x\n", rdescptr);
-//		csrptr->stateram->rx_hdp[0] = (uint32)rdescptr;
-//	}
-//	else {
-//		while(prev->next != NULL) {
-//			prev = prev->next;
-//		}
-//		prev->next = rdescptr;
-//	}
+	prev = (struct eth_aw_rx_desc *)csrptr->rx_dma_desc_list;
+	if(prev == NULL) {
+		kprintf("null rx_dma_desc_list, adding %x\n", rdescptr);
+		csrptr->rx_dma_desc_list = (reg32)rdescptr;
+	}
+	else {
+		while(prev->next != NULL) {
+			prev = prev->next;
+		}
+		prev->next = rdescptr;
+	}
 
 	/* Increment the head index of rx ring */
-//	ethptr->rxHead++;
-//	if(ethptr->rxHead >= ethptr->rxRingSize) {
-//		ethptr->rxHead = 0;
-//	}
+	ethptr->rxHead++;
+	if(ethptr->rxHead >= ethptr->rxRingSize) {
+		ethptr->rxHead = 0;
+	}
 
 	return retval;
 }

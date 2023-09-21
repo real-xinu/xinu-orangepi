@@ -272,18 +272,19 @@ static void fetch_linux_mac ( char *addr )
 	*addr++ = 0xff;
 }
 
-#define NUM_RX	64
-#define NUM_TX	64
-#define RX_SIZE		2048
-#define TX_SIZE		2048
-#define RX_ETH_SIZE	2044
 /* We have 32 * 2k for Rx bufs (64K)
  * We have 32 * 2k for Tx bufs (64K)
  * and we have 64 * 64 bytes for descriptors (4K)
  * This is 128 + 4 = 132K, fits handily in 1M
  */
 
-static struct emac_desc *rx_list_init ( void )
+
+#define NUM_RX	64
+#define NUM_TX	64
+#define RX_SIZE		2048
+#define TX_SIZE		2048
+#define RX_ETH_SIZE	2044
+static struct emac_desc *rx_list_init ( struct	ethcblk *ethptr )
 {
 	struct emac_desc *edp;
 	char *buf;
@@ -301,10 +302,10 @@ static struct emac_desc *rx_list_init ( void )
 	buf = (char *) mem;
 	*/
 	/* We can depend on ram_alloc to give us dma aligned addresses */
-	//TODO I have a feeling that the alignment isn't right here in some way that only manifests when we try to cast to an emac_desc pointer
 	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_RX * RX_SIZE );
 
+	ethptr->rxBufs = buf;
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;
 	    edp->size = RX_ETH_SIZE;
@@ -321,7 +322,7 @@ static struct emac_desc *rx_list_init ( void )
 	return desc;
 }
 
-static struct emac_desc *tx_list_init ( void )
+static struct emac_desc *tx_list_init ( struct	ethcblk *ethptr )
 {
 	int i;
 	struct emac_desc *edp;
@@ -333,6 +334,7 @@ static struct emac_desc *tx_list_init ( void )
 	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_TX * TX_SIZE );
 
+	ethptr->txBufs = buf;
 	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;
 	    edp->size = 0;
@@ -453,9 +455,24 @@ int32	ethinit	(
 
 	set_irq_handler(IRQ_EMAC, (uint32)devptr->dvintr);
 
+
+	kprintf("ei1\n");
 	//Initialize RX/TX rings
-	csrptr->rx_dma_desc_list = rx_list_init();
-	csrptr->tx_dma_desc_list = tx_list_init ();
+	csrptr->rx_dma_desc_list = rx_list_init(ethptr);
+	csrptr->tx_dma_desc_list = tx_list_init (ethptr);
+	kprintf("ei2\n");
+	ethptr->rxRing = csrptr->rx_dma_desc_list;
+	ethptr->txRing = csrptr->tx_dma_desc_list;
+	ethptr->rxHead = ethptr->rxRing;
+	ethptr->rxTail = ethptr->rxRing;
+	ethptr->rxRingSize = NUM_RX;
+	ethptr->rxIrq = 0;
+	ethptr->txHead = ethptr->txRing;
+	ethptr->txTail = ethptr->txRing;
+	ethptr->txRingSize = NUM_TX;
+	ethptr->txIrq = 0;
+
+	kprintf("ei3\n");
 
 	//Enable EMAC interrupts
 	csrptr->int_en = INT_RX | INT_TX | INT_TX_UNDERFLOW;
@@ -468,6 +485,8 @@ int32	ethinit	(
 	csrptr->tx_ctl_1 |= TX_DMA_ENA;
 	csrptr->tx_ctl_0 |= TX_EN;
 
+
+	kprintf("ei4\n");
 
 //TODO Everything beyond this point is leftover from the BBB ethernet driver, so it won't be relevant for us.
 //	/* Read the device MAC address */
