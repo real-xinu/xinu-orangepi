@@ -21,22 +21,10 @@ struct __attribute__((packed)) eth_aw_csreg {
 	reg32 rx_hash_1;		/* 0x44	Hash table 1 */
 	reg32 mii_cmd;			/* 0x48	Management interface command */
 	reg32 mii_data;			/* 0x4C	Management interface data */
-	reg32 addr0_high;		/* 0x50	MAC address high 0 */
-	reg32 addr0_low;		/* 0x54	MAC address low 0 */
-	reg32 addr1_high;		/* 0x58	MAC address high 1 */
-	reg32 addr1_low;		/* 0x5C	MAC address low 1 */
-	reg32 addr2_high;		/* 0x60	MAC address high 2 */
-	reg32 addr2_low;		/* 0x64	MAC address low 2 */
-	reg32 addr3_high;		/* 0x68	MAC address high 3 */
-	reg32 addr3_low;		/* 0x6C	MAC address low 3 */
-	reg32 addr4_high;		/* 0x70	MAC address high 4 */
-	reg32 addr4_low;		/* 0x74	MAC address low 4 */
-	reg32 addr5_high;		/* 0x78	MAC address high 5 */
-	reg32 addr5_low;		/* 0x7C	MAC address low 5 */
-	reg32 addr6_high;		/* 0x80	MAC address high 6 */
-	reg32 addr6_low;		/* 0x84	MAC address low 6 */
-	reg32 addr7_high;		/* 0x88	MAC address high 7 */
-	reg32 addr7_low;		/* 0x8C	MAC address low 7 */
+	struct {
+	    volatile unsigned int hi;		/* 50 */
+	    volatile unsigned int lo;		/* 54 */
+	} mac_addr[8];
 	byte res3[32];
 	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */
 	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */
@@ -334,3 +322,114 @@ struct eth_aw_tx_desc {
 #define SYSCON_TCS_EXT		1		/* External for GMII or RGMII */
 #define SYSCON_TCS_INT		2		/* Internal for GMII or RGMII */
 #define SYSCON_TCS_INVALID	3		/* invalid */
+
+#define CTL1_BURST_8		0x08000000;	/* DMA burst len = 8 (29:24)  */
+
+
+/* -- bits in the ctl0 register */
+
+#define	CTL_FULL_DUPLEX	0x0001
+#define	CTL_LOOPBACK	0x0002
+#define	CTL_SPEED_1000	0x0000
+#define	CTL_SPEED_100	0x000C
+#define	CTL_SPEED_10	0x0008
+
+/* -- bits in the ctl1 register */
+
+#define CTL1_SOFT_RESET		0x01
+#define CTL1_RX_TX		0x02		/* Rx DMA has prio over Tx when set */
+#define CTL1_BURST_8		0x08000000;	/* DMA burst len = 8 (29:24)  */
+
+/* bits in the int_ena and int_stat registers */
+#define INT_TX			0x0001
+#define INT_TX_DMA_STOP		0x0002
+#define INT_TX_BUF_AVAIL	0x0004
+#define INT_TX_TIMEOUT		0x0008
+#define INT_TX_UNDERFLOW	0x0010
+#define INT_TX_EARLY		0x0020
+#define INT_TX_ALL	(INT_TX | INT_TX_BUF_AVAIL | INT_TX_DMA_STOP | INT_TX_TIMEOUT | INT_TX_UNDERFLOW )
+#define INT_TX_MASK		0x00ff
+
+#define INT_RX			0x0100
+#define INT_RX_NOBUF		0x0200
+#define INT_RX_DMA_STOP		0x0400
+#define INT_RX_TIMEOUT		0x0800
+#define INT_RX_OVERFLOW		0x1000
+#define INT_RX_EARLY		0x2000
+#define INT_RX_ALL	(INT_RX | INT_RX_NOBUF | INT_RX_DMA_STOP | INT_RX_TIMEOUT | INT_RX_OVERFLOW )
+#define INT_RX_MASK		0xff00
+
+#define	INT_MII			0x10000		/* only in status */
+
+/* bits in the Rx ctrl0 register */
+#define	RX_EN			0x80000000
+#define	RX_FRAME_LEN_CTL	0x40000000
+#define	RX_JUMBO		0x20000000
+#define	RX_STRIP_FCS		0x10000000
+#define	RX_CHECK_CRC		0x08000000
+
+#define	RX_PAUSE_MD		0x00020000
+#define	RX_FLOW_CTL_ENA		0x08010000
+
+/* bits in the Rx ctrl1 register */
+#define	RX_DMA_START		0x80000000
+#define	RX_DMA_ENA		0x40000000
+#define	RX_MD			0x00000002
+#define	RX_NO_FLUSH		0x00000001
+
+/* bits in the Tx ctrl0 register */
+#define	TX_EN			0x80000000
+#define	TX_FRAME_LEN_CTL	0x40000000
+
+/* bits in the Tx ctrl1 register */
+#define	TX_DMA_START		0x80000000
+#define	TX_DMA_ENA		0x40000000
+#define	TX_MD			0x00000002
+
+/* Bits in the Rx filter register */
+#define	RX_FILT_DIS		0x80000000
+#define	RX_DROP_BROAD		0x00020000
+#define	RX_ALL_MULTI		0x00010000
+
+#define EMAC_BASE	((struct eth_aw_csreg *) 0x01c30000)
+#define IRQ_EMAC	114	/* Ethernet */
+
+struct emac_desc {
+	volatile unsigned long status;
+	long size;
+	char * buf;
+	struct emac_desc *next;
+}	__aligned(ARM_DMA_ALIGN);
+
+/* status bits */
+#define DS_ACTIVE	0x80000000	/* set when available for DMA */
+#define DS_DS_FAIL	0x40000000	/* Rx DAF fail */
+#define DS_CLIP		0x00004000	/* Rx clipped (buffer too small) */
+#define DS_SA_FAIL	0x00002000	/* Rx SAF fail */
+#define DS_OVERFLOW	0x00000800	/* Rx overflow */
+#define DS_FIRST	0x00000200	/* Rx first in list */
+#define DS_LAST		0x00000100	/* Rx last in list */
+#define DS_HEADER_ERR	0x00000080	/* Rx header error */
+#define DS_COLLISION	0x00000040	/* Rx late collision in half duplex */
+#define DS_LENGTH_ERR	0x00000010	/* Rx length is wrong */
+#define DS_PHY_ERR	0x00000008	/* Rx error from Phy */
+#define DS_CRC_ERR	0x00000002	/* Rx error CRC wrong */
+#define DS_PAYLOAD_ERR	0x00000001	/* Rx error payload checksum or length wrong */
+
+#define DS_TX_HEADER_ERR	0x00010000	/* Tx header error */
+#define DS_TX_LENGTH_ERR	0x00004000	/* Tx length error */
+#define DS_TX_PAYLOAD		0x00001000	/* Tx payload checksum wrong */
+#define DS_CARRIER		0x00000400	/* Tx lost carrier */
+#define DS_COL1			0x00000200	/* Tx collision */
+#define DS_COL2			0x00000100	/* Tx too many collisions */
+/* collision count in these bits */
+#define DS_DEFER_ERR		0x00000004	/* Tx defer error (too many) */
+#define DS_UNDERFLOW		0x00000002	/* Tx fifo underflow */
+#define DS_DEFER		0x00000001	/* Tx defer this frame (half duplex) */
+
+/* Bits in the Tx size descriptor */
+#define DS_TX_INT		0x80000000	/* Set TX_INT when finished */
+#define DS_TX_LAST		0x40000000	/* This is the last buffer in a packet */
+#define DS_TX_FIRST		0x20000000	/* This is the first buffer in a packet */
+#define	DS_TX_EOR		0x02000000	/* End of Ring */
+#define	DS_TX_ADR_CHAIN		0x01000000	/* was magic for U-Boot */

@@ -4,6 +4,8 @@
 
 struct	ethcblk ethertab[1];
 
+
+
 /*-----------------------------------------------------------------------
  * eth_phy_read - read a PHY register
  *-----------------------------------------------------------------------
@@ -259,6 +261,105 @@ static void emac_syscon_setup ( void )
 	// printf ( "Emac Syscon = %08x\n", *sc );
 }
 
+//TODO Need to figure out how to get actual MAC. Currently just manually setting it for testing purposes.
+static void fetch_linux_mac ( char *addr )
+{
+	*addr++ = 0x02;
+	*addr++ = 0x20;
+	*addr++ = 0xcc;
+	*addr++ = 0xa2;
+	*addr++ = 0xd5;
+	*addr++ = 0xff;
+}
+
+#define NUM_RX	64
+#define NUM_TX	64
+#define RX_SIZE		2048
+#define TX_SIZE		2048
+#define RX_ETH_SIZE	2044
+/* We have 32 * 2k for Rx bufs (64K)
+ * We have 32 * 2k for Tx bufs (64K)
+ * and we have 64 * 64 bytes for descriptors (4K)
+ * This is 128 + 4 = 132K, fits handily in 1M
+ */
+
+static struct emac_desc *rx_list_init ( void )
+{
+	struct emac_desc *edp;
+	char *buf;
+	struct emac_desc *desc;
+
+	// printf ( "Descriptor size: %d bytes\n", sizeof(struct emac_desc) );
+
+	/*
+	mem = ram_alloc ( (NUM_RX+1) * sizeof(struct emac_desc) );
+	mem = (mem + sizeof(struct emac_desc)) & ~ARM_DMA_ALIGN;
+	desc = (struct emac_desc *) mem;
+
+	mem = ram_alloc ( NUM_RX * RX_SIZE + ARM_DMA_ALIGN );
+	mem = (mem + ARM_DMA_ALIGN) & ~ARM_DMA_ALIGN;
+	buf = (char *) mem;
+	*/
+	/* We can depend on ram_alloc to give us dma aligned addresses */
+	//TODO I have a feeling that the alignment isn't right here in some way that only manifests when we try to cast to an emac_desc pointer
+	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
+	buf = (char *) getmem ( NUM_RX * RX_SIZE );
+
+	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
+	    edp->status = DS_ACTIVE;
+	    edp->size = RX_ETH_SIZE;
+	    edp->buf = buf;
+	    edp->next = &edp[1];
+	    buf += RX_SIZE;
+	}
+
+	desc[NUM_RX-1].next = &desc[0];
+
+	// emac_cache_flush ( (void *) desc, &desc[NUM_RX] );
+	// rx_list_show ( desc, NUM_RX );
+
+	return desc;
+}
+
+static struct emac_desc *tx_list_init ( void )
+{
+	int i;
+	struct emac_desc *edp;
+	struct emac_desc *desc;
+	// unsigned long mem;
+	char *buf;
+
+	/* We can depend on ram_alloc to give us dma aligned addresses */
+	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
+	buf = (char *) getmem ( NUM_TX * TX_SIZE );
+
+	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
+	    edp->status = DS_ACTIVE;
+	    edp->size = 0;
+	    edp->buf = buf;
+	    edp->next = &edp[1];
+	    buf += TX_SIZE;
+	}
+
+	desc[NUM_TX-1].next = &desc[0];
+
+	// flush_dcache_range ( (void *) desc, &desc[NUM_TX] );
+// 	emac_cache_flush ( (void *) desc, &desc[NUM_TX] );
+
+	return desc;
+}
+
+/* Interestingly the emac can accomodate 8 MAC addresses.
+ * All but the first must have a bit set to indicate they
+ *  are active.
+ */
+static void set_mac (struct	eth_aw_csreg *csrptr, char *mac_id )
+{
+	csrptr->mac_addr[0].hi = mac_id[4] + (mac_id[5] << 8);
+	csrptr->mac_addr[0].lo = mac_id[0] + (mac_id[1] << 8) +
+	    (mac_id[2] << 16) + (mac_id[3] << 24);
+}
+
 /*-----------------------------------------------------------------------
  * ethinit - initialize the Allwinner H3 ethernet hardware
  *-----------------------------------------------------------------------
@@ -267,7 +368,6 @@ int32	ethinit	(
 		struct	dentry *devptr
 	)
 {
-	// TODO
 	struct	ethcblk *ethptr;		/* Ethernet control blk pointer	*/
 	struct	eth_aw_tx_desc *tdescptr;/* Tx descriptor pointer	*/
 	struct	eth_aw_rx_desc *rdescptr;/* Rx descriptor pointer	*/
@@ -328,19 +428,60 @@ int32	ethinit	(
 		kprintf("Link is Half Duplex\n");
 	}
 
+	//Note: csrptr structure is defined by the chip. Our struct has the exact same alignment as it (and thus also as Tom's), but field names are arbitrary.
+	//MAC addr from U-Boot 0: 0000ffff ffffffff
+	csrptr->basic_ctl_1 = CTL1_BURST_8
+
+
+	char emac_mac[6];
+	fetch_linux_mac(emac_mac);
+	set_mac(csrptr, emac_mac);
+
+	for ( i=0; i<1; i++ ) {
+	    printf ( "MAC addr from U-Boot %d: %08x %08x\n",
+		i, csrptr->mac_addr[i].hi, csrptr->mac_addr[i].lo );
+	}
+
+	csrptr->rx_ctl_1 |= TX_MD;
+	csrptr->rx_ctl_1 |= RX_MD;
+
+	csrptr->rx_ctl_1 &= ~RX_EN;
+	csrptr->rx_ctl_1 &= ~RX_DMA_ENA;
+
+	csrptr->tx_ctl_0 &= ~TX_EN;
+	csrptr->tx_ctl_1 &= ~TX_DMA_ENA;
+
+	set_irq_handler(IRQ_EMAC, (uint32)devptr->dvintr);
+
+	//Initialize RX/TX rings
+	csrptr->rx_dma_desc_list = rx_list_init();
+	csrptr->tx_dma_desc_list = tx_list_init ();
+
+	//Enable EMAC interrupts
+	csrptr->int_en = INT_RX | INT_TX | INT_TX_UNDERFLOW;
+
+	//Start RX
+	csrptr->rx_ctl_1 |= RX_DMA_ENA;
+	csrptr->rx_ctl_0 |= RX_EN;
+
+	//Start TX
+	csrptr->tx_ctl_1 |= TX_DMA_ENA;
+	csrptr->tx_ctl_0 |= TX_EN;
+
+
+//TODO Everything beyond this point is leftover from the BBB ethernet driver, so it won't be relevant for us.
 //	/* Read the device MAC address */
-	for(i = 0; i < 2; i++) {
-		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
-	}
-	for(i = 0; i < 4; i++) {
-		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
-	}
-//
-	kprintf("MAC Address is: ");
-	for(i = 0; i < 5; i++) {
-		kprintf("%02X:", ethptr->devAddress[i]);
-	}
-	kprintf("%02X\n", ethptr->devAddress[5]);
+// 	for(i = 0; i < 2; i++) {
+// 		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
+// 	}
+// 	for(i = 0; i < 4; i++) {
+// 		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
+// 	}
+// 	kprintf("MAC Address is: ");
+// 	for(i = 0; i < 5; i++) {
+// 		kprintf("%02X:", ethptr->devAddress[i]);
+// 	}
+// 	kprintf("%02X\n", ethptr->devAddress[5]);
 
 //	/* Initialize the rx ring size field */
 //	ethptr->rxRingSize = ETH_AM335X_RX_RING_SIZE;
