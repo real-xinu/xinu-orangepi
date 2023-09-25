@@ -6,6 +6,7 @@
  * ethread - read an incoming packet on TI AM335X Ethernet
  *------------------------------------------------------------------------
  */
+	// TODO look into allwinner_eth.h/tx status symbols (under comment) and rx status symbols. Also cross-reference with h3 datasheet to determine correct values here.
 int32	ethread	(
 		struct	dentry *devptr,
 		void	*buf,
@@ -40,7 +41,7 @@ int32	ethread	(
 	memcpy((char *)buf, (char *)rdescptr->buf_addr, retval);
 
 	/* Initialize the descriptor for next packet */
-	rdescptr->status = DS_ACTIVE;
+	rdescptr->status = ETH_AW_RX_DESC_CTL;
 	rdescptr->buf_len = ETH_BUF_SIZE;
 	rdescptr->next = NULL;
 
