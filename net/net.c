@@ -16,7 +16,6 @@ void	net_init (void)
 {
 	int32	nbufs;			/* Total no of buffers		*/
 
-	kprintf("Initializing network (net.c/net_init())\n");
 	/* Initialize the network data structure */
 
 	memset((char *)&NetData, NULLCH, sizeof(struct network));

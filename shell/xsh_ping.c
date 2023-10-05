@@ -19,6 +19,7 @@ shellcmd xsh_ping(int nargs, char *args[])
 	int32	nextval;		/* next value to use		*/
 	bool8	dname;
 
+	kprintf("ping start\n");
 	/* For argument '--help', emit help about the 'ping' command	*/
 
 	if (nargs == 2 && strncmp(args[1], "--help", 7) == 0) {
@@ -72,6 +73,7 @@ shellcmd xsh_ping(int nargs, char *args[])
 
 	/* Register to receive an ICMP Echo Reply */
 
+	kprintf("icmp-reg\n");
 	slot = icmp_register(ipaddr);
 	if (slot == SYSERR) {
 		fprintf(stderr,"%s: ICMP registration failed\n", args[0]);

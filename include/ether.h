@@ -71,6 +71,50 @@ struct	etherPkt {
 #define BMCR_ANEG 0x0200
 #define BMSR_ANEGCOMPLETE 0x0020
 
+/* Here are the registers in the PHY device that we use.
+ * The first PHY registers are standardized and device
+ * independent
+ */
+#define PHY_BMCR        0
+#define PHY_BMSR        1
+#define PHY_ID1         2
+#define PHY_ID2         3
+#define PHY_ADVERT      4
+#define PHY_PEER        5
+
+/* Bits in the basic mode control register. */
+#define BMCR_RESET              0x8000
+#define BMCR_LOOPBACK           0x4000
+#define BMCR_100                0x2000		/* Set for 100 Mbit, else 10 */
+#define BMCR_ANEG_ENA           0x1000		/* enable autonegotiation */
+#define BMCR_POWERDOWN          0x0800		/* set to power down */
+#define BMCR_ISOLATE            0x0400
+#define BMCR_ANEG               0x0200		/* restart autonegotiation */
+#define BMCR_FULL               0x0100		/* Set for full, else half */
+#define BMCR_CT_ENABLE          0x0080		/* enable collision test */
+
+/* Bits in the basic mode status register. */
+
+#define BMSR_100FULL            0x4000
+#define BMSR_100HALF            0x2000
+#define BMSR_10FULL             0x1000
+#define BMSR_10HALF             0x0800
+#define BMSR_ANEGCOMPLETE       0x0020
+#define BMSR_ANEGCAPABLE        0x0008
+#define BMSR_LINK_UP            0x0004
+
+/* Bits in the link partner ability register. */
+#define LPA_10HALF              0x0020
+#define LPA_10FULL              0x0040
+#define LPA_100HALF             0x0080
+#define LPA_100FULL             0x0100
+
+#define LPA_ADVERT              LPA_10HALF | LPA_10FULL | LPA_100HALF | LPA_100FULL
+
+#define ETH_ADDR_SIZE	6
+#define ETH_MIN_SIZE	64
+#define ETH_MAX_SIZE	1514
+
 
 struct	ethcblk	{
 	byte	state; 		/* ETH_STATE_... as defined above 	*/

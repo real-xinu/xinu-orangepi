@@ -27,7 +27,7 @@ CFILES	= abs.c atoi.c atol.c bzero.c ctype_.c doprnt.c doscan.c	\
 		memset.c printf.c putchar.c qsort.c rand.c sprintf.c	\
 		sscanf.c strchr.c strrchr.c strstr.c strncat.c		\
 		strncmp.c strncpy.c strnlen.c strcmp.c strcpy.c		\
-		strlen.c
+		strlen.c armv7.c
 
 OFILE2 = ${CFILES:%.c=%.o}
 OFILES = ${OFILE2:%.s=%.o}

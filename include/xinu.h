@@ -41,3 +41,4 @@
 #include <allwinner_eth.h>
 #include <am335x_watchdog.h>
 #include <armv7a.h>
+#include <armv7.h>

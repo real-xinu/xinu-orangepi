@@ -2,6 +2,49 @@
 
 #include <xinu.h>
 
+/*------------------------------------------------------------------------
+ * eth_rxPackets - handler for receiver interrupts
+ *------------------------------------------------------------------------
+ */
+local 	void 	eth_rxPackets(
+	struct 	ethcblk	*ethptr 	/* ptr to control block		*/
+	)
+{
+	struct	emac_desc *descptr;/* ptr to ring descriptor 	*/
+	uint32	tail;			/* pos to insert next packet	*/
+	uint32	status;			/* status of ring descriptor 	*/
+	int numdesc; 			/* num. of descriptor reclaimed	*/
+
+
+	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
+
+		/* Insert new arrived packet to the tail */
+
+		tail = ethptr->rxTail;
+		descptr = (struct emac_desc *)ethptr->rxRing + tail;
+		status = descptr->status;
+
+		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+// 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
+
+		if (descptr->status & DS_ACTIVE) {
+			break;
+		}
+
+// 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
+		emac_cache_flush ( (void *) descptr, &descptr[1] );
+
+		ethptr->rxTail
+			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
+		descptr->status = DS_ACTIVE;
+	}
+
+	signaln(ethptr->isem, numdesc);
+
+	return;
+}
+
+//TODO This part is totally broken - redo it using tom's as the basis now that I have a better understanding of how the system should work
 //TODO Design/Implement proper handling of rx/tx with rings
 //TODO Convert netbuf to Xinu netbuf (netpacket?) format
 static void rx_handler ( int stat, struct emac_desc *cur_rx_dma, struct ethcblk	*ethptr )
@@ -62,6 +105,48 @@ static void rx_handler ( int stat, struct emac_desc *cur_rx_dma, struct ethcblk	
 		// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 // 		emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 	}
+}
+
+/*------------------------------------------------------------------------
+ * eth_txPackets - handler for transmitter interrupts
+ *------------------------------------------------------------------------
+ */
+local 	void 	eth_txPackets(
+	struct	ethcblk	*ethptr		/* ptr to control block		*/
+	)
+{
+	kprintf("eth_txPackets\n");
+	struct	eth_aw_tx_desc *descptr;/* ptr to ring descriptor 	*/
+	uint32 	head; 			/* pos to reclaim descriptor	*/
+	char 	*pktptr; 		/* ptr used during packet copy  */
+	int 	numdesc; 		/* num. of descriptor reclaimed	*/
+
+	for (numdesc = 0; numdesc < ethptr->txRingSize; numdesc++) {
+		head = ethptr->txHead;
+		descptr = (struct eth_aw_tx_desc *)ethptr->txRing + head;
+
+		//If ETH_AW_TX_DESC_CTL is set, the buffer has not been fully transmitted, so we should not clear it out for future use.
+		if ((descptr->status & ETH_AW_TX_DESC_CTL))
+			kprintf("Can't clear untransmitted packet\n");
+			break;
+
+		kprintf("Transmitted a packet\n");
+		/* Clear the write-back descriptor and buffer */
+
+// 		descptr->lower.data = 0;
+// 		descptr->upper.data = 0;
+		//Zero out the packet structure since it has been transmitted
+		pktptr = (char *)((uint32)(descptr->buf_addr));
+		memset(pktptr, '\0', ETH_BUF_SIZE);
+
+		//Increment the tx ring
+		ethptr->txHead
+			= (ethptr->txHead + 1) % ethptr->txRingSize;
+	}
+
+	signaln(ethptr->osem, numdesc);
+
+	return;
 }
 
 /* Some notes on the cur and clean pointers ...
@@ -128,7 +213,6 @@ interrupt ethhandler (
 	//TODO Comer says there may be an interrupt for every successful transmission/reception
 	//Doesn't have to do anything until the end of the ring is reached
 	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
-// 	kprintf("EMAC interrupt (ethhandler())\n");
 // 	kprintf("eh1\n");
 	uint32	status;
 	struct  dentry  *devptr;        /* address of device control blk*/
@@ -167,6 +251,7 @@ interrupt ethhandler (
 	// tx_cleaner ();
 
 	statx = stat & INT_RX_MASK;
+	kprintf("EMAC interrupt (ethhandler()): %d\n", stat);
 
 	if ( statx && statx != INT_RX )
 	    printf ( " *** unexpected emac Rx int status: %08x\n", stat );
@@ -174,13 +259,15 @@ interrupt ethhandler (
 	// ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
 	if ( stat & INT_RX ) {
 		kprintf("RX Interrupt (ethhandler.c)\n");
-	    rx_handler ( stat, ep->rx_dma_desc_list, ethptr );
+		eth_rxPackets(ethptr);
+// 	    rx_handler ( stat, ep->rx_dma_desc_list, ethptr );
 	}
 
 	if ( stat & INT_TX ) {
 		kprintf("TX Interrupt (ethhandler.c)\n");
 		//Print contents of tx ring
 		kprintf("ethptr->txRing: %d\n", ethptr->txRing);
+		eth_txPackets(ethptr);
 // 	    tx_handler ( stat, ep->tx_dma_desc_list, ethptr );
 	}
 

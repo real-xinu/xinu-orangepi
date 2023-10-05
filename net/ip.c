@@ -131,12 +131,16 @@ status	ip_send(
 		return OK;
 	}
 
+
+	kprintf("gonna bcast\n");
+
 	/* Broadcast if destination is 255.255.255.255 */
 
 	if ( (dest == IP_BCAST) ||
 	     (dest == NetData.ipbcast) ) {
 		memcpy(pktptr->net_ethdst, NetData.ethbcast,
 							ETH_ADDR_LEN);
+		kprintf("after bcast memcpy\n");
 		retval = ip_out(pktptr);
 		restore(mask);
 		return retval;
@@ -156,6 +160,7 @@ status	ip_send(
 		/* Next hop is default router on the network */
 		nxthop = NetData.iprouter;
 
+		kprintf("defrtr\n");
 	}
 
 	if (nxthop == 0) {	/* Dest. invalid or no default route	*/
@@ -165,6 +170,7 @@ status	ip_send(
 
 	/* Resolve the next-hop address to get a MAC address */
 
+	kprintf("arp_resolve call 1\n");
 	retval = arp_resolve(nxthop, pktptr->net_ethdst);
 	if (retval != OK) {
 		freebuf((char *)pktptr);
@@ -214,6 +220,7 @@ status	ip_out(
 	  struct netpacket *pktptr	/* Pointer to the packet	*/
 	)
 {
+	kprintf("ipout\n");
 	uint16	cksum;			/* Checksum in host byte order	*/
 	int32	len;			/* Length of ICMP message	*/	
 	int32	pktlen;			/* Length of entire packet	*/
@@ -268,6 +275,7 @@ status	ip_out(
 
 	/* Send packet over the Ethernet */
 
+	kprintf("writing to ETHER0\n");
 	retval = write(ETHER0, (char*)pktptr, pktlen);
 	freebuf((char *)pktptr);
 
@@ -398,6 +406,7 @@ process	ipout(void)
 			continue;
 		}
 
+		kprintf("local net check\n");
 		/* Check whether destination is on the local net */
 
 		if ( (destip & NetData.ipmask) == NetData.ipprefix) {
@@ -419,6 +428,7 @@ process	ipout(void)
 
 		/* Use ARP to resolve next-hop address */
 
+		kprintf("arp_resolve call\n");
 		retval = arp_resolve(nxthop, pktptr->net_ethdst);
 		if (retval != OK) {
 			freebuf((char *)pktptr);

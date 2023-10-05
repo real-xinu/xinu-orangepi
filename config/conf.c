@@ -33,12 +33,12 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)ionull, (void *)ionull, (void *)ioerr,
 	  (void *)0x0, (void *)ioerr, 0 },
 
-/* ETHER0 is eth */
-	{ 2, 0, "ETHER0",
-	  (void *)ethinit, (void *)ioerr, (void *)ioerr,
-	  (void *)ethread, (void *)ethwrite, (void *)ioerr,
-	  (void *)ioerr, (void *)ioerr, (void *)ethcontrol,
-	  (void *)0x1c30000, (void *)ethhandler, 0 },
+/* NULLDEV2 is null */
+	{ 2, 1, "NULLDEV2",
+	  (void *)ionull, (void *)ionull, (void *)ionull,
+	  (void *)ionull, (void *)ionull, (void *)ioerr,
+	  (void *)ionull, (void *)ionull, (void *)ioerr,
+	  (void *)0x0, (void *)ioerr, 0 },
 
 /* NAMESPACE is nam */
 	{ 3, 0, "NAMESPACE",
@@ -101,5 +101,12 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)lflinit, (void *)ioerr, (void *)lflclose,
 	  (void *)lflread, (void *)lflwrite, (void *)lflseek,
 	  (void *)lflgetc, (void *)lflputc, (void *)lflcontrol,
-	  (void *)0x0, (void *)ionull, 0 }
+	  (void *)0x0, (void *)ionull, 0 },
+
+/* ETHER0 is eth */
+	{ 12, 0, "ETHER0",
+	  (void *)ethinit, (void *)ioerr, (void *)ioerr,
+	  (void *)ethread, (void *)ethwrite, (void *)ioerr,
+	  (void *)ioerr, (void *)ioerr, (void *)ethcontrol,
+	  (void *)0x1c30000, (void *)ethhandler, 0 }
 };

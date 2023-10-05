@@ -261,6 +261,32 @@ static void emac_syscon_setup ( void )
 	// printf ( "Emac Syscon = %08x\n", *sc );
 }
 
+static void
+fetch_uboot_mac ( char *addr )
+{
+	struct eth_aw_csreg *ep = EMAC_BASE;
+	// char *addr = emac_mac;
+
+	unsigned long mac_hi = ep->mac_addr[0].hi;
+	unsigned long mac_lo = ep->mac_addr[0].lo;
+
+	/* This is just from good old U-Boot
+	printf ( "MAC addr %d: %08x %08x\n", ep->mac_addr[0].hi, ep->mac_addr[0].lo );
+	MAC addr 0: 00008c26 9b7f2002
+	*/
+	*addr++ = mac_lo & 0xff;
+	mac_lo >>= 8;
+	*addr++ = mac_lo & 0xff;
+	mac_lo >>= 8;
+	*addr++ = mac_lo & 0xff;
+	mac_lo >>= 8;
+	*addr++ = mac_lo & 0xff;
+
+	*addr++ = mac_hi & 0xff;
+	mac_hi >>= 8;
+	*addr++ = mac_hi & 0xff;
+}
+
 //TODO Need to figure out how to get actual MAC. Currently just manually setting it for testing purposes.
 static void fetch_linux_mac ( char *addr )
 {
@@ -305,7 +331,7 @@ static struct emac_desc *rx_list_init ( struct	ethcblk *ethptr )
 	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_RX * RX_SIZE );
 
-	ethptr->rxBufs = buf;
+// 	ethptr->rxBufs = buf;
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;
 	    edp->size = RX_ETH_SIZE;
@@ -334,7 +360,7 @@ static struct emac_desc *tx_list_init ( struct	ethcblk *ethptr )
 	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_TX * TX_SIZE );
 
-	ethptr->txBufs = buf;
+// 	ethptr->txBufs = buf;
 	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;
 	    edp->size = 0;
@@ -346,7 +372,7 @@ static struct emac_desc *tx_list_init ( struct	ethcblk *ethptr )
 	desc[NUM_TX-1].next = &desc[0];
 
 	// flush_dcache_range ( (void *) desc, &desc[NUM_TX] );
-// 	emac_cache_flush ( (void *) desc, &desc[NUM_TX] );
+	emac_cache_flush ( (void *) desc, &desc[NUM_TX] );
 
 	return desc;
 }
@@ -360,6 +386,33 @@ static void set_mac (struct	eth_aw_csreg *csrptr, char *mac_id )
 	csrptr->mac_addr[0].hi = mac_id[4] + (mac_id[5] << 8);
 	csrptr->mac_addr[0].lo = mac_id[0] + (mac_id[1] << 8) +
 	    (mac_id[2] << 16) + (mac_id[3] << 24);
+}
+
+
+
+static void tx_list_show ( struct emac_desc *tx_list )
+{
+	struct emac_desc *desc = tx_list;
+	int num = NUM_TX;
+
+	struct emac_desc *edp;
+	int len;
+	int i;
+
+	// invalidate_dcache_range ( (void *) desc, &desc[num] );
+// 	emac_cache_invalidate ( (void *) desc, &desc[num] );
+
+	for ( i=0; i<num; i++ ) {
+	    edp = &desc[i];
+// 	    if ( edp == cur_tx_dma && cur_tx_dma == clean_tx_dma )
+// 		printf ( "* Tx Buf %2d (%08x) status: %08x %08x  %08x %08x\n", i, edp, edp->status, edp->size, edp->buf, edp->next );
+// 	    else if ( edp == clean_tx_dma )
+// 		printf ( "> Tx Buf %2d (%08x) status: %08x %08x  %08x %08x\n", i, edp, edp->status, edp->size, edp->buf, edp->next );
+// 	    else if ( edp == cur_tx_dma )
+// 		printf ( "* Tx Buf %2d (%08x) status: %08x %08x  %08x %08x\n", i, edp, edp->status, edp->size, edp->buf, edp->next );
+// 	    else
+		kprintf ( "  Tx Buf %2d (%08x) status: %08x %08x  %08x %08x\n", i, edp, edp->status, edp->size, edp->buf, edp->next );
+	}
 }
 
 /*-----------------------------------------------------------------------
@@ -379,7 +432,7 @@ int32	ethinit	(
 	int32	retval;			/* Return value			*/
 	int32	i;			/* Index variable		*/
 
-	emac_syscon_setup();
+// 	emac_syscon_setup();
 
 	/* Get the Ethernet control block address	*/
 	/* from the device table entry			*/
@@ -438,16 +491,23 @@ int32	ethinit	(
 	char emac_mac[6];
 	fetch_linux_mac(emac_mac);
 	set_mac(csrptr, emac_mac);
+	int ei = 0;
+	for (ei = 0; ei < 6; ++ei) {
+		ethptr->devAddress[ei] = emac_mac[ei];
+	}
 
 	for ( i=0; i<1; i++ ) {
 	    printf ( "MAC addr from U-Boot %d: %08x %08x\n",
 		i, csrptr->mac_addr[i].hi, csrptr->mac_addr[i].lo );
 	}
 
+	//Setting to TX_MD/RX_MD makes it so a full frame must be present for transmission to start.
 	csrptr->rx_ctl_1 |= TX_MD;
-	csrptr->rx_ctl_1 |= RX_MD;
+	csrptr->tx_ctl_1 |= RX_MD;
+// 	csrptr->rx_ctl_1 &= 0xFFFFF8FF; //Set transmission to 64 (minimum)
+// 	csrptr->tx_ctl_1 &= 0xFFFFF8FF;
 
-	csrptr->rx_ctl_1 &= ~RX_EN;
+	csrptr->rx_ctl_0 &= ~RX_EN;
 	csrptr->rx_ctl_1 &= ~RX_DMA_ENA;
 
 	csrptr->tx_ctl_0 &= ~TX_EN;
@@ -463,12 +523,12 @@ int32	ethinit	(
 	kprintf("ei2\n");
 	ethptr->rxRing = csrptr->rx_dma_desc_list;
 	ethptr->txRing = csrptr->tx_dma_desc_list;
-	ethptr->rxHead = ethptr->rxRing;
-	ethptr->rxTail = ethptr->rxRing;
+	ethptr->rxHead = 0;
+	ethptr->rxTail = 0;
 	ethptr->rxRingSize = NUM_RX;
 	ethptr->rxIrq = 0;
-	ethptr->txHead = ethptr->txRing;
-	ethptr->txTail = ethptr->txRing;
+	ethptr->txHead = 0;
+	ethptr->txTail = 0;
 	ethptr->txRingSize = NUM_TX;
 	ethptr->txIrq = 0;
 
@@ -487,6 +547,7 @@ int32	ethinit	(
 
 
 	kprintf("ei4\n");
+	tx_list_show(ethptr->txRing);
 
 //TODO Everything beyond this point is leftover from the BBB ethernet driver, so it won't be relevant for us.
 //	/* Read the device MAC address */

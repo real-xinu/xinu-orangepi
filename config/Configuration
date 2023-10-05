@@ -130,8 +130,9 @@ spi:
    /* Define a null device */
    NULLDEV is null on nothing
 
-   /* Physical Ethernet (raw packet transfer) */
-   ETHER0 is eth   on am335x_eth csr 0x01C30000 -irq 0
+   /* Define a null device */
+   NULLDEV2 is null on nothing
+
 
    /* Define a namespace device */
    NAMESPACE is nam on top
@@ -171,6 +172,10 @@ spi:
    LFILE3 is lfl on lfs
    LFILE4 is lfl on lfs
    LFILE5 is lfl on lfs
+
+
+   /* Physical Ethernet (raw packet transfer) */
+   ETHER0 is eth   on am335x_eth csr 0x01C30000 -irq 0
 
    /* SPI devices */
 

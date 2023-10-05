@@ -246,6 +246,7 @@ status	icmp_send (
 
 	/* Send the packet */
 
+	kprintf("doing ip_send\n");
 	retval = ip_send(pkt);
 	restore(mask);
 	return retval;

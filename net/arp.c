@@ -17,6 +17,8 @@ void	arp_init(void)
 	}
 }
 
+//TODO Issue is now somewhere in here
+
 /*------------------------------------------------------------------------
  * arp_resolve  -  Use ARP to resolve an IP address to an Ethernet address
  *------------------------------------------------------------------------
@@ -35,12 +37,14 @@ status	arp_resolve (
 
 	/* Use MAC broadcast address for IP limited broadcast */
 
+	kprintf("arp_resolve 1\n");
 	if (nxthop == IP_BCAST) {
 		memcpy(mac, NetData.ethbcast, ETH_ADDR_LEN);
 		return OK;
 	}
 
 	/* Use MAC broadcast address for IP network broadcast */
+	kprintf("arp_resolve 2\n");
 
 	if (nxthop == NetData.ipbcast) {
 		memcpy(mac, NetData.ethbcast, ETH_ADDR_LEN);
@@ -51,6 +55,7 @@ status	arp_resolve (
 
 	mask = disable();
 
+	kprintf("arp_resolve 3\n");
 	/* See if next hop address is already present in ARP cache */
 
 	for (i=0; i<ARP_SIZ; i++) {
@@ -123,14 +128,19 @@ status	arp_resolve (
 
 	msg = recvclr();
 	for (i=0; i<ARP_RETRY; i++) {
+		kprintf("arp_resolve ethwrite\n");
 		write(ETHER0, (char *)&apkt, sizeof(struct arppacket));
+		kprintf("after arp_resolve ethwrite\n");
 		msg = recvtime(ARP_TIMEOUT);
+		kprintf("after arp_resolve ethwrite 2\n");
 		if (msg == TIMEOUT) {
+			kprintf("arp_resolve timeout\n");
 			continue;
 		} else if (msg == SYSERR) {
 			restore(mask);
 			return SYSERR;
 		} else {	/* entry is resolved */
+			kprintf("arp_resolve success\n");
 			break;
  		}
 	}
@@ -146,6 +156,12 @@ status	arp_resolve (
 	/* Return hardware address */
 
 	memcpy(mac, arptr->arhaddr, ARP_HALEN);
+	kprintf("arp_resolve mac:\n");
+	int i2 = 0;
+	for (i2 = 0; i2 < ARP_HALEN; ++i2) {
+		kprintf("%x", mac[i2]);
+	}
+	kprintf("\n");
 	restore(mask);
 	return OK;
 }

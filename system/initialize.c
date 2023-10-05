@@ -80,7 +80,7 @@ void	nulluser()
 
 	/* Initialize the network stack and start processes */
 
-// 	net_init(); //TODO:
+	net_init(); //TODO:
 
 	/* Create a process to finish startup and start main */
 

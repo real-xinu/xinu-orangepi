@@ -2,39 +2,39 @@
 
 	/*register name			offset	description*/
 struct __attribute__((packed)) eth_aw_csreg {
-	reg32 basic_ctl_0;	/* 0x00	Basic control 0 */
-	reg32 basic_ctl_1;	/* 0x04	Basic control 1 */
-	reg32 int_sta;			/* 0x08	Interrupt status */
-	reg32 int_en;				/* 0x0C	Interrupt enable */
-	reg32 tx_ctl_0;			/* 0x10	Transmit control 0 */
-	reg32 tx_ctl_1;			/* 0x14	Transmit control 1 */
-	byte res0[4];
-	reg32 tx_flow_ctl;	/* 0x1C	Transmit flow control */
-	reg32 tx_dma_desc_list;	/* 0x20	Transmit descriptor list address */
-	reg32 rx_ctl_0;			/* 0x24	Receive control 0 */
-	reg32 rx_ctl_1;			/* 0x28	Receive control 1 */
-	byte res1[8];
-	reg32 rx_dma_desc_list;	/* 0x34	Receive descriptor list address */
-	reg32 rx_frm_flt;		/* 0x38	Receive frame filter */
-	byte res2[4];
-	reg32 rx_hash_0;		/* 0x40	Hash table 0 */
-	reg32 rx_hash_1;		/* 0x44	Hash table 1 */
-	reg32 mii_cmd;			/* 0x48	Management interface command */
-	reg32 mii_data;			/* 0x4C	Management interface data */
+	volatile reg32 basic_ctl_0;	/* 0x00	Basic control 0 */
+	volatile reg32 basic_ctl_1;	/* 0x04	Basic control 1 */
+	volatile reg32 int_sta;			/* 0x08	Interrupt status */
+	volatile reg32 int_en;				/* 0x0C	Interrupt enable */
+	volatile reg32 tx_ctl_0;			/* 0x10	Transmit control 0 */
+	volatile reg32 tx_ctl_1;			/* 0x14	Transmit control 1 */
+	volatile byte res0[4];
+	volatile reg32 tx_flow_ctl;	/* 0x1C	Transmit flow control */
+	volatile reg32 tx_dma_desc_list;	/* 0x20	Transmit descriptor list address */
+	volatile reg32 rx_ctl_0;			/* 0x24	Receive control 0 */
+	volatile reg32 rx_ctl_1;			/* 0x28	Receive control 1 */
+	volatile byte res1[8];
+	volatile reg32 rx_dma_desc_list;	/* 0x34	Receive descriptor list address */
+	volatile reg32 rx_frm_flt;		/* 0x38	Receive frame filter */
+	volatile byte res2[4];
+	volatile reg32 rx_hash_0;		/* 0x40	Hash table 0 */
+	volatile reg32 rx_hash_1;		/* 0x44	Hash table 1 */
+	volatile reg32 mii_cmd;			/* 0x48	Management interface command */
+	volatile reg32 mii_data;			/* 0x4C	Management interface data */
 	struct {
 	    volatile unsigned int hi;		/* 50 */
 	    volatile unsigned int lo;		/* 54 */
 	} mac_addr[8];
-	byte res3[32];
-	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */
-	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */
-	reg32 tx_cur_buf;	/* 0xB8	Current transmit buffer address */
-	byte res4[4];
-	reg32 rx_dma_sta;	/* 0xC0	Receive dma status */
-	reg32 rx_cur_desc;	/* 0xC4	Current receive descriptor */
-	reg32 rx_cur_buf;	/* 0xC8	Current receive buffer address */
-	byte res5[4];
-	reg32 rgmii_sta;	/* 0xD0	RGMII status register */
+	volatile byte res3[32];
+	volatile reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */
+	volatile reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */
+	volatile reg32 tx_cur_buf;	/* 0xB8	Current transmit buffer address */
+	volatile byte res4[4];
+	volatile reg32 rx_dma_sta;	/* 0xC0	Receive dma status */
+	volatile reg32 rx_cur_desc;	/* 0xC4	Current receive descriptor */
+	volatile reg32 rx_cur_buf;	/* 0xC8	Current receive buffer address */
+	volatile byte res5[4];
+	volatile reg32 rgmii_sta;	/* 0xD0	RGMII status register */
 };
 
 /*	Name			Value		Description */
@@ -227,9 +227,9 @@ struct __attribute__((packed)) eth_aw_csreg {
 
 /* Receiving buffer description structure */
 struct eth_aw_rx_desc {
-	uint32 status;
-	uint32 buf_len;
-	uint32 buf_addr;
+	volatile uint32 status;
+	volatile uint32 buf_len;
+	volatile uint32 buf_addr;
 	struct eth_aw_rx_desc * next;
 };
 
@@ -260,9 +260,9 @@ struct eth_aw_rx_desc {
 
 /* Transmitting buffer description structure */
 struct eth_aw_tx_desc {
-	uint32 status;
-	uint32 buf_len;
-	uint32 buf_addr;
+	volatile uint32 status;
+	volatile uint32 buf_len;
+	volatile uint32 buf_addr;
 	struct eth_aw_tx_desc * next;
 };
 
@@ -396,8 +396,8 @@ struct eth_aw_tx_desc {
 
 struct emac_desc {
 	volatile unsigned long status;
-	long size;
-	char * buf;
+	volatile long size;
+	volatile char * buf;
 	struct emac_desc *next;
 }	__aligned(ARM_DMA_ALIGN);
 
@@ -433,3 +433,6 @@ struct emac_desc {
 #define DS_TX_FIRST		0x20000000	/* This is the first buffer in a packet */
 #define	DS_TX_EOR		0x02000000	/* End of Ring */
 #define	DS_TX_ADR_CHAIN		0x01000000	/* was magic for U-Boot */
+
+#define emac_cache_flush(a,b )		flush_dcache_range ( a, b )
+#define emac_cache_invalidate(a,b)	invalidate_dcache_range ( a, b )

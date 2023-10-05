@@ -23,6 +23,7 @@ devcall	ethcontrol (
 		/* Get MAC address */
 
 		case ETH_CTRL_GET_MAC:
+			kprintf("mac: %x%x%x%x%x%x\n", ethptr->devAddress[0], ethptr->devAddress[1], ethptr->devAddress[2], ethptr->devAddress[3], ethptr->devAddress[4], ethptr->devAddress[5]);
 			memcpy((byte *)arg1, ethptr->devAddress,
 					ETH_ADDR_LEN);
 			break;

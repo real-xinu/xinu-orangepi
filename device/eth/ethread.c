@@ -15,7 +15,7 @@ int32	ethread	(
 {
 	struct	ethcblk *ethptr;	/* Ethernet ctl blk ptr	*/
 	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer	*/
-	struct	eth_aw_rx_desc *rdescptr;/* Rx Desc. pointer	*/
+	struct	emac_desc *rdescptr;/* Rx Desc. pointer	*/
 	struct	eth_aw_rx_desc *prev;	/* Prev Rx desc pointer	*/
 	uint32	retval = 0;			/* Num of bytes returned*/
 
@@ -24,39 +24,47 @@ int32	ethread	(
 	/* Get the pointer to Ethernet CSR */
 	csrptr = (struct eth_aw_csreg *)ethptr->csr;
 
+// 	kprintf("ethread before wait()\n");
 	/* Wait for a packet */
 	wait(ethptr->isem);
+// 	kprintf("ethread after wait()\n");
 
 	/* Get pointer to the descriptor */
-	rdescptr = (struct eth_aw_rx_desc *)ethptr->rxRing +
+	rdescptr = (struct emac_desc *)ethptr->rxRing +
 						ethptr->rxHead;
 
 	/* Read the packet length */
-	retval = rdescptr->buf_len;
+	retval = rdescptr->size;
 	if(retval > count) {
 		retval = count;
 	}
 
 	/* Copy the packet into user provided buffer */
-	memcpy((char *)buf, (char *)rdescptr->buf_addr, retval);
+// 	kprintf("ethread before memcpy\n");
+	memcpy((char *)buf, (char *)rdescptr->buf, retval);
+// 	kprintf("ethread after memcpy\n");
 
 	/* Initialize the descriptor for next packet */
 	rdescptr->status = ETH_AW_RX_DESC_CTL;
-	rdescptr->buf_len = ETH_BUF_SIZE;
-	rdescptr->next = NULL;
+	rdescptr->size = ETH_BUF_SIZE;
+// 	rdescptr->next = NULL;
 
+// 	kprintf("ethread inserting descriptor\n");
 	/* Insert the descriptor into Rx queue */
-	prev = (struct eth_aw_rx_desc *)csrptr->rx_dma_desc_list;
-	if(prev == NULL) {
-		kprintf("null rx_dma_desc_list, adding %x\n", rdescptr);
-		csrptr->rx_dma_desc_list = (reg32)rdescptr;
-	}
-	else {
-		while(prev->next != NULL) {
-			prev = prev->next;
-		}
-		prev->next = rdescptr;
-	}
+	//TODO I think the issue is that we are trying to add here when we have actually already created all descs in ethinit
+// 	prev = (struct eth_aw_rx_desc *)csrptr->rx_dma_desc_list;
+// 	if(prev == NULL) {
+// 		kprintf("null rx_dma_desc_list, adding %x\n", rdescptr);
+// 		csrptr->rx_dma_desc_list = (reg32)rdescptr;
+// 	}
+// 	else {
+// 		while(prev->next != NULL) {
+// 			kprintf("ethread while\n");
+// 			prev = prev->next;
+// 		}
+// 		prev->next = rdescptr;
+// 	}
+// 	kprintf("ethread after descriptor insert\n");
 
 	/* Increment the head index of rx ring */
 	ethptr->rxHead++;
@@ -64,5 +72,6 @@ int32	ethread	(
 		ethptr->rxHead = 0;
 	}
 
+// 	kprintf("ethread done\n");
 	return retval;
 }
