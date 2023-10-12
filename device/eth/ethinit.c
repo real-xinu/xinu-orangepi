@@ -2,6 +2,7 @@
 
 #include <xinu.h>
 
+// extern int emac_init_new(struct dentry *devptr);
 struct	ethcblk ethertab[1];
 
 /*-----------------------------------------------------------------------
@@ -342,6 +343,9 @@ int32	ethinit	(
 	}
 	kprintf("%02X\n", ethptr->devAddress[5]);
 
+	kprintf("Calling emac_init_new()");
+	emac_init_new(devptr);
+	kprintf("Finished emac_init_new()");
 //	/* Initialize the rx ring size field */
 //	ethptr->rxRingSize = ETH_AM335X_RX_RING_SIZE;
 //

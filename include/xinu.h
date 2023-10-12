@@ -41,3 +41,7 @@
 #include <allwinner_eth.h>
 #include <am335x_watchdog.h>
 #include <armv7a.h>
+#include <emac_regs.h>
+#include <h3_ints.h>
+#include <netbuf.h>
+#include <net_kyu.h>
