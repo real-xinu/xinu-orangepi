@@ -1,5 +1,6 @@
 /* allwinner_eth.h - Ethernet device definitions for Allwinner SoC */
-
+#define ARM_DMA_ALIGN   64
+#define __aligned(x)            __attribute__((aligned(x)))
 	/*register name			offset	description*/
 struct __attribute__((packed)) eth_aw_csreg {
 	volatile reg32 basic_ctl_0;	/* 0x00	Basic control 0 */

@@ -545,9 +545,11 @@ int32	ethinit	(
 	csrptr->tx_ctl_1 |= TX_DMA_ENA;
 	csrptr->tx_ctl_0 |= TX_EN;
 
-
+	//Set link parameters
+	csrptr->basic_ctl_0 = CTL_SPEED_100 | CTL_FULL_DUPLEX;
 	kprintf("ei4\n");
-	tx_list_show(ethptr->txRing);
+
+// 	tx_list_show(ethptr->txRing);
 
 //TODO Everything beyond this point is leftover from the BBB ethernet driver, so it won't be relevant for us.
 //	/* Read the device MAC address */
