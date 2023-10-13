@@ -346,6 +346,7 @@ int32	ethinit	(
 	kprintf("Calling emac_init_new()");
 	emac_init_new(devptr);
 	kprintf("Finished emac_init_new()");
+	emac_activate();
 //	/* Initialize the rx ring size field */
 //	ethptr->rxRingSize = ETH_AM335X_RX_RING_SIZE;
 //

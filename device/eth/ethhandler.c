@@ -10,7 +10,81 @@ interrupt ethhandler (
 		uint32	xnum	/* IRQ number	*/
 	)
 {
-	kprintf("ethhandler\n");
+// 	kprintf("ethhandler\n");
+		//TODO Comer says there may be an interrupt for every successful transmission/reception
+	//Doesn't have to do anything until the end of the ring is reached
+	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
+// 	kprintf("eh1\n");
+	uint32	status;
+	struct  dentry  *devptr;        /* address of device control blk*/
+	struct 	ethcblk	*ethptr;	/* ptr to control block		*/
+
+	/* Initialize structure pointers */
+
+	devptr = (struct dentry *) &devtab[ETHER0];
+
+	/* Obtain a pointer to the tty control block */
+
+	ethptr = &ethertab[devptr->dvminor];
+// 	kprintf("eh2\n");
+
+	//TODO Comer says there may be an interrupt for every successful transmission/reception
+	//Doesn't have to do anything until the end of the ring is reached
+	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
+// 	kprintf("EMAC interrupt (ethhandler())\n");
+	struct eth_aw_csreg *ep = EMAC_BASE;
+	int stat;
+	int statx;
+	int stat2;
+
+// 	int_count++;
+
+	stat = ep->int_sta;
+// 	last_stat = stat;
+
+// 	kprintf("eh3\n");
+	// printf ( "emac interrupt --   status:%08x\n", stat );
+
+	/* For now, we run this on each interrupt,
+	 * which at the present time is just Rx Ints
+	 * XXX someday do this in Tx Ints.
+	 */
+	// tx_cleaner ();
+
+	statx = stat & INT_RX_MASK;
+	printf("EMAC interrupt (ethhandler()): %d\n", stat);
+
+	if ( statx && statx != INT_RX )
+	    printf ( " *** unexpected emac Rx int status: %08x\n", stat );
+
+	// ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
+	if ( stat & INT_RX ) {
+		printf("RX Interrupt (ethhandler.c)\n");
+// 		eth_rxPackets(ethptr);
+// 	    rx_handler ( stat, ep->rx_dma_desc_list, ethptr );
+	}
+
+	if ( stat & INT_TX ) {
+		printf("TX Interrupt (ethhandler.c)\n");
+		//Print contents of tx ring
+// 		kprintf("ethptr->txRing: %d\n", ethptr->txRing);
+// 		eth_txPackets(ethptr);
+// 	    tx_handler ( stat, ep->tx_dma_desc_list, ethptr );
+	}
+
+	if ( stat & INT_TX_UNDERFLOW ) {
+	    printf ( " *** TX underflow interrupt !!\n" );
+	}
+
+	stat2 = ep->int_sta;
+	// if ( stat2 != stat )
+	//     printf ( "emac interrupt --  xstatus: %08x --> %08x\n", stat, stat2 );
+
+	/* Ack the IRQ in the emac */
+	/* experiment shows this to be necessary and correct */
+	// ep->int_stat = ep->int_stat & 0xffff; (bad)
+	// ep->int_stat &= stat;
+	ep->int_sta = stat & 0x3fff;
 	//TODO Comer says there may be an interrupt for every successful transmission/reception
 	//Doesn't have to do anything until the end of the ring is reached
 	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
