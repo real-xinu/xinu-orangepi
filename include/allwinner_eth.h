@@ -334,3 +334,122 @@ struct eth_aw_tx_desc {
 #define SYSCON_TCS_EXT		1		/* External for GMII or RGMII */
 #define SYSCON_TCS_INT		2		/* Internal for GMII or RGMII */
 #define SYSCON_TCS_INVALID	3		/* invalid */
+
+
+
+/* status bits */
+#define DS_ACTIVE	0x80000000	/* set when available for DMA */
+#define DS_DS_FAIL	0x40000000	/* Rx DAF fail */
+#define DS_CLIP		0x00004000	/* Rx clipped (buffer too small) */
+#define DS_SA_FAIL	0x00002000	/* Rx SAF fail */
+#define DS_OVERFLOW	0x00000800	/* Rx overflow */
+#define DS_FIRST	0x00000200	/* Rx first in list */
+#define DS_LAST		0x00000100	/* Rx last in list */
+#define DS_HEADER_ERR	0x00000080	/* Rx header error */
+#define DS_COLLISION	0x00000040	/* Rx late collision in half duplex */
+#define DS_LENGTH_ERR	0x00000010	/* Rx length is wrong */
+#define DS_PHY_ERR	0x00000008	/* Rx error from Phy */
+#define DS_CRC_ERR	0x00000002	/* Rx error CRC wrong */
+#define DS_PAYLOAD_ERR	0x00000001	/* Rx error payload checksum or length wrong */
+
+#define DS_TX_HEADER_ERR	0x00010000	/* Tx header error */
+#define DS_TX_LENGTH_ERR	0x00004000	/* Tx length error */
+#define DS_TX_PAYLOAD		0x00001000	/* Tx payload checksum wrong */
+#define DS_CARRIER		0x00000400	/* Tx lost carrier */
+#define DS_COL1			0x00000200	/* Tx collision */
+#define DS_COL2			0x00000100	/* Tx too many collisions */
+/* collision count in these bits */
+#define DS_DEFER_ERR		0x00000004	/* Tx defer error (too many) */
+#define DS_UNDERFLOW		0x00000002	/* Tx fifo underflow */
+#define DS_DEFER		0x00000001	/* Tx defer this frame (half duplex) */
+
+/* Bits in the Tx size descriptor */
+#define DS_TX_INT		0x80000000	/* Set TX_INT when finished */
+#define DS_TX_LAST		0x40000000	/* This is the last buffer in a packet */
+#define DS_TX_FIRST		0x20000000	/* This is the first buffer in a packet */
+#define	DS_TX_EOR		0x02000000	/* End of Ring */
+#define	DS_TX_ADR_CHAIN		0x01000000	/* was magic for U-Boot */
+
+
+
+/* line size for this flavor of ARM */
+/* XXX should be in some header file */
+#define	ARM_DMA_ALIGN	64
+
+/* from linux/compiler_gcc.h in U-Boot */
+#define __aligned(x)            __attribute__((aligned(x)))
+
+#define EMAC_NOCACHE
+
+#ifdef EMAC_NOCACHE
+#define emac_cache_flush(a,b)
+#define emac_cache_invalidate(a,b)
+#else
+#define emac_cache_flush(a,b )		flush_dcache_range ( a, b )
+#define emac_cache_invalidate(a,b)	invalidate_dcache_range ( a, b )
+#endif
+
+
+/* Bits in the mii_cmd register */
+
+#define MII_BUSY	0x01
+#define MII_WRITE	0x02
+#define MII_REG		0x1f0		/* 5 bits for which register */
+#define MII_REG_SHIFT	4
+#define MII_DEV		0x1f000		/* 5 bits for which device */
+#define MII_DEV_SHIFT	12
+
+#define MII_DIV_MASK	0x700000	/* 3 bits for scaler */
+#define MII_DIV_16	0
+#define MII_DIV_32	0x100000
+#define MII_DIV_64	0x200000
+#define MII_DIV_128	0x300000	/* linux uses this */
+
+#define MII_DIV		MII_DIV_128
+
+/* Here are the registers in the PHY device that we use.
+ * The first PHY registers are standardized and device
+ * independent
+ */
+#define PHY_BMCR        0
+#define PHY_BMSR        1
+#define PHY_ID1         2
+#define PHY_ID2         3
+#define PHY_ADVERT      4
+#define PHY_PEER        5
+
+/* Bits in the basic mode control register. */
+#define BMCR_RESET              0x8000
+#define BMCR_LOOPBACK           0x4000
+#define BMCR_100                0x2000		/* Set for 100 Mbit, else 10 */
+#define BMCR_ANEG_ENA           0x1000		/* enable autonegotiation */
+#define BMCR_POWERDOWN          0x0800		/* set to power down */
+#define BMCR_ISOLATE            0x0400
+#define BMCR_ANEG               0x0200		/* restart autonegotiation */
+#define BMCR_FULL               0x0100		/* Set for full, else half */
+#define BMCR_CT_ENABLE          0x0080		/* enable collision test */
+
+/* Bits in the basic mode status register. */
+
+#define BMSR_100FULL            0x4000
+#define BMSR_100HALF            0x2000
+#define BMSR_10FULL             0x1000
+#define BMSR_10HALF             0x0800
+#define BMSR_ANEGCOMPLETE       0x0020
+#define BMSR_ANEGCAPABLE        0x0008
+#define BMSR_LINK_UP            0x0004
+
+/* Bits in the link partner ability register. */
+#define LPA_10HALF              0x0020
+#define LPA_10FULL              0x0040
+#define LPA_100HALF             0x0080
+#define LPA_100FULL             0x0100
+
+#define LPA_ADVERT              LPA_10HALF | LPA_10FULL | LPA_100HALF | LPA_100FULL
+
+struct emac_desc {
+	volatile unsigned long status;
+	long size;
+	char * buf;
+	struct emac_desc *next;
+}	__aligned(ARM_DMA_ALIGN);

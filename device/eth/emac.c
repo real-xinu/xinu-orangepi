@@ -32,23 +32,6 @@
 
 // #include "net.h"
 
-/* line size for this flavor of ARM */
-/* XXX should be in some header file */
-#define	ARM_DMA_ALIGN	64
-
-/* from linux/compiler_gcc.h in U-Boot */
-#define __aligned(x)            __attribute__((aligned(x)))
-
-#define EMAC_NOCACHE
-
-#ifdef EMAC_NOCACHE
-#define emac_cache_flush(a,b)
-#define emac_cache_invalidate(a,b)
-#else
-#define emac_cache_flush(a,b )		flush_dcache_range ( a, b )
-#define emac_cache_invalidate(a,b)	invalidate_dcache_range ( a, b )
-#endif
-
 struct	ethcblk ethertab[1];
 void emac_show ( void );
 void tx_start ( void );
@@ -125,45 +108,6 @@ typedef union {
 } desc0_u;
 #endif
 
-struct emac_desc {
-	volatile unsigned long status;
-	long size;
-	char * buf;
-	struct emac_desc *next;
-}	__aligned(ARM_DMA_ALIGN);
-
-/* status bits */
-#define DS_ACTIVE	0x80000000	/* set when available for DMA */
-#define DS_DS_FAIL	0x40000000	/* Rx DAF fail */
-#define DS_CLIP		0x00004000	/* Rx clipped (buffer too small) */
-#define DS_SA_FAIL	0x00002000	/* Rx SAF fail */
-#define DS_OVERFLOW	0x00000800	/* Rx overflow */
-#define DS_FIRST	0x00000200	/* Rx first in list */
-#define DS_LAST		0x00000100	/* Rx last in list */
-#define DS_HEADER_ERR	0x00000080	/* Rx header error */
-#define DS_COLLISION	0x00000040	/* Rx late collision in half duplex */
-#define DS_LENGTH_ERR	0x00000010	/* Rx length is wrong */
-#define DS_PHY_ERR	0x00000008	/* Rx error from Phy */
-#define DS_CRC_ERR	0x00000002	/* Rx error CRC wrong */
-#define DS_PAYLOAD_ERR	0x00000001	/* Rx error payload checksum or length wrong */
-
-#define DS_TX_HEADER_ERR	0x00010000	/* Tx header error */
-#define DS_TX_LENGTH_ERR	0x00004000	/* Tx length error */
-#define DS_TX_PAYLOAD		0x00001000	/* Tx payload checksum wrong */
-#define DS_CARRIER		0x00000400	/* Tx lost carrier */
-#define DS_COL1			0x00000200	/* Tx collision */
-#define DS_COL2			0x00000100	/* Tx too many collisions */
-/* collision count in these bits */
-#define DS_DEFER_ERR		0x00000004	/* Tx defer error (too many) */
-#define DS_UNDERFLOW		0x00000002	/* Tx fifo underflow */
-#define DS_DEFER		0x00000001	/* Tx defer this frame (half duplex) */
-
-/* Bits in the Tx size descriptor */
-#define DS_TX_INT		0x80000000	/* Set TX_INT when finished */
-#define DS_TX_LAST		0x40000000	/* This is the last buffer in a packet */
-#define DS_TX_FIRST		0x20000000	/* This is the first buffer in a packet */
-#define	DS_TX_EOR		0x02000000	/* End of Ring */
-#define	DS_TX_ADR_CHAIN		0x01000000	/* was magic for U-Boot */
 
 /* ------------------------------------------------------------ */
 /* Descriptors */
@@ -413,9 +357,13 @@ tx_list_init ( void )
 }
 
 void
-init_rings ( void )
+init_rings ( struct dentry *devptr )
 {
 	kprintf("Starting ring init\n");
+
+	struct	ethcblk *ethptr;		/* Ethernet control blk pointer	*/
+	ethptr = &ethertab[devptr->dvminor];
+
 	struct emac *ep = EMAC_BASE;
 	void *desc;
 
@@ -434,7 +382,10 @@ init_rings ( void )
 	desc = rx_list_init ();
 #endif
 	rx_list = desc;
-
+	ethptr->rxRing = rx_list;
+	ethptr->rxHead = 0;
+	ethptr->rxTail = 0;
+	ethptr->rxRingSize = NUM_RX;
 	/* Reload the dma pointer register.
 	 * This causes the dma list pointer to get reset.
 	 */
@@ -446,6 +397,10 @@ init_rings ( void )
 	/* Now set up the Tx list */
 	desc = tx_list_init ();
 	tx_list = desc;
+	ethptr->txRing = tx_list;
+	ethptr->txHead = 0;
+	ethptr->txTail = 0;
+	ethptr->txRingSize = NUM_TX;
 
 	clean_tx_dma = cur_tx_dma = desc;
 	ep->tx_desc = desc;
@@ -1134,7 +1089,7 @@ emac_init_new ( struct dentry *devptr )
 // 	irq_hookup ( IRQ_EMAC, emac_handler, 0 );
 	kprintf("Completed IRQ hookup\n");
 
-	init_rings ();
+	init_rings (devptr);
 	kprintf("Completed init_rings\n");
 
 	/* the "emac_activate" entry point really kicks things off */
