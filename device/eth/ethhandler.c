@@ -16,7 +16,7 @@ local 	void 	eth_rxPackets(
 	int numdesc; 			/* num. of descriptor reclaimed	*/
 
 
-	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
+// 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
 
 		/* Insert new arrived packet to the tail */
 
@@ -28,7 +28,8 @@ local 	void 	eth_rxPackets(
 // 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
 
 		if (descptr->status & DS_ACTIVE) {
-			break;
+			kprintf("ERROR: INACTIVE in rxPackets\n");
+			return;
 		}
 
 // 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
@@ -37,10 +38,11 @@ local 	void 	eth_rxPackets(
 		ethptr->rxTail
 			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
 		descptr->status = DS_ACTIVE;
-	}
+// 	}
 
-	signaln(ethptr->isem, numdesc);
+	signal(ethptr->isem);
 
+	kprintf("rxTail: %d\n", ethptr->rxTail);
 	return;
 }
 
