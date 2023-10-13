@@ -12,7 +12,7 @@ int32	ethwrite (
 		uint32	count
 	)
 {
-	kprintf("ethwrite called\n");
+// 	kprintf("ethwrite called\n");
 	// TODO
 //	struct	ethcblk *ethptr;	/* Ether entry pointer	*/
 //	struct	eth_a_csreg *csrptr;	/* Ethernet CSR pointer	*/

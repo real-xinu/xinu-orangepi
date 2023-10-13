@@ -80,7 +80,7 @@ void	nulluser()
 
 	/* Initialize the network stack and start processes */
 
-// 	net_init(); //TODO:
+	net_init(); //TODO:
 
 	/* Create a process to finish startup and start main */
 
@@ -90,6 +90,7 @@ void	nulluser()
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
 
+	kprintf("Init complete\n");
 	while (TRUE) {
 		;		/* Do nothing */
 	}

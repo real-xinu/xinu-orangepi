@@ -32,5 +32,6 @@ devcall	ethcontrol (
 			return SYSERR;
 	}
 
+	kprintf("ethcontrol ret\n");
 	return retval;
 }

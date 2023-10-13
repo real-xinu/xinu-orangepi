@@ -131,16 +131,16 @@ void phy_link_setup ( void );
 int phy_read ( int );
 void phy_write ( int, int );
 
-int phy_debug = 0;
+int phy_debug;
 
 #define DUPLEX_HALF             0x00
 #define DUPLEX_FULL             0x01
 
 /* These values should be overwritten by autonegotiation
  */
-int phy_speed = 100;
-int phy_duplex = DUPLEX_FULL;
-int phy_up = 0;
+int phy_speed;
+int phy_duplex;
+int phy_up;
 
 int
 phy_get_speed ( void )

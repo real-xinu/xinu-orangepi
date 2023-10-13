@@ -215,7 +215,7 @@ struct emac_desc *cur_rx_dma;
 struct emac_desc *cur_tx_dma;
 struct emac_desc *clean_tx_dma;
 
-int emac_wait_flag = 0;
+int emac_wait_flag;
 sid32 emac_sem;
 
 void emac_debug ( void );
@@ -223,7 +223,7 @@ void emac_debug ( void );
 char *
 ether2str ( unsigned char *bytes )
 {
-    	static char buf[20];
+    	char buf[20];
 	int i, len;
 	char *p;
 
@@ -436,7 +436,7 @@ init_rings ( void )
 	rx_list = desc;
 
 	/* Reload the dma pointer register.
-	 * This causes the dma list pointer to get reset. 
+	 * This causes the dma list pointer to get reset.
 	 */
 	ep->rx_desc = desc;
 	cur_rx_dma = desc;
@@ -456,8 +456,8 @@ init_rings ( void )
 /* Interrupts */
 /* ------------------------------------------------------------ */
 
-int rx_count = 0;
-int tx_count = 0;
+int rx_count;
+int tx_count;
 
 
 #define ONE_LINE
@@ -548,7 +548,7 @@ kyu_receive ( char *buf, int len )
 // }	__aligned(ARM_DMA_ALIGN);
 // #endif
 
-int last_capture = 0;
+int last_capture;
 
 void
 capture_last ( int val )
@@ -558,7 +558,7 @@ capture_last ( int val )
 
 int last_stat;		/* last interrupt status */
 int last_desc_stat;	/* last descriptor status */
-int last_len = 0;
+int last_len;
 char last_buf[2048];
 int prior_len;
 char prior_buf[2048];
@@ -717,10 +717,10 @@ tx_handler ( int stat )
 	}
 }
 
-int int_count = 0;
-int rx_int_count = 0;
-int tx_int_count = 0;
-int first_int = 1;
+int int_count;
+int rx_int_count;
+int tx_int_count;
+int first_int;
 
 /* Interrupt handler.
  *
@@ -1019,6 +1019,19 @@ fetch_uboot_mac ( char *addr )
 int
 emac_init_new ( struct dentry *devptr )
 {
+	emac_wait_flag = 0;
+	rx_count = 0;
+	tx_count = 0;
+	last_capture = 0;
+	last_len = 0;
+	int_count = 0;
+	rx_int_count = 0;
+	tx_int_count = 0;
+	first_int = 1;
+
+
+
+
 	struct	ethcblk *ethptr;		/* Ethernet control blk pointer	*/
 	ethptr = &ethertab[devptr->dvminor];
 	struct emac *ep = EMAC_BASE;
@@ -1152,6 +1165,7 @@ emac_init_new ( struct dentry *devptr )
 	if ( phy_get_duplex () )
 	    reg |= CTL_FULL_DUPLEX;
 	ep->ctl0 = reg;
+	ep->ctl0 = CTL_SPEED_100 | CTL_FULL_DUPLEX;
 	kprintf ( "emac CTL0 (new) = %08x\n", ep->ctl0 );
 
 	return 1;
@@ -1225,7 +1239,7 @@ rx_start ( void )
 
 #ifdef notdef
 -- /* Stuff pertaining to U-Boot harvesting */
--- 
+--
 -- /* Figure out where list activity starts, if there is any.
 --  * Note that DMA is active while this is running,
 --  * so things can change out from under us.
@@ -1241,12 +1255,12 @@ rx_start ( void )
 -- 	int wait = 0;
 -- 	int i;
 -- 	int num;
--- 
+--
 -- 	if ( ! (list->status & DS_ACTIVE) ) {
 -- 	    ready0 = 1;
 -- 	    wait = 1;
 -- 	}
--- 
+--
 -- 	i = 0;
 -- 	for ( edp = list;; edp = edp->next ) {
 -- 	    if ( edp->next == list )
@@ -1260,13 +1274,13 @@ rx_start ( void )
 -- 	    }
 -- 	    i++;
 -- 	}
--- 
+--
 -- 	/* detect idle list */
 -- 	if ( index < 0 && ready0 == 0 ) {
 -- 	    kprintf ( "Scan finds idle list\n" );
 -- 	    return -1;
 -- 	}
--- 
+--
 -- 	/* detect full list */
 -- 	if ( index < 0 && ready0 == 1 && wait == 1 ) {
 -- 	    num = i;
@@ -1275,17 +1289,17 @@ rx_start ( void )
 -- 		list[i].status = DS_ACTIVE;
 -- 	    return -1;
 -- 	}
--- 
+--
 -- 	// kprintf ( "scan ends with %d %d\n", index, ready0 );
 -- 	if ( index < 0 )
 -- 	    return 0;
 -- 	return index;
 -- }
--- 
+--
 -- int first_poll = 1;
 -- struct emac_desc *cur_rx_dma;
 -- struct emac_desc *cur_tx_dma;
--- 
+--
 -- void
 -- emac_rcv_poll ( void )
 -- {
@@ -1295,13 +1309,13 @@ rx_start ( void )
 -- 	int index;
 -- 	int len;
 -- 	int i_dma;
--- 
+--
 -- 	list = (struct emac_desc *) ep->rx_desc;
--- 
+--
 -- 	invalidate_dcache_range ( (void *) list, &list[NUM_RX_UBOOT] );
--- 
+--
 -- 	// rx_list_show ( (struct emac_desc *) ep->rx_desc, NUM_RX_UBOOT );
--- 
+--
 -- 	if ( first_poll ) {
 -- 	    index = scan_rcv_list ( list );
 -- 	    if ( index < 0 ) {
@@ -1311,13 +1325,13 @@ rx_start ( void )
 -- 	    cur_rx_dma = &list[index];
 -- 	    first_poll = 0;
 -- 	}
--- 
+--
 -- 	if ( cur_rx_dma->status & DS_ACTIVE ) {
 -- 	    // rx_list_show ( (struct emac_desc *) ep->rx_desc, NUM_RX_UBOOT );
 -- 	    // kprintf ( "Rx list empty on poll\n" );
 -- 	    return;
 -- 	}
--- 
+--
 -- 	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
 -- 	    i_dma = (cur_rx_dma - list);
 -- 	    len = (cur_rx_dma->status >> 16) & 0x3fff;
@@ -1376,7 +1390,7 @@ emac_show ( void )
 // 	    dump_buf ( last_buf, last_len );
 // }
 
-int first_drop = 1;
+int first_drop;
 
 void
 emac_send_int ( struct netbuf *nbp, int wait_int )

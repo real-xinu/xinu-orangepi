@@ -278,7 +278,7 @@ int32	ethinit	(
 	int32	retval;			/* Return value			*/
 	int32	i;			/* Index variable		*/
 
-	emac_syscon_setup();
+// 	emac_syscon_setup();
 
 	/* Get the Ethernet control block address	*/
 	/* from the device table entry			*/
