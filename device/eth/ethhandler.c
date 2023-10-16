@@ -13,16 +13,16 @@ local 	void 	eth_rxPackets(
 	struct	emac_desc *descptr;/* ptr to ring descriptor 	*/
 	uint32	tail;			/* pos to insert next packet	*/
 	uint32	status;			/* status of ring descriptor 	*/
-	int numdesc; 			/* num. of descriptor reclaimed	*/
+	int numdesc = 0; 			/* num. of descriptor reclaimed	*/
 
 
+	tail = ethptr->rxTail;
+	descptr = (struct emac_desc *)ethptr->rxRing + tail;
+	status = descptr->status;
 // 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
-
+	while ( ! (status & DS_ACTIVE) && tail != ethptr->rxHead ) {
 		/* Insert new arrived packet to the tail */
 
-		tail = ethptr->rxTail;
-		descptr = (struct emac_desc *)ethptr->rxRing + tail;
-		status = descptr->status;
 
 		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
 // 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
@@ -38,10 +38,17 @@ local 	void 	eth_rxPackets(
 		ethptr->rxTail
 			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
 		descptr->status = DS_ACTIVE;
-// 	}
 
-	signal(ethptr->isem);
+		tail = ethptr->rxTail;
+		descptr = (struct emac_desc *)ethptr->rxRing + tail;
+		status = descptr->status;
 
+		numdesc++;
+	}
+
+	signaln(ethptr->isem, numdesc);
+
+	kprintf("addr of last packet: %d\n", descptr);
 	kprintf("rxTail: %d\n", ethptr->rxTail);
 	return;
 }
@@ -252,6 +259,8 @@ interrupt ethhandler (
 	 */
 	// tx_cleaner ();
 
+	resched_cntl(DEFER_START);
+
 	statx = stat & INT_RX_MASK;
 	kprintf("EMAC interrupt (ethhandler()): %d\n", stat);
 
@@ -286,6 +295,9 @@ interrupt ethhandler (
 	// ep->int_stat = ep->int_stat & 0xffff; (bad)
 	// ep->int_stat &= stat;
 	ep->int_sta = stat & 0x3fff;
+
+
+	resched_cntl(DEFER_STOP);
 	// TODO
 //	struct	eth_a_csreg *csrptr;		/* Ethernet CSR pointer	*/
 //	struct	eth_a_tx_desc *tdescptr;	/* Tx desc pointer	*/

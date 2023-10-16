@@ -26,6 +26,7 @@ int32	ethread	(
 
 // 	kprintf("ethread before wait()\n");
 	/* Wait for a packet */
+	kprintf("ethptr->isem ct: %d\n", semcount(ethptr->isem));
 	wait(ethptr->isem);
 // 	kprintf("ethread after wait()\n");
 
@@ -72,6 +73,6 @@ int32	ethread	(
 		ethptr->rxHead = 0;
 	}
 
-// 	kprintf("ethread done\n");
+	kprintf("ethread done (%d bytes)\n", retval);
 	return retval;
 }

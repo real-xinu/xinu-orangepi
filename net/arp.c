@@ -166,6 +166,7 @@ void	arp_in (
 	bool8	found;			/* Is the sender's address in	*/
 					/*   the cache?			*/
 
+	kprintf("ARP packet\n");
 	/* Convert packet from network order to host order */
 
 	arp_ntoh(pktptr);

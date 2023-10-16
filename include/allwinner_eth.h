@@ -38,13 +38,13 @@ struct __attribute__((packed)) eth_aw_csreg {
 	reg32 addr7_high;		/* 0x88	MAC address high 7 */
 	reg32 addr7_low;		/* 0x8C	MAC address low 7 */
 	byte res3[32];
-	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */
-	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */
-	reg32 tx_cur_buf;	/* 0xB8	Current transmit buffer address */
+	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */ //Never used
+	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */ //Never used
+	reg32 tx_cur_buf;	/* 0xB8	Current transmit buffer address */ //Never used
 	byte res4[4];
-	reg32 rx_dma_sta;	/* 0xC0	Receive dma status */
-	reg32 rx_cur_desc;	/* 0xC4	Current receive descriptor */
-	reg32 rx_cur_buf;	/* 0xC8	Current receive buffer address */
+	reg32 rx_dma_sta;	/* 0xC0	Receive dma status */ //Never used
+	reg32 rx_cur_desc;	/* 0xC4	Current receive descriptor */ //Never used
+	reg32 rx_cur_buf;	/* 0xC8	Current receive buffer address */ //Never used
 	byte res5[4];
 	reg32 rgmii_sta;	/* 0xD0	RGMII status register */
 };

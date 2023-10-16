@@ -390,10 +390,10 @@ int32	ethinit	(
 //
 //	ethptr->rxHead = 0;
 //	ethptr->rxTail = 0;
-//	ethptr->isem = semcreate(0);
-//	if((int32)ethptr->isem == SYSERR) {
-//		return SYSERR;
-//	}
+	ethptr->isem = semcreate(0);
+	if((int32)ethptr->isem == SYSERR) {
+		return SYSERR;
+	}
 //
 //	/* initialize the tx ring size */
 //	ethptr->txRingSize = ETH_AM335X_TX_RING_SIZE;
@@ -440,10 +440,10 @@ int32	ethinit	(
 //
 //	ethptr->txHead = 0;
 //	ethptr->txTail = 0;
-//	ethptr->osem = semcreate(ethptr->txRingSize);
-//	if((int32)ethptr->osem == SYSERR) {
-//		return SYSERR;
-//	}
+	ethptr->osem = semcreate(ethptr->txRingSize);
+	if((int32)ethptr->osem == SYSERR) {
+		return SYSERR;
+	}
 //
 //	/* Enable the ALE and put it into bypass mode */
 //	csrptr->ale->ctrl = (ETH_AM335X_ALECTL_EN |
