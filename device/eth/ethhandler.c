@@ -9,6 +9,8 @@ static void rx_handler ( int stat )
 	int len;
 	int tag = ' ';
 
+	struct emac *ep = EMAC_BASE;
+
 	kprintf ( "Rx interrupt, packet incoming (emac)\n" );
 // 	et_rx ();
 
@@ -60,6 +62,7 @@ static void rx_handler ( int stat )
 	    // invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 	    emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 	}
+// 	ep->ctl1 &= ~RX_DMA_START;
 }
 
 
@@ -361,6 +364,7 @@ interrupt ethhandler (
 
 
 	resched_cntl(DEFER_STOP);
+// 	emac_debug();
 	// TODO
 //	struct	eth_a_csreg *csrptr;		/* Ethernet CSR pointer	*/
 //	struct	eth_a_tx_desc *tdescptr;	/* Tx desc pointer	*/

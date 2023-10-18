@@ -255,11 +255,11 @@ rx_list_init ( void )
 	// kprintf ( "Descriptor size: %d bytes\n", sizeof(struct emac_desc) );
 
 	/*
-	mem = ram_alloc ( (NUM_RX+1) * sizeof(struct emac_desc) );
+	mem = getmem ( (NUM_RX+1) * sizeof(struct emac_desc) );
 	mem = (mem + sizeof(struct emac_desc)) & ~ARM_DMA_ALIGN;
 	desc = (struct emac_desc *) mem;
 
-	mem = ram_alloc ( NUM_RX * RX_SIZE + ARM_DMA_ALIGN );
+	mem = getmem ( NUM_RX * RX_SIZE + ARM_DMA_ALIGN );
 	mem = (mem + ARM_DMA_ALIGN) & ~ARM_DMA_ALIGN;
 	buf = (char *) mem;
 	*/
@@ -274,12 +274,13 @@ rx_list_init ( void )
 	desc = (struct emac_desc *) nocache;
 	nocache += NUM_RX * sizeof(struct emac_desc);
 #else
-	/* We can depend on ram_alloc to give us dma aligned addresses */
-	desc = (struct emac_desc *) ram_alloc ( NUM_RX * sizeof(struct emac_desc) );
-	buf = (char *) ram_alloc ( NUM_RX * RX_SIZE );
+	/* We can depend on getmem to give us dma aligned addresses */
+	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
+	buf = (char *) getmem ( NUM_RX * RX_SIZE );
 #endif
 
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
+		kprintf("buf: %d\n", buf);
 	    edp->status = DS_ACTIVE;
 	    edp->size = RX_ETH_SIZE;
 	    edp->buf = buf;
@@ -335,9 +336,9 @@ tx_list_init ( void )
 	desc = (struct emac_desc *) nocache;
 	nocache += NUM_TX * sizeof(struct emac_desc);
 #else
-	/* We can depend on ram_alloc to give us dma aligned addresses */
-	desc = (struct emac_desc *) ram_alloc ( NUM_TX * sizeof(struct emac_desc) );
-	buf = (char *) ram_alloc ( NUM_TX * TX_SIZE );
+	/* We can depend on getmem to give us dma aligned addresses */
+	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
+	buf = (char *) getmem ( NUM_TX * TX_SIZE );
 #endif
 
 	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
@@ -382,14 +383,15 @@ init_rings ( struct dentry *devptr )
 	desc = rx_list_init ();
 #endif
 	rx_list = desc;
-	ethptr->rxRing = rx_list;
-	ethptr->rxHead = 0;
-	ethptr->rxTail = 0;
-	ethptr->rxRingSize = NUM_RX;
+// 	ethptr->rxRing = rx_list;
+// 	ethptr->rxHead = 0;
+// 	ethptr->rxTail = 0;
+// 	ethptr->rxRingSize = NUM_RX;
 	/* Reload the dma pointer register.
 	 * This causes the dma list pointer to get reset.
 	 */
 	ep->rx_desc = desc;
+	kprintf("ep->rx_desc: %d\n", ep->rx_desc);
 	cur_rx_dma = desc;
 
 	// rx_list_show ( (struct emac_desc *) ep->rx_desc, NUM_RX_UBOOT );
@@ -397,10 +399,10 @@ init_rings ( struct dentry *devptr )
 	/* Now set up the Tx list */
 	desc = tx_list_init ();
 	tx_list = desc;
-	ethptr->txRing = tx_list;
-	ethptr->txHead = 0;
-	ethptr->txTail = 0;
-	ethptr->txRingSize = NUM_TX;
+// 	ethptr->txRing = tx_list;
+// 	ethptr->txHead = 0;
+// 	ethptr->txTail = 0;
+// 	ethptr->txRingSize = NUM_TX;
 
 	clean_tx_dma = cur_tx_dma = desc;
 	ep->tx_desc = desc;
@@ -1091,6 +1093,7 @@ emac_init_new ( struct dentry *devptr )
 
 	init_rings (devptr);
 	kprintf("Completed init_rings\n");
+	emac_debug();
 
 	/* the "emac_activate" entry point really kicks things off */
 
@@ -1489,10 +1492,14 @@ emac_debug ( void )
 	kprintf ( "emac Rx DMA cur desc: %08x\n", ep-> rx_dma_cur_desc );
 	kprintf ( "emac Rx DMA cur buf: %08x\n", ep-> rx_dma_cur_buf );
 
+	kprintf ( "emac Rx DMA dec list addr: %08x\n", ep-> rx_desc);
+
 // 	emac_show_last ( 1 );
 
 	/* Again, since it gets lost in the above */
 	phy_update ();
+// 	struct emac_desc* desc = (struct emac_desc*) ep->rx_desc;
+// 	desc[13].status = ETH_AW_RX_DESC_CTL;
 }
 
 /* THE END */

@@ -22,6 +22,9 @@ extern	shellcmd  xsh_devdump	(int32, char *[]);
 /* in file xsh_echo.c */
 extern	shellcmd  xsh_echo	(int32, char *[]);
 
+/* in file xsh_emac.c */
+extern	shellcmd  xsh_emac	(int32, char *[]);
+
 /* in file xsh_ethstat.c */
 extern	shellcmd  xsh_ethstat	(int32, char *[]);
 
