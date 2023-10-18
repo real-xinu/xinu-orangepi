@@ -1,6 +1,6 @@
 /* memory.h - roundmb, truncmb, freestk */
 
-#define	PAGE_SIZE	16*1024
+#define	PAGE_SIZE	64*1024
 
 /*----------------------------------------------------------------------
  * roundmb, truncmb - Round or truncate address to memory block size
@@ -9,7 +9,7 @@
 #define	roundmbold(x)	(char *)( (7 + (uint32)(x)) & (~7) )
 #define	truncmbold(x)	(char *)( ((uint32)(x)) & (~7) )
 
-#define RAM_QUANTA  (16*1024)      /* 0 - 0x3fff */
+#define RAM_QUANTA  (64*1024)      /* 0 - 0x3fff */
 #define roundmb(x)  (char *)((((uint32)(x) + (RAM_QUANTA - 1)) / RAM_QUANTA) * RAM_QUANTA)
 #define truncmb(x)  (char *)(((uint32)(x) / RAM_QUANTA) * RAM_QUANTA)
 

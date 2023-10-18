@@ -277,6 +277,11 @@ rx_list_init ( void )
 	/* We can depend on getmem to give us dma aligned addresses */
 	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_RX * RX_SIZE );
+	if (desc == SYSERR || buf == SYSERR) {
+		panic("SYSERR in emac.c\n");
+	}
+	memset(desc, '\0', NUM_RX * sizeof(struct emac_desc));
+	memset(buf, '\0', NUM_RX * RX_SIZE);
 #endif
 
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
@@ -936,10 +941,10 @@ get_mac ( char *x )
 {
 	x[0] = 0x02;
 	x[1] = 0x20;
-	x[2] = 0x7f;
-	x[3] = 0x9b;
-	x[4] = 0x26;
-	x[5] = 0x8c;
+	x[2] = 0xcc;
+	x[3] = 0xa2;
+	x[4] = 0xd5;
+	x[5] = 0xff;
 }
 #endif
 
@@ -996,8 +1001,8 @@ emac_init_new ( struct dentry *devptr )
 	int reg;
 
 	// validate my structure layout
-	// kprintf ( "Shoud be 0xd0 == 0x%x\n", &ep->rgmii_status );
-	// verify_regs ();
+	kprintf ( "Shoud be 0xd0 == 0x%x\n", &ep->rgmii_status );
+	verify_regs ();
 
 	/* We inherit clocks and such from U-boot, thus far anyway ... */
 	// ccu_emac ();
@@ -1088,6 +1093,7 @@ emac_init_new ( struct dentry *devptr )
 
 	/* Set up interrupts */
 	set_irq_handler(IRQ_EMAC, (uint32)devptr->dvintr);
+	set_irq_handler(IRQ_DMA, (uint32)devptr->dvintr);
 // 	irq_hookup ( IRQ_EMAC, emac_handler, 0 );
 	kprintf("Completed IRQ hookup\n");
 
@@ -1138,8 +1144,8 @@ emac_enable ( void )
 	struct emac *ep = EMAC_BASE;
 
 	/* Linux driver enables these three */
-	ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
-	// ep->int_ena = INT_RX_ALL | INT_TX_ALL | INT_TX_UNDERFLOW;
+// 	ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
+	ep->int_ena = INT_RX_ALL | INT_TX_ALL | INT_TX_UNDERFLOW;
 	// ep->int_ena = INT_RX_ALL;
 
 	rx_start ();
@@ -1500,6 +1506,7 @@ emac_debug ( void )
 	phy_update ();
 // 	struct emac_desc* desc = (struct emac_desc*) ep->rx_desc;
 // 	desc[13].status = ETH_AW_RX_DESC_CTL;
+	emac_enable();
 }
 
 /* THE END */

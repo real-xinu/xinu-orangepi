@@ -71,6 +71,8 @@
 #define IRQ_TWI_R	76	/* R_TWI */
 #define IRQ_PIO_J	77	/* aka pio "L" */
 
+#define IRQ_DMA     82 //DMA Channel interrupt
+
 #define IRQ_EMAC	114	/* Ethernet */
 
 /* Software generated interrupt channels */

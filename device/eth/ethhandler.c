@@ -287,7 +287,7 @@ interrupt ethhandler (
 	//TODO Comer says there may be an interrupt for every successful transmission/reception
 	//Doesn't have to do anything until the end of the ring is reached
 	//TODO Will need this to handle the case where the buffer is empty and a read is attempted, or if it is full and a write is attempted.
-// 	kprintf("eh1\n");
+	kprintf("eh1 IRQ %d\n", xnum);
 	uint32	status;
 	struct  dentry  *devptr;        /* address of device control blk*/
 	struct 	ethcblk	*ethptr;	/* ptr to control block		*/
@@ -327,7 +327,7 @@ interrupt ethhandler (
 	resched_cntl(DEFER_START);
 
 	statx = stat & INT_RX_MASK;
-	kprintf("EMAC interrupt (ethhandler()): %d\n", stat);
+	kprintf("EMAC interrupt (ethhandler()): %08x\n", stat);
 
 	if ( statx && statx != INT_RX )
 	    printf ( " *** unexpected emac Rx int status: %08x\n", stat );
@@ -364,6 +364,7 @@ interrupt ethhandler (
 
 
 	resched_cntl(DEFER_STOP);
+// 	rx_start();
 // 	emac_debug();
 	// TODO
 //	struct	eth_a_csreg *csrptr;		/* Ethernet CSR pointer	*/

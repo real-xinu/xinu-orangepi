@@ -330,12 +330,13 @@ int32	ethinit	(
 	}
 
 //	/* Read the device MAC address */
-	for(i = 0; i < 2; i++) {
-		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
-	}
-	for(i = 0; i < 4; i++) {
-		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
-	}
+// 	for(i = 0; i < 2; i++) {
+// 		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
+// 	}
+// 	for(i = 0; i < 4; i++) {
+// 		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
+// 	}
+	fetch_linux_mac(ethptr->devAddress);
 //
 	kprintf("MAC Address is: ");
 	for(i = 0; i < 5; i++) {
@@ -344,6 +345,14 @@ int32	ethinit	(
 	kprintf("%02X\n", ethptr->devAddress[5]);
 
 	kprintf("Calling emac_init_new()");
+
+
+
+
+
+
+
+
 	emac_init_new(devptr);
 	kprintf("Finished emac_init_new()");
 	emac_activate();
