@@ -285,7 +285,7 @@ rx_list_init ( void )
 #endif
 
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
-		kprintf("buf: %d\n", buf);
+// 		kprintf("buf: %d\n", buf);
 	    edp->status = DS_ACTIVE;
 	    edp->size = RX_ETH_SIZE;
 	    edp->buf = buf;
@@ -525,66 +525,66 @@ char last_buf[2048];
 int prior_len;
 char prior_buf[2048];
 
-void
-rx_handler ( int stat )
-{
-	struct netbuf *nbp;
-	int len;
-	int tag = ' ';
-
-	kprintf ( "Rx interrupt, packet incoming (emac)\n" );
-// 	et_rx ();
-
-	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-
-	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
-	    int i_dma = (cur_rx_dma - rx_list);
-
-	    rx_count++;
-	    len = (cur_rx_dma->status >> 16) & 0x3fff;
-	    last_desc_stat = cur_rx_dma->status;
-
-	    if ( last_desc_stat & ~0x3fff0000 != 0x00000320 )
-		kprintf ( "Unusual desc status: %08x\n", cur_rx_dma->status );
-
-		kprintf("RECEIVED PACKET (handling not implemented - discarding)\n");
-	    // nbp = netbuf_alloc ();
-// 	    nbp = netbuf_alloc_i ();
+// void
+// rx_handler ( int stat )
+// {
+// 	struct netbuf *nbp;
+// 	int len;
+// 	int tag = ' ';
 //
-// 	    if ( ! nbp )
-// 		return;     /* drop packet */
+// 	kprintf ( "Rx interrupt, packet incoming (emac)\n" );
+// // 	et_rx ();
 //
-// 	    // pkt_arrive ();
+// 	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 	emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 //
-// 	    nbp->elen = len - 4;
-// 	    memcpy ( (char *) nbp->eptr, cur_rx_dma->buf, len - 4 );
+// 	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
+// 	    int i_dma = (cur_rx_dma - rx_list);
 //
-// 	    if ( last_capture ) {
-// 		if ( last_len ) {
-// 		    prior_len = last_len;
-// 		    memcpy ( prior_buf, last_buf, last_len );
-// 		}
-// 		last_len = len - 4;
-// 		memcpy ( last_buf, cur_rx_dma->buf, len - 4 );
-// 	    }
+// 	    rx_count++;
+// 	    len = (cur_rx_dma->status >> 16) & 0x3fff;
+// 	    last_desc_stat = cur_rx_dma->status;
 //
-// 	    // emac_show_packet ( tag, i_dma, nbp );
-// 	    // tag = '*';
+// 	    if ( last_desc_stat & ~0x3fff0000 != 0x00000320 )
+// 		kprintf ( "Unusual desc status: %08x\n", cur_rx_dma->status );
 //
-// 	    cur_rx_dma->status = DS_ACTIVE;
-//
-// 	    // flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-// 	    emac_cache_flush ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-//
-// 	    net_rcv ( nbp );
-//
-// 	    cur_rx_dma = cur_rx_dma->next;
-//
-// 	    // invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-// 	    emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	}
-}
+// 		kprintf("RECEIVED PACKET (handling not implemented - discarding)\n");
+// 	    // nbp = netbuf_alloc ();
+// // 	    nbp = netbuf_alloc_i ();
+// //
+// // 	    if ( ! nbp )
+// // 		return;     /* drop packet */
+// //
+// // 	    // pkt_arrive ();
+// //
+// // 	    nbp->elen = len - 4;
+// // 	    memcpy ( (char *) nbp->eptr, cur_rx_dma->buf, len - 4 );
+// //
+// // 	    if ( last_capture ) {
+// // 		if ( last_len ) {
+// // 		    prior_len = last_len;
+// // 		    memcpy ( prior_buf, last_buf, last_len );
+// // 		}
+// // 		last_len = len - 4;
+// // 		memcpy ( last_buf, cur_rx_dma->buf, len - 4 );
+// // 	    }
+// //
+// // 	    // emac_show_packet ( tag, i_dma, nbp );
+// // 	    // tag = '*';
+// //
+// // 	    cur_rx_dma->status = DS_ACTIVE;
+// //
+// // 	    // flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// // 	    emac_cache_flush ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// //
+// // 	    net_rcv ( nbp );
+// //
+// // 	    cur_rx_dma = cur_rx_dma->next;
+// //
+// // 	    // invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// // 	    emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 	}
+// }
 
 #ifdef notdef
 void
@@ -731,12 +731,12 @@ emac_handler ( int junk )
 	// ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
 	if ( stat & INT_RX ) {
 	    ++rx_int_count;
-	    rx_handler ( stat );
+// 	    rx_handler ( stat );
 	}
 
 	if ( stat & INT_TX ) {
 	    ++tx_int_count;
-	    tx_handler ( stat );
+// 	    tx_handler ( stat );
 	}
 
 	if ( stat & INT_TX_UNDERFLOW ) {
@@ -1195,7 +1195,7 @@ rx_start ( void )
 	struct emac *ep = EMAC_BASE;
 
 	/* Restart Rx DMA */
-	ep->rx_ctl1 |= RX_DMA_ENA;
+	ep->rx_ctl1 |= RX_DMA_ENA | RX_DMA_START & ~RX_NO_FLUSH;
 
 	/* Enable the receiver */
 	ep->rx_ctl0 |= RX_EN;
