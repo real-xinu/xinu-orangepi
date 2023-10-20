@@ -1136,8 +1136,8 @@ emac_enable ( void )
 	struct emac *ep = EMAC_BASE;
 
 	/* Linux driver enables these three */
-// 	ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
-	ep->int_ena = INT_RX_ALL | INT_TX_ALL | INT_TX_UNDERFLOW;
+	ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
+// 	ep->int_ena = INT_RX_ALL | INT_TX_ALL | INT_TX_UNDERFLOW;
 	// ep->int_ena = INT_RX_ALL;
 
 	rx_start ();

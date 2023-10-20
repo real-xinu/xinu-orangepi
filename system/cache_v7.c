@@ -292,7 +292,7 @@ void invalidate_dcache_all(void)
 {
 	v7_maint_dcache_all(ARMV7_DCACHE_INVAL_ALL);
 
-	v7_outer_cache_inval_all();
+// 	v7_outer_cache_inval_all();
 }
 
 /*
@@ -303,7 +303,7 @@ void flush_dcache_all(void)
 {
 	v7_maint_dcache_all(ARMV7_DCACHE_CLEAN_INVAL_ALL);
 
-	v7_outer_cache_flush_all();
+// 	v7_outer_cache_flush_all();
 }
 
 /*
@@ -314,7 +314,7 @@ void invalidate_dcache_range(u32 start, u32 stop)
 {
 	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_INVAL_RANGE);
 
-	v7_outer_cache_inval_range(start, stop);
+// 	v7_outer_cache_inval_range(start, stop);
 }
 
 /*
@@ -326,12 +326,12 @@ void flush_dcache_range(u32 start, u32 stop)
 {
 	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_CLEAN_INVAL_RANGE);
 
-	v7_outer_cache_flush_range(start, stop);
+// 	v7_outer_cache_flush_range(start, stop);
 }
 
 void arm_init_before_mmu(void)
 {
-	v7_outer_cache_enable();
+// 	v7_outer_cache_enable();
 	invalidate_dcache_all();
 	v7_inval_tlb();
 }
