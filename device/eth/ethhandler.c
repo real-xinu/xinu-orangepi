@@ -4,119 +4,125 @@
 
 extern struct emac_desc *cur_rx_dma;
 
-static void rx_handler ( int stat )
-{
-	int len;
-	int tag = ' ';
-
-	struct emac *ep = EMAC_BASE;
-
-	kprintf ( "Rx interrupt, packet incoming (emac)\n" );
-// 	et_rx ();
-
-	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-
-	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
-// 	    int i_dma = (cur_rx_dma - rx_list);
-
-// 	    rx_count++;
-	    len = (cur_rx_dma->status >> 16) & 0x3fff;
-	    int last_desc_stat = cur_rx_dma->status;
-
-	    if ( last_desc_stat & ~0x3fff0000 != 0x00000320 )
-			kprintf ( "Unusual desc status: %08x\n", cur_rx_dma->status );
-
-	    // nbp = netbuf_alloc ();
-// 	    nbp = netbuf_alloc_i ();
-
-// 	    if ( ! nbp )
-// 		return;     /* drop packet */
-
-	    // pkt_arrive ();
-
-// 	    nbp->elen = len - 4;
-// 	    memcpy ( (char *) nbp->eptr, cur_rx_dma->buf, len - 4 );
-
-// 	    if ( last_capture ) {
-// 		if ( last_len ) {
-// 		    prior_len = last_len;
-// 		    memcpy ( prior_buf, last_buf, last_len );
-// 		}
-// 		last_len = len - 4;
-// 		memcpy ( last_buf, cur_rx_dma->buf, len - 4 );
-// 	    }
-
-	    // emac_show_packet ( tag, i_dma, nbp );
-	    // tag = '*';
-
-	    cur_rx_dma->status = DS_ACTIVE;
-
-	    // flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	    emac_cache_flush ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-
-// 	    net_rcv ( nbp );
-
-	    cur_rx_dma = cur_rx_dma->next;
-
-	    // invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	    emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
-	}
-// 	ep->ctl1 &= ~RX_DMA_START;
-}
-
-
-// /*------------------------------------------------------------------------
-//  * eth_rxPackets - handler for receiver interrupts
-//  *------------------------------------------------------------------------
-//  */
-// local 	void 	eth_rxPackets(
-// 	struct 	ethcblk	*ethptr 	/* ptr to control block		*/
-// 	)
+// static void rx_handler ( int stat )
 // {
-// 	struct	emac_desc *descptr;/* ptr to ring descriptor 	*/
-// 	uint32	tail;			/* pos to insert next packet	*/
-// 	uint32	status;			/* status of ring descriptor 	*/
-// 	int numdesc = 0; 			/* num. of descriptor reclaimed	*/
+// 	int len;
+// 	int tag = ' ';
 //
+// 	struct emac *ep = EMAC_BASE;
 //
-// 	tail = ethptr->rxTail;
-// 	descptr = (struct emac_desc *)ethptr->rxRing + tail;
-// 	status = descptr->status;
-// // 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
-// 	while ( ! (status & DS_ACTIVE) && tail != ethptr->rxHead ) {
-// 		/* Insert new arrived packet to the tail */
+// 	kprintf ( "Rx interrupt, packet incoming (emac)\n" );
+// // 	et_rx ();
 //
+// 	// invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 	emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 //
-// 		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
-// // 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
+// 	while ( ! (cur_rx_dma->status & DS_ACTIVE) ) {
+// // 	    int i_dma = (cur_rx_dma - rx_list);
 //
-// 		if (descptr->status & DS_ACTIVE) {
-// 			kprintf("ERROR: INACTIVE in rxPackets\n");
-// 			return;
-// 		}
+// // 	    rx_count++;
+// 	    len = (cur_rx_dma->status >> 16) & 0x3fff;
+// 	    int last_desc_stat = cur_rx_dma->status;
 //
-// // 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
-// 		emac_cache_flush ( (void *) descptr, &descptr[1] );
+// 	    if ( last_desc_stat & ~0x3fff0000 != 0x00000320 )
+// 			kprintf ( "Unusual desc status: %08x\n", cur_rx_dma->status );
 //
-// 		ethptr->rxTail
-// 			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
-// 		descptr->status = DS_ACTIVE;
+// 	    // nbp = netbuf_alloc ();
+// // 	    nbp = netbuf_alloc_i ();
 //
-// 		tail = ethptr->rxTail;
-// 		descptr = (struct emac_desc *)ethptr->rxRing + tail;
-// 		status = descptr->status;
+// // 	    if ( ! nbp )
+// // 		return;     /* drop packet */
 //
-// 		numdesc++;
+// 	    // pkt_arrive ();
+//
+// // 	    nbp->elen = len - 4;
+// // 	    memcpy ( (char *) nbp->eptr, cur_rx_dma->buf, len - 4 );
+//
+// // 	    if ( last_capture ) {
+// // 		if ( last_len ) {
+// // 		    prior_len = last_len;
+// // 		    memcpy ( prior_buf, last_buf, last_len );
+// // 		}
+// // 		last_len = len - 4;
+// // 		memcpy ( last_buf, cur_rx_dma->buf, len - 4 );
+// // 	    }
+//
+// 	    // emac_show_packet ( tag, i_dma, nbp );
+// 	    // tag = '*';
+//
+// 	    cur_rx_dma->status = DS_ACTIVE;
+//
+// 	    // flush_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 	    emac_cache_flush ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+//
+// // 	    net_rcv ( nbp );
+//
+// 	    cur_rx_dma = cur_rx_dma->next;
+//
+// 	    // invalidate_dcache_range ( (void *) cur_rx_dma, &cur_rx_dma[1] );
+// 	    emac_cache_invalidate ( (void *) cur_rx_dma, &cur_rx_dma[1] );
 // 	}
-//
-// 	signaln(ethptr->isem, numdesc);
-// 	kprintf("ethhandler got %d packets\n", numdesc);
-//
-// 	kprintf("addr of last packet: %d\n", descptr);
-// 	kprintf("rxTail: %d\n", ethptr->rxTail);
-// 	return;
+// // 	ep->ctl1 &= ~RX_DMA_START;
 // }
+
+
+/*------------------------------------------------------------------------
+ * eth_rxPackets - handler for receiver interrupts
+ *------------------------------------------------------------------------
+ */
+local 	void 	eth_rxPackets(
+	struct 	ethcblk	*ethptr 	/* ptr to control block		*/
+	)
+{
+	struct	emac_desc *descptr;/* ptr to ring descriptor 	*/
+	uint32	tail;			/* pos to insert next packet	*/
+	uint32	status;			/* status of ring descriptor 	*/
+	int numdesc = 0; 			/* num. of descriptor reclaimed	*/
+
+
+	tail = ethptr->rxTail;
+	descptr = (struct emac_desc *)ethptr->rxRing + tail;
+	status = descptr->status;
+// 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
+	while ( ! (status & DS_ACTIVE) ) {
+		/* Insert new arrived packet to the tail */
+
+// 		kprintf("while\n");
+
+		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+// 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
+
+		if (descptr->status & DS_ACTIVE) {
+			kprintf("ERROR: INACTIVE in rxPackets (ethptr->rxTail: %d)\n", ethptr->rxTail);
+			return;
+		}
+
+// 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
+// 		descptr->status = DS_ACTIVE;
+		emac_cache_flush ( (void *) descptr, &descptr[1] );
+
+		ethptr->rxTail
+			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
+
+		tail = ethptr->rxTail;
+		descptr = (struct emac_desc *)ethptr->rxRing + tail;
+		status = descptr->status;
+
+		numdesc++;
+		cur_rx_dma = cur_rx_dma->next;
+	}
+
+// 	ethptr->rxTail = (ethptr->rxTail + 1) % ethptr->rxRingSize;
+// 	numdesc = 1;
+// 	cur_rx_dma = cur_rx_dma->next;
+
+	signaln(ethptr->isem, numdesc);
+	kprintf("ethhandler got %d packets\n", numdesc);
+
+	kprintf("addr of last packet: %d\n", descptr);
+	kprintf("rxTail: %d\n", ethptr->rxTail);
+	return;
+}
 
 //TODO This part is totally broken - redo it using tom's as the basis now that I have a better understanding of how the system should work
 //TODO Design/Implement proper handling of rx/tx with rings
@@ -335,8 +341,8 @@ interrupt ethhandler (
 	// ep->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
 	if ( stat & INT_RX ) {
 		kprintf("RX Interrupt (ethhandler.c)\n");
-// 		eth_rxPackets(ethptr);
-		rx_handler (stat);
+		eth_rxPackets(ethptr);
+// 		rx_handler (stat);
 // 	    rx_handler ( stat, ep->rx_dma_desc_list, ethptr );
 	}
 

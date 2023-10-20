@@ -452,3 +452,16 @@ struct emac_desc {
 	char * buf;
 	struct emac_desc *next;
 }	__aligned(ARM_DMA_ALIGN);
+
+
+/* There are notes in the U-Boot driver that setting the value 2048
+ * causes weird behavior and something less like 2044 should be used
+ * On the other hand, we need a DMA aligned buffer, so both values
+ * have relevance.
+ * The behavior when you do set 2048 in the size field is that when
+ * a packet arrives, the DMA runs through every available buffer
+ * putting nothing in any of them.
+ */
+#define RX_SIZE		2048
+#define TX_SIZE		2048
+#define RX_ETH_SIZE	2044

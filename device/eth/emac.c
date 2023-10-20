@@ -127,17 +127,6 @@ typedef union {
 #define NUM_RX	64
 #define NUM_TX	64
 
-/* There are notes in the U-Boot driver that setting the value 2048
- * causes weird behavior and something less like 2044 should be used
- * On the other hand, we need a DMA aligned buffer, so both values
- * have relevance.
- * The behavior when you do set 2048 in the size field is that when
- * a packet arrives, the DMA runs through every available buffer
- * putting nothing in any of them.
- */
-#define RX_SIZE		2048
-#define TX_SIZE		2048
-#define RX_ETH_SIZE	2044
 
 /*
 #define NUM_RX_UBOOT	32
@@ -380,10 +369,10 @@ init_rings ( struct dentry *devptr )
 	desc = rx_list_init ();
 #endif
 	rx_list = desc;
-// 	ethptr->rxRing = rx_list;
-// 	ethptr->rxHead = 0;
-// 	ethptr->rxTail = 0;
-// 	ethptr->rxRingSize = NUM_RX;
+	ethptr->rxRing = rx_list;
+	ethptr->rxHead = 0;
+	ethptr->rxTail = 0;
+	ethptr->rxRingSize = NUM_RX;
 	/* Reload the dma pointer register.
 	 * This causes the dma list pointer to get reset.
 	 */
@@ -396,10 +385,10 @@ init_rings ( struct dentry *devptr )
 	/* Now set up the Tx list */
 	desc = tx_list_init ();
 	tx_list = desc;
-// 	ethptr->txRing = tx_list;
-// 	ethptr->txHead = 0;
-// 	ethptr->txTail = 0;
-// 	ethptr->txRingSize = NUM_TX;
+	ethptr->txRing = tx_list;
+	ethptr->txHead = 0;
+	ethptr->txTail = 0;
+	ethptr->txRingSize = NUM_TX;
 
 	clean_tx_dma = cur_tx_dma = desc;
 	ep->tx_desc = desc;
@@ -1498,7 +1487,7 @@ emac_debug ( void )
 	phy_update ();
 // 	struct emac_desc* desc = (struct emac_desc*) ep->rx_desc;
 // 	desc[13].status = ETH_AW_RX_DESC_CTL;
-	emac_enable();
+// 	emac_enable();
 }
 
 /* THE END */

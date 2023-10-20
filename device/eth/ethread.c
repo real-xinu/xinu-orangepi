@@ -47,7 +47,7 @@ int32	ethread	(
 
 	/* Initialize the descriptor for next packet */
 	rdescptr->status = ETH_AW_RX_DESC_CTL;
-	rdescptr->size = ETH_BUF_SIZE;
+	rdescptr->size = RX_ETH_SIZE;
 // 	rdescptr->next = NULL;
 
 // 	kprintf("ethread inserting descriptor\n");
