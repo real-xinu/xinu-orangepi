@@ -379,7 +379,6 @@ struct eth_aw_tx_desc {
 /* from linux/compiler_gcc.h in U-Boot */
 #define __aligned(x)            __attribute__((aligned(x)))
 
-#define EMAC_NOCACHE
 
 #ifdef EMAC_NOCACHE
 #define emac_cache_flush(a,b)

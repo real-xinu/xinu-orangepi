@@ -264,25 +264,17 @@ rx_list_init ( void )
 	buf = (char *) mem;
 	*/
 
-#ifdef EMAC_NOCACHE
-	/* This gives us a full megabyte of memory with
-	 * caching disabled.
-	 */
-	// buf = (char *) ram_section_nocache ( 1 );
-	buf = nocache;
-	nocache += NUM_RX * RX_SIZE;
-	desc = (struct emac_desc *) nocache;
-	nocache += NUM_RX * sizeof(struct emac_desc);
-#else
 	/* We can depend on getmem to give us dma aligned addresses */
 	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_RX * RX_SIZE );
 	if (desc == SYSERR || buf == SYSERR) {
 		panic("SYSERR in emac.c\n");
 	}
+	kprintf("desc: %08x, buf: %08x\n", desc, buf);
+	kprintf("NUM_RX * sizeof(struct emac_desc): %d\n", (NUM_RX * sizeof(struct emac_desc)));
+	kprintf("NUM_RX * RX_SIZE: %d\n", (NUM_RX * RX_SIZE));
 	memset(desc, '\0', NUM_RX * sizeof(struct emac_desc));
 	memset(buf, '\0', NUM_RX * RX_SIZE);
-#endif
 
 	for ( edp = desc; edp < &desc[NUM_RX]; edp ++ ) {
 // 		kprintf("buf: %d\n", buf);
