@@ -67,6 +67,7 @@ int32	ethread	(
 // 	}
 // 	kprintf("ethread after descriptor insert\n");
 
+	emac_cache_flush ( (void *) rdescptr, &rdescptr[1] );
 	/* Increment the head index of rx ring */
 	ethptr->rxHead++;
 	if(ethptr->rxHead >= ethptr->rxRingSize) {

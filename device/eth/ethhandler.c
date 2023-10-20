@@ -84,6 +84,7 @@ local 	void 	eth_rxPackets(
 	descptr = (struct emac_desc *)ethptr->rxRing + tail;
 	status = descptr->status;
 // 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
+	emac_cache_invalidate ( (void *) descptr, &descptr[1] );
 	while ( ! (status & DS_ACTIVE) ) {
 		/* Insert new arrived packet to the tail */
 
@@ -99,7 +100,7 @@ local 	void 	eth_rxPackets(
 
 // 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
 // 		descptr->status = DS_ACTIVE;
-		emac_cache_flush ( (void *) descptr, &descptr[1] );
+// 		emac_cache_flush ( (void *) descptr, &descptr[1] );
 
 		ethptr->rxTail
 			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
