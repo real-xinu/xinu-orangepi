@@ -3,6 +3,7 @@
 #include <xinu.h>
 
 extern struct emac_desc *cur_rx_dma;
+extern struct emac_desc *cur_tx_dma;
 
 // static void rx_handler ( int stat )
 // {
@@ -82,15 +83,19 @@ local 	void 	eth_rxPackets(
 
 	tail = ethptr->rxTail;
 	descptr = (struct emac_desc *)ethptr->rxRing + tail;
-	status = descptr->status;
-// 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
+
 	emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+	descptr = (struct emac_desc *)ethptr->rxRing + tail;
+	status = descptr->status;
+
+
+// 	for (numdesc = 0; numdesc < ethptr->rxRingSize; numdesc++) {
 	while ( ! (status & DS_ACTIVE) ) {
 		/* Insert new arrived packet to the tail */
 
 // 		kprintf("while\n");
 
-		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+// 		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
 // 		__asm_invalidate_dcache_range((void*) descptr, &descptr[1]);
 
 		if (descptr->status & DS_ACTIVE) {
@@ -100,12 +105,15 @@ local 	void 	eth_rxPackets(
 
 // 		__asm_flush_dcache_range((void*) descptr, &descptr[1]);
 // 		descptr->status = DS_ACTIVE;
-// 		emac_cache_flush ( (void *) descptr, &descptr[1] );
 
 		ethptr->rxTail
 			= (ethptr->rxTail + 1) % ethptr->rxRingSize;
 
 		tail = ethptr->rxTail;
+		descptr = (struct emac_desc *)ethptr->rxRing + tail;
+
+
+		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
 		descptr = (struct emac_desc *)ethptr->rxRing + tail;
 		status = descptr->status;
 
@@ -197,19 +205,26 @@ local 	void 	eth_txPackets(
 	)
 {
 	kprintf("eth_txPackets\n");
-	struct	eth_aw_tx_desc *descptr;/* ptr to ring descriptor 	*/
-	uint32 	head; 			/* pos to reclaim descriptor	*/
+	struct	emac_desc *descptr;/* ptr to ring descriptor 	*/
 	char 	*pktptr; 		/* ptr used during packet copy  */
-	int 	numdesc; 		/* num. of descriptor reclaimed	*/
+	int 	numdesc = 0; 		/* num. of descriptor reclaimed	*/
+	uint32	status;			/* status of ring descriptor 	*/
 
-	for (numdesc = 0; numdesc < ethptr->txRingSize; numdesc++) {
-		head = ethptr->txHead;
-		descptr = (struct eth_aw_tx_desc *)ethptr->txRing + head;
 
+	descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
+	emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+	descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
+	status = descptr->status;
+
+	while ( ! (status & DS_ACTIVE) ) {
+// 	for (numdesc = 0; numdesc < ethptr->txRingSize; numdesc++) {
+
+// 		kprintf("Before txPacket conditional\n");
 		//If ETH_AW_TX_DESC_CTL is set, the buffer has not been fully transmitted, so we should not clear it out for future use.
-		if ((descptr->status & ETH_AW_TX_DESC_CTL))
-			kprintf("Can't clear untransmitted packet\n");
+		if ((status & ETH_AW_TX_DESC_CTL) || (status == 0 && descptr->size == 0)) {
+			kprintf("Can't clear untransmitted packet, or no packet to transmit\n");
 			break;
+		}
 
 		kprintf("Transmitted a packet\n");
 		/* Clear the write-back descriptor and buffer */
@@ -217,12 +232,21 @@ local 	void 	eth_txPackets(
 // 		descptr->lower.data = 0;
 // 		descptr->upper.data = 0;
 		//Zero out the packet structure since it has been transmitted
-		pktptr = (char *)((uint32)(descptr->buf_addr));
+		pktptr = (char *)((uint32)(descptr->buf));
 		memset(pktptr, '\0', ETH_BUF_SIZE);
+		descptr->size = 0;
+		emac_cache_flush ( (void *) descptr, &descptr[1] );
 
 		//Increment the tx ring
 		ethptr->txHead
 			= (ethptr->txHead + 1) % ethptr->txRingSize;
+		cur_tx_dma = cur_tx_dma->next;
+
+
+		descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
+		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+		descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
+		numdesc++;
 	}
 
 	signaln(ethptr->osem, numdesc);
@@ -371,6 +395,7 @@ interrupt ethhandler (
 
 
 	resched_cntl(DEFER_STOP);
+// 	emac_enable();
 // 	rx_start();
 // 	emac_debug();
 	// TODO

@@ -315,17 +315,9 @@ tx_list_init ( void )
 	// unsigned long mem;
 	char *buf;
 
-#ifdef EMAC_NOCACHE
-	// buf = (char *) ram_section_nocache ( 1 );
-	buf = nocache;
-	nocache += NUM_TX * TX_SIZE;
-	desc = (struct emac_desc *) nocache;
-	nocache += NUM_TX * sizeof(struct emac_desc);
-#else
 	/* We can depend on getmem to give us dma aligned addresses */
 	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_TX * TX_SIZE );
-#endif
 
 	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;

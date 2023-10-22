@@ -81,6 +81,7 @@ int32	ethwrite (
 	#define DS_TX_SEND	( DS_TX_INT | DS_TX_LAST | DS_TX_FIRST | DS_TX_ADR_CHAIN )
 	tdescptr->size = (count & 0x7ff) | DS_TX_SEND;
 	tdescptr->status = DS_ACTIVE;
+	emac_cache_flush ( (void *) tdescptr, &tdescptr[1] );
 
 	csrptr->tx_ctl_1 |= TX_DMA_START;
 
