@@ -45,6 +45,9 @@ int32	ethread	(
 	memcpy((char *)buf, (char *)rdescptr->buf, retval);
 // 	kprintf("ethread after memcpy\n");
 
+	memset(rdescptr->buf, '\0', RX_ETH_SIZE);
+	emac_cache_flush ( (void *) rdescptr->buf, rdescptr->buf + RX_ETH_SIZE);
+
 	/* Initialize the descriptor for next packet */
 	rdescptr->status = ETH_AW_RX_DESC_CTL;
 	rdescptr->size = RX_ETH_SIZE;

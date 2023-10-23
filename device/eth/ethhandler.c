@@ -234,7 +234,9 @@ local 	void 	eth_txPackets(
 		//Zero out the packet structure since it has been transmitted
 		pktptr = (char *)((uint32)(descptr->buf));
 		memset(pktptr, '\0', ETH_BUF_SIZE);
+		emac_cache_flush ( (unsigned long ) descptr->buf, (unsigned long) descptr->buf + ETH_BUF_SIZE );
 		descptr->size = 0;
+		descptr->status = 0;
 		emac_cache_flush ( (void *) descptr, &descptr[1] );
 
 		//Increment the tx ring
