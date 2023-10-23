@@ -276,7 +276,7 @@ rx_list_init ( void )
 
 	desc[NUM_RX-1].next = &desc[0];
 
-	// emac_cache_flush ( (void *) desc, &desc[NUM_RX] );
+	emac_cache_flush ( (void *) desc, &desc[NUM_RX] );
 	// rx_list_show ( desc, NUM_RX );
 
 	return desc;
