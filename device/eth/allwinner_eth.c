@@ -61,26 +61,6 @@ sid32 emac_sem;
 
 void allwinner_eth_debug ( void );
 
-char *ether2str ( unsigned char *bytes )
-{
-    	char buf[20];
-	int i, len;
-	char *p;
-
-	len = ETH_ADDR_SIZE;
-	p = buf;
-	for ( i=0; i<len; i++ ) {
-	    sprintf ( p, "%02x", bytes[i] );
-	    p += 2;
-	    if ( i < len-1 )
-		*p++ = ':';
-	}
-	*p = '\0';
-
-	return buf;
-}
-
-
 void rx_list_show ( void )
 {
 	struct emac_desc *desc = rx_list;
@@ -90,7 +70,7 @@ void rx_list_show ( void )
 	int len;
 	int i;
 
-	emac_cache_invalidate ( (void *) desc, &desc[num] );
+	emac_cache_invalidate ( (unsigned long) desc, (unsigned long) &desc[num] );
 
 	for ( i=0; i<num; i++ ) {
 	    edp = &desc[i];
@@ -108,10 +88,9 @@ void tx_list_show ( void )
 	int num = NUM_TX;
 
 	struct emac_desc *edp;
-	int len;
 	int i;
 
-	emac_cache_invalidate ( (void *) desc, &desc[num] );
+	emac_cache_invalidate ( (unsigned long) desc, (unsigned long) &desc[num] );
 
 	for ( i=0; i<num; i++ ) {
 	    edp = &desc[i];
@@ -143,8 +122,9 @@ struct emac_desc *rx_list_init ( void )
 	/* We can depend on getmem to give us dma aligned addresses */
 	desc = (struct emac_desc *) getmem ( NUM_RX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_RX * RX_SIZE );
-	if (desc == SYSERR || buf == SYSERR) {
-		panic("SYSERR in emac.c\n");
+	if ((int)desc == SYSERR || (int)buf == SYSERR) {
+		kprintf("ERORR: rx_list_init failed in device/eth/allwinner_eth.c\n");
+		return NULL;
 	}
 // 	kprintf("desc: %08x, buf: %08x\n", desc, buf);
 // 	kprintf("NUM_RX * sizeof(struct emac_desc): %d\n", (NUM_RX * sizeof(struct emac_desc)));
@@ -163,7 +143,7 @@ struct emac_desc *rx_list_init ( void )
 
 	desc[NUM_RX-1].next = &desc[0];
 
-	emac_cache_flush ( (void *) desc, &desc[NUM_RX] );
+	emac_cache_flush ( (unsigned long) desc, (unsigned long) &desc[NUM_RX] );
 	// rx_list_show ( desc, NUM_RX );
 
 	return desc;
@@ -177,12 +157,11 @@ void reset_rx_list ( struct emac_desc *list, int num )
 	for ( edp = list->next; edp != list; edp = edp->next )
 	    edp->status = DS_ACTIVE;
 
-	emac_cache_flush ( (void *) list, &list[num] );
+	emac_cache_flush ( (unsigned long) list, (unsigned long) &list[num] );
 }
 
 struct emac_desc *tx_list_init ( void )
 {
-	int i;
 	struct emac_desc *edp;
 	struct emac_desc *desc;
 	char *buf;
@@ -190,6 +169,10 @@ struct emac_desc *tx_list_init ( void )
 	/* We can depend on getmem to give us dma aligned addresses */
 	desc = (struct emac_desc *) getmem ( NUM_TX * sizeof(struct emac_desc) );
 	buf = (char *) getmem ( NUM_TX * TX_SIZE );
+	if ((int)desc == SYSERR || (int)buf == SYSERR) {
+		kprintf("ERORR: rx_list_init failed in device/eth/allwinner_eth.c\n");
+		return NULL;
+	}
 
 	for ( edp = desc; edp < &desc[NUM_TX]; edp ++ ) {
 	    edp->status = DS_ACTIVE;
@@ -201,7 +184,7 @@ struct emac_desc *tx_list_init ( void )
 
 	desc[NUM_TX-1].next = &desc[0];
 
-	emac_cache_flush ( (void *) desc, &desc[NUM_TX] );
+	emac_cache_flush ( (unsigned long) desc, (unsigned long) &desc[NUM_TX] );
 
 	return desc;
 }
@@ -221,7 +204,7 @@ void init_rings ( struct dentry *devptr )
 	/* Reload the dma pointer register.
 	 * This causes the dma list pointer to get reset.
 	 */
-	csrptr->rx_dma_desc_list = desc;
+	csrptr->rx_dma_desc_list = (reg32) desc;
 // 	kprintf("csrptr->rx_dma_desc_list: %d\n", csrptr->rx_dma_desc_list);
 	cur_rx_dma = desc;
 
@@ -234,7 +217,7 @@ void init_rings ( struct dentry *devptr )
 	ethptr->txRingSize = NUM_TX;
 
 	clean_tx_dma = cur_tx_dma = desc;
-	csrptr->tx_dma_desc_list = desc;
+	csrptr->tx_dma_desc_list = (reg32) desc;
 // 	kprintf("Completed ring init\n");
 }
 
@@ -329,7 +312,6 @@ int allwinner_eth_init ( struct dentry *devptr )
 	ethptr = &ethertab[devptr->dvminor];
 	csrptr = ethptr->csr;
 	int i;
-	int reg;
 
 	// validate my structure layout
 // 	kprintf ( "Shoud be 0xd0 == 0x%x\n", &csrptr->rgmii_stat );
@@ -468,7 +450,7 @@ void tx_start ( void )
 void rx_start ( void )
 {
 	/* Restart Rx DMA */
-	csrptr->rx_ctl_1 |= RX_DMA_ENA | RX_DMA_START & ~RX_NO_FLUSH;
+	csrptr->rx_ctl_1 |= RX_DMA_ENA | RX_DMA_START;
 
 	/* Enable the receiver */
 	csrptr->rx_ctl_0 |= RX_EN;

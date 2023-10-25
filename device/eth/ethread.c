@@ -13,15 +13,14 @@ int32	ethread	(
 	)
 {
 	struct	ethcblk *ethptr;	/* Ethernet ctl blk ptr	*/
-	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer	*/
+// 	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer	(not currently needed here, so commented out) */
 	struct	emac_desc *rdescptr;/* Rx Desc. pointer	*/
-	struct	eth_aw_rx_desc *prev;	/* Prev Rx desc pointer	*/
 	uint32	retval = 0;			/* Num of bytes returned*/
 
 	ethptr = &ethertab[devptr->dvminor];
 
-	/* Get the pointer to Ethernet CSR */
-	csrptr = (struct eth_aw_csreg *)ethptr->csr;
+	/* Get the pointer to Ethernet CSR (not currently needed here, so commented out) */
+// 	csrptr = (struct eth_aw_csreg *)ethptr->csr;
 
 	/* Wait for a packet */
 // 	kprintf("ethptr->isem ct: %d\n", semcount(ethptr->isem));
@@ -41,13 +40,13 @@ int32	ethread	(
 	memcpy((char *)buf, (char *)rdescptr->buf, retval);
 
 	memset(rdescptr->buf, '\0', RX_ETH_SIZE);
-	emac_cache_flush ( (void *) rdescptr->buf, rdescptr->buf + RX_ETH_SIZE);
+	emac_cache_flush ( (unsigned long) rdescptr->buf, (unsigned long) rdescptr->buf + RX_ETH_SIZE);
 
 	/* Initialize the descriptor for next packet */
 	rdescptr->status = ETH_AW_RX_DESC_CTL;
 	rdescptr->size = RX_ETH_SIZE;
 
-	emac_cache_flush ( (void *) rdescptr, &rdescptr[1] );
+	emac_cache_flush ( (unsigned long) rdescptr, (unsigned long) &rdescptr[1] );
 	/* Increment the head index of rx ring */
 	ethptr->rxHead++;
 	if(ethptr->rxHead >= ethptr->rxRingSize) {

@@ -1,8 +1,11 @@
 /* in file addargs.c */
 extern	status	addargs(pid32, int32, int32[], int32,char *, void *);
 
-/* in file am335x_eth_init.c */
-extern	int32	am335x_eth_init(struct ethcblk *);
+/* in file allwiner_eth.c */
+extern int allwinner_eth_init ( struct dentry *devptr );
+extern	void allwinner_eth_debug ( void );
+extern void fetch_linux_mac ( char *addr );
+extern void allwinner_eth_activate ( void );
 
 /* in file arp.c */
 extern	void	arp_init(void);
@@ -17,6 +20,10 @@ extern	status	ascdate(uint32, char *);
 
 /* in file bufinit.c */
 extern	status	bufinit(void);
+
+/* in file cache_v7.c */
+extern void invalidate_dcache_range(unsigned long start, unsigned long stop);
+extern void flush_dcache_range(unsigned long start, unsigned long stop);
 
 /* in file chprio.c */
 extern	pri16	chprio(pid32, pri16);
@@ -614,9 +621,6 @@ extern	void	xdone(void);
 
 /* in file yield.c */
 extern	syscall	yield(void);
-
-/* in file emac.c */
-extern int emac_init_new ( struct dentry *devptr );
 
 /* NETWORK BYTE ORDER CONVERSION NOT NEEDED ON A BIG-ENDIAN COMPUTER */
 #define	htons(x)   ( ( 0xff & ((x)>>8) ) | ( (0xff & (x)) << 8 ) )

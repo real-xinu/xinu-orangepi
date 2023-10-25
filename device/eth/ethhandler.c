@@ -23,7 +23,7 @@ local 	void 	eth_rxPackets(
 	tail = ethptr->rxTail;
 	descptr = (struct emac_desc *)ethptr->rxRing + tail;
 
-	emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+	emac_cache_invalidate ( (unsigned long) descptr, (unsigned long) &descptr[1] );
 	descptr = (struct emac_desc *)ethptr->rxRing + tail;
 	status = descptr->status;
 
@@ -43,7 +43,7 @@ local 	void 	eth_rxPackets(
 		descptr = (struct emac_desc *)ethptr->rxRing + tail;
 
 
-		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+		emac_cache_invalidate ( (unsigned long) descptr, (unsigned long) &descptr[1] );
 		descptr = (struct emac_desc *)ethptr->rxRing + tail;
 		status = descptr->status;
 
@@ -76,7 +76,7 @@ local 	void 	eth_txPackets(
 
 
 	descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
-	emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+	emac_cache_invalidate ( (unsigned long) descptr, (unsigned long) &descptr[1] );
 	descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
 	status = descptr->status;
 
@@ -96,7 +96,7 @@ local 	void 	eth_txPackets(
 		emac_cache_flush ( (unsigned long ) descptr->buf, (unsigned long) descptr->buf + ETH_BUF_SIZE );
 		descptr->size = 0;
 		descptr->status = 0;
-		emac_cache_flush ( (void *) descptr, &descptr[1] );
+		emac_cache_flush ( (unsigned long) descptr, (unsigned long) &descptr[1] );
 
 		//Increment the tx ring
 		ethptr->txHead
@@ -105,7 +105,7 @@ local 	void 	eth_txPackets(
 
 
 		descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
-		emac_cache_invalidate ( (void *) descptr, &descptr[1] );
+		emac_cache_invalidate ( (unsigned long) descptr, (unsigned long) &descptr[1] );
 		descptr = (struct emac_desc *)ethptr->txRing + ethptr->txHead;
 		numdesc++;
 	}
@@ -125,7 +125,7 @@ interrupt ethhandler (
 	)
 {
 // 	kprintf("eh1 IRQ %d\n", xnum);
-	uint32	status;
+// 	uint32	status;
 	struct  dentry  *devptr;        /* address of device control blk*/
 	struct 	ethcblk	*ethptr;	/* ptr to control block		*/
 
@@ -186,8 +186,9 @@ interrupt ethhandler (
 	}
 
 	stat2 = csrptr->int_sta;
-	// if ( stat2 != stat )
-	//     printf ( "emac interrupt --  xstatus: %08x --> %08x\n", stat, stat2 );
+	if ( stat2 != stat ) {
+// 	    printf ( "emac interrupt --  xstatus: %08x --> %08x\n", stat, stat2 );
+	}
 
 	/* Ack the IRQ in the emac */
 	csrptr->int_sta = stat & 0x3fff;

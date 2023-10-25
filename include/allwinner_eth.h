@@ -506,3 +506,7 @@ struct emac_desc {
 #define	RX_FILT_DIS		0x80000000
 #define	RX_DROP_BROAD		0x00020000
 #define	RX_ALL_MULTI		0x00010000
+
+#define ETH_ADDR_SIZE	6
+#define ETH_MIN_SIZE	60
+#define ETH_MAX_SIZE	1514

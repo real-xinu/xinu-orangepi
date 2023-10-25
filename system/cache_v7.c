@@ -18,8 +18,6 @@
  * arch/arm/cpu/armv7/cache_v7.c
  */
 
-typedef unsigned long u32;
-typedef long s32;
 #include <xinu.h>
 
 #ifndef __weak
@@ -30,10 +28,10 @@ typedef long s32;
  *  arch/arm/include/asm/utils.h
  */
 
-static inline s32 log_2_n_round_up(u32 n)
+static inline long log_2_n_round_up(unsigned long n)
 {
-        s32 log2n = -1;
-        u32 temp = n;
+        long log2n = -1;
+        unsigned long temp = n;
 
         while (temp) {
                 log2n++;
@@ -46,10 +44,10 @@ static inline s32 log_2_n_round_up(u32 n)
                 return log2n; /* power of 2 */
 }
 
-static inline s32 log_2_n_round_down(u32 n)
+static inline long log_2_n_round_down(unsigned long n)
 {
-        s32 log2n = -1;
-        u32 temp = n;
+        long log2n = -1;
+        unsigned long temp = n;
 
         while (temp) {
                 log2n++;
@@ -69,38 +67,38 @@ static inline s32 log_2_n_round_down(u32 n)
  * Write the level and type you want to Cache Size Selection Register(CSSELR)
  * to get size details from Current Cache Size ID Register(CCSIDR)
  */
-static void set_csselr(u32 level, u32 type)
+static void set_csselr(unsigned long level, unsigned long type)
 {
-	u32 csselr = level << 1 | type;
+	unsigned long csselr = level << 1 | type;
 
 	/* Write to Cache Size Selection Register(CSSELR) */
 	asm volatile ("mcr p15, 2, %0, c0, c0, 0" : : "r" (csselr));
 }
 
-static u32 get_ccsidr(void)
+static unsigned long get_ccsidr(void)
 {
-	u32 ccsidr;
+	unsigned long ccsidr;
 
 	/* Read current CP15 Cache Size ID Register */
 	asm volatile ("mrc p15, 1, %0, c0, c0, 0" : "=r" (ccsidr));
 	return ccsidr;
 }
 
-static u32 get_clidr(void)
+static unsigned long get_clidr(void)
 {
-	u32 clidr;
+	unsigned long clidr;
 
 	/* Read current CP15 Cache Level ID Register */
 	asm volatile ("mrc p15,1,%0,c0,c0,1" : "=r" (clidr));
 	return clidr;
 }
 
-static void v7_inval_dcache_level_setway(u32 level, u32 num_sets,
-					 u32 num_ways, u32 way_shift,
-					 u32 log2_line_len)
+static void v7_inval_dcache_level_setway(unsigned long level, unsigned long num_sets,
+					 unsigned long num_ways, unsigned long way_shift,
+					 unsigned long log2_line_len)
 {
 	int way, set;
-	u32 setway;
+	unsigned long setway;
 
 	/*
 	 * For optimal assembly code:
@@ -121,12 +119,12 @@ static void v7_inval_dcache_level_setway(u32 level, u32 num_sets,
 	dsb ();
 }
 
-static void v7_clean_inval_dcache_level_setway(u32 level, u32 num_sets,
-					       u32 num_ways, u32 way_shift,
-					       u32 log2_line_len)
+static void v7_clean_inval_dcache_level_setway(unsigned long level, unsigned long num_sets,
+					       unsigned long num_ways, unsigned long way_shift,
+					       unsigned long log2_line_len)
 {
 	int way, set;
-	u32 setway;
+	unsigned long setway;
 
 	/*
 	 * For optimal assembly code:
@@ -150,11 +148,11 @@ static void v7_clean_inval_dcache_level_setway(u32 level, u32 num_sets,
 	dsb ();
 }
 
-static void v7_maint_dcache_level_setway(u32 level, u32 operation)
+static void v7_maint_dcache_level_setway(unsigned long level, unsigned long operation)
 {
-	u32 ccsidr;
-	u32 num_sets, num_ways, log2_line_len, log2_num_ways;
-	u32 way_shift;
+	unsigned long ccsidr;
+	unsigned long num_sets, num_ways, log2_line_len, log2_num_ways;
+	unsigned long way_shift;
 
 	set_csselr(level, ARMV7_CSSELR_IND_DATA_UNIFIED);
 
@@ -185,10 +183,10 @@ static void v7_maint_dcache_level_setway(u32 level, u32 operation)
 	}
 }
 
-static void v7_maint_dcache_all(u32 operation)
+static void v7_maint_dcache_all(unsigned long operation)
 {
-	u32 level, cache_type, level_start_bit = 0;
-	u32 clidr = get_clidr();
+	unsigned long level, cache_type, level_start_bit = 0;
+	unsigned long clidr = get_clidr();
 
 	for (level = 0; level < 7; level++) {
 		cache_type = (clidr >> level_start_bit) & 0x7;
@@ -200,9 +198,9 @@ static void v7_maint_dcache_all(u32 operation)
 	}
 }
 
-static void v7_dcache_clean_inval_range(u32 start, u32 stop, u32 line_len)
+static void v7_dcache_clean_inval_range(unsigned long start, unsigned long stop, unsigned long line_len)
 {
-	u32 mva;
+	unsigned long mva;
 
 	/* Align start to cache line boundary */
 	start &= ~(line_len - 1);
@@ -213,9 +211,9 @@ static void v7_dcache_clean_inval_range(u32 start, u32 stop, u32 line_len)
 	}
 }
 
-static void v7_dcache_inval_range(u32 start, u32 stop, u32 line_len)
+static void v7_dcache_inval_range(unsigned long start, unsigned long stop, unsigned long line_len)
 {
-	u32 mva;
+	unsigned long mva;
 
 	/*
 	 * If start address is not aligned to cache-line do not
@@ -246,9 +244,9 @@ static void v7_dcache_inval_range(u32 start, u32 stop, u32 line_len)
 	}
 }
 
-static void v7_dcache_maint_range(u32 start, u32 stop, u32 range_op)
+static void v7_dcache_maint_range(unsigned long start, unsigned long stop, unsigned long range_op)
 {
-	u32 line_len, ccsidr;
+	unsigned long line_len, ccsidr;
 
 	ccsidr = get_ccsidr();
 	line_len = ((ccsidr & CCSIDR_LINE_SIZE_MASK) >>
@@ -310,7 +308,7 @@ void flush_dcache_all(void)
  * Invalidates range in all levels of D-cache/unified cache used:
  * Affects the range [start, stop - 1]
  */
-void invalidate_dcache_range(u32 start, u32 stop)
+void invalidate_dcache_range(unsigned long start, unsigned long stop)
 {
 	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_INVAL_RANGE);
 
@@ -322,7 +320,7 @@ void invalidate_dcache_range(u32 start, u32 stop)
  * cache used:
  * Affects the range [start, stop - 1]
  */
-void flush_dcache_range(u32 start, u32 stop)
+void flush_dcache_range(unsigned long start, unsigned long stop)
 {
 	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_CLEAN_INVAL_RANGE);
 
@@ -336,7 +334,7 @@ void arm_init_before_mmu(void)
 	v7_inval_tlb();
 }
 
-void mmu_page_table_flush(u32 start, u32 stop)
+void mmu_page_table_flush(unsigned long start, unsigned long stop)
 {
 	flush_dcache_range(start, stop);
 	v7_inval_tlb();
@@ -346,7 +344,7 @@ void mmu_page_table_flush(u32 start, u32 stop)
  * Flush range from all levels of d-cache/unified-cache used:
  * Affects the range [start, start + size - 1]
  */
-void  flush_cache(u32 start, u32 size)
+void  flush_cache(unsigned long start, unsigned long size)
 {
 	flush_dcache_range(start, start + size);
 }
@@ -359,11 +357,11 @@ void flush_dcache_all(void)
 {
 }
 
-void invalidate_dcache_range(u32 start, u32 stop)
+void invalidate_dcache_range(unsigned long start, unsigned long stop)
 {
 }
 
-void flush_dcache_range(u32 start, u32 stop)
+void flush_dcache_range(unsigned long start, unsigned long stop)
 {
 }
 
@@ -371,11 +369,11 @@ void arm_init_before_mmu(void)
 {
 }
 
-void  flush_cache(u32 start, u32 size)
+void  flush_cache(unsigned long start, unsigned long size)
 {
 }
 
-void mmu_page_table_flush(u32 start, u32 stop)
+void mmu_page_table_flush(unsigned long start, unsigned long stop)
 {
 }
 

@@ -269,9 +269,6 @@ int32	ethinit	(
 {
 	// TODO
 	struct	ethcblk *ethptr;		/* Ethernet control blk pointer	*/
-	struct	eth_aw_tx_desc *tdescptr;/* Tx descriptor pointer	*/
-	struct	eth_aw_rx_desc *rdescptr;/* Rx descriptor pointer	*/
-	struct	netpacket *pktptr;	/* Packet pointer		*/
 	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer		*/
 	uint32	phyreg;			/* Variable to store PHY reg val*/
 	int32	retval;			/* Return value			*/
@@ -336,7 +333,7 @@ int32	ethinit	(
 // 	for(i = 0; i < 4; i++) {
 // 		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
 // 	}
-	fetch_linux_mac(ethptr->devAddress);
+	fetch_linux_mac((char*) ethptr->devAddress);
 //
 	kprintf("MAC Address is: ");
 	for(i = 0; i < 5; i++) {
