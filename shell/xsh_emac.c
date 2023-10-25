@@ -15,7 +15,7 @@ shellcmd xsh_emac(int nargs, char *args[])
 	if (nargs == 2 && strncmp(args[1], "--help", 7) == 0) {
 
 		printf("Use: emac\n");
-		printf("Prints EMAC information to stdout\n");
+		printf("Prints Allwinner EMAC status to stdout\n");
 		return 0;
 	}
 
@@ -27,6 +27,6 @@ shellcmd xsh_emac(int nargs, char *args[])
 		return 1;
 	}
 
-	emac_debug();
+	allwinner_eth_debug();
 	return 0;
 }

@@ -19,9 +19,7 @@ char  	*getmem(
 		return (char *)SYSERR;
 	}
 
-	kprintf("Actual alloc: %d\n", nbytes);
 	nbytes = (uint32) roundmb(nbytes);	/* Use memblk multiples	*/
-	kprintf("roundmb alloc: %d\n", nbytes);
 
 	prev = &memlist;
 	curr = memlist.mnext;

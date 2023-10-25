@@ -90,7 +90,6 @@ void	nulluser()
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
 
-	kprintf("Init complete\n");
 	while (TRUE) {
 		;		/* Do nothing */
 	}
@@ -112,6 +111,7 @@ local process	startup(void)
 	/* Use DHCP to obtain an IP address and format it */
 
 	// TODO:
+	kprintf("Obtaining an IP address...\n");
 	ipaddr = getlocalip();
 	if ((int32)ipaddr == SYSERR) {
 		kprintf("Cannot obtain an IP address\n");

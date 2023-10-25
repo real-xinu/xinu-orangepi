@@ -21,32 +21,20 @@ struct __attribute__((packed)) eth_aw_csreg {
 	reg32 rx_hash_1;		/* 0x44	Hash table 1 */
 	reg32 mii_cmd;			/* 0x48	Management interface command */
 	reg32 mii_data;			/* 0x4C	Management interface data */
-	reg32 addr0_high;		/* 0x50	MAC address high 0 */
-	reg32 addr0_low;		/* 0x54	MAC address low 0 */
-	reg32 addr1_high;		/* 0x58	MAC address high 1 */
-	reg32 addr1_low;		/* 0x5C	MAC address low 1 */
-	reg32 addr2_high;		/* 0x60	MAC address high 2 */
-	reg32 addr2_low;		/* 0x64	MAC address low 2 */
-	reg32 addr3_high;		/* 0x68	MAC address high 3 */
-	reg32 addr3_low;		/* 0x6C	MAC address low 3 */
-	reg32 addr4_high;		/* 0x70	MAC address high 4 */
-	reg32 addr4_low;		/* 0x74	MAC address low 4 */
-	reg32 addr5_high;		/* 0x78	MAC address high 5 */
-	reg32 addr5_low;		/* 0x7C	MAC address low 5 */
-	reg32 addr6_high;		/* 0x80	MAC address high 6 */
-	reg32 addr6_low;		/* 0x84	MAC address low 6 */
-	reg32 addr7_high;		/* 0x88	MAC address high 7 */
-	reg32 addr7_low;		/* 0x8C	MAC address low 7 */
+	struct {
+	    volatile unsigned int hi;		/* 50 */
+	    volatile unsigned int lo;		/* 54 */
+	} mac_addr[8];
 	byte res3[32];
-	reg32 tx_dma_sta;	/* 0xB0	Transmit dma status */ //Never used
-	reg32 tx_cur_desc;	/* 0xB4	Current transmit descriptor */ //Never used
-	reg32 tx_cur_buf;	/* 0xB8	Current transmit buffer address */ //Never used
+	reg32 tx_dma_stat;	/* 0xB0	Transmit dma status */
+	reg32 tx_dma_cur_desc;	/* 0xB4	Current transmit descriptor */
+	reg32 tx_dma_cur_buf;	/* 0xB8	Current transmit buffer address */
 	byte res4[4];
-	reg32 rx_dma_sta;	/* 0xC0	Receive dma status */ //Never used
-	reg32 rx_cur_desc;	/* 0xC4	Current receive descriptor */ //Never used
-	reg32 rx_cur_buf;	/* 0xC8	Current receive buffer address */ //Never used
+	reg32 rx_dma_stat;	/* 0xC0	Receive dma status */ //Never used
+	reg32 rx_dma_cur_desc;	/* 0xC4	Current receive descriptor */
+	reg32 rx_dma_cur_buf;	/* 0xC8	Current receive buffer address */
 	byte res5[4];
-	reg32 rgmii_sta;	/* 0xD0	RGMII status register */
+	reg32 rgmii_stat;	/* 0xD0	RGMII status register */
 };
 
 /*	Name			Value		Description */
@@ -237,14 +225,6 @@ struct __attribute__((packed)) eth_aw_csreg {
 #define ETH_AW_RGMII_LINK_SP	0x00000006	/* Receive link speed */
 #define ETH_AW_RGMII_LINK_MD	0x00000001	/* Indicates link mode */
 
-/* Receiving buffer description structure */
-struct eth_aw_rx_desc {
-	uint32 status;
-	uint32 buf_len;
-	uint32 buf_addr;
-	struct eth_aw_rx_desc * next;
-};
-
 /* rx status signals */
 #define ETH_AW_RX_DESC_CTL	0x80000000	/* Usable by DMA */
 #define ETH_AW_RX_DAF_FAIL	0x40000000	/* Frame failed DA filter */
@@ -269,14 +249,6 @@ struct eth_aw_rx_desc {
 /* rx buf_addr holds the address of the current descriptor */
 
 /* rx next holds the address of the next descriptor, 32 bit aligned */
-
-/* Transmitting buffer description structure */
-struct eth_aw_tx_desc {
-	uint32 status;
-	uint32 buf_len;
-	uint32 buf_addr;
-	struct eth_aw_tx_desc * next;
-};
 
 /* tx status signals */
 #define ETH_AW_TX_DESC_CTL	0x80000000	/* Usable by DMA */
@@ -465,3 +437,72 @@ struct emac_desc {
 #define RX_SIZE		2048
 #define TX_SIZE		2048
 #define RX_ETH_SIZE	2044
+
+#define NUM_RX	64
+#define NUM_TX	64
+
+
+/* -- bits in the ctl0 register */
+
+#define	CTL_FULL_DUPLEX	0x0001
+#define	CTL_LOOPBACK	0x0002
+#define	CTL_SPEED_1000	0x0000
+#define	CTL_SPEED_100	0x000C
+#define	CTL_SPEED_10	0x0008
+
+/* -- bits in the ctl1 register */
+
+#define CTL1_SOFT_RESET		0x01
+#define CTL1_RX_TX		0x02		/* Rx DMA has prio over Tx when set */
+#define CTL1_BURST_8		0x08000000;	/* DMA burst len = 8 (29:24)  */
+
+/* bits in the int_ena and int_stat registers */
+#define INT_TX			0x0001
+#define INT_TX_DMA_STOP		0x0002
+#define INT_TX_BUF_AVAIL	0x0004
+#define INT_TX_TIMEOUT		0x0008
+#define INT_TX_UNDERFLOW	0x0010
+#define INT_TX_EARLY		0x0020
+#define INT_TX_ALL	(INT_TX | INT_TX_BUF_AVAIL | INT_TX_DMA_STOP | INT_TX_TIMEOUT | INT_TX_UNDERFLOW )
+#define INT_TX_MASK		0x00ff
+
+#define INT_RX			0x0100
+#define INT_RX_NOBUF		0x0200
+#define INT_RX_DMA_STOP		0x0400
+#define INT_RX_TIMEOUT		0x0800
+#define INT_RX_OVERFLOW		0x1000
+#define INT_RX_EARLY		0x2000
+#define INT_RX_ALL	(INT_RX | INT_RX_NOBUF | INT_RX_DMA_STOP | INT_RX_TIMEOUT | INT_RX_OVERFLOW )
+#define INT_RX_MASK		0xff00
+
+#define	INT_MII			0x10000		/* only in status */
+
+/* bits in the Rx ctrl0 register */
+#define	RX_EN			0x80000000
+#define	RX_FRAME_LEN_CTL	0x40000000
+#define	RX_JUMBO		0x20000000
+#define	RX_STRIP_FCS		0x10000000
+#define	RX_CHECK_CRC		0x08000000
+
+#define	RX_PAUSE_MD		0x00020000
+#define	RX_FLOW_CTL_ENA		0x08010000
+
+/* bits in the Rx ctrl1 register */
+#define	RX_DMA_START		0x80000000
+#define	RX_DMA_ENA		0x40000000
+#define	RX_MD			0x00000002
+#define	RX_NO_FLUSH		0x00000001
+
+/* bits in the Tx ctrl0 register */
+#define	TX_EN			0x80000000
+#define	TX_FRAME_LEN_CTL	0x40000000
+
+/* bits in the Tx ctrl1 register */
+#define	TX_DMA_START		0x80000000
+#define	TX_DMA_ENA		0x40000000
+#define	TX_MD			0x00000002
+
+/* Bits in the Rx filter register */
+#define	RX_FILT_DIS		0x80000000
+#define	RX_DROP_BROAD		0x00020000
+#define	RX_ALL_MULTI		0x00010000

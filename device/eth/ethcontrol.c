@@ -13,7 +13,7 @@ devcall	ethcontrol (
 	int32	arg2			/* argument 2, if needed	*/
 	)
 {
-	kprintf("ethcontrol called\n");
+// 	kprintf("ethcontrol called\n");
 	struct	ethcblk *ethptr;	/* Ethertab entry pointer	*/
 	int32	retval = OK;		/* Return value of cntl function*/
 // TODO: Add multicast subscriptions
@@ -32,6 +32,6 @@ devcall	ethcontrol (
 			return SYSERR;
 	}
 
-	kprintf("ethcontrol ret\n");
+// 	kprintf("ethcontrol ret\n");
 	return retval;
 }

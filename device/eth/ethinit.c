@@ -1,8 +1,7 @@
-/* ethinit.c - ethinit, eth_phy_read, eth_phy_write */
+/* ethinit.c - ethinit, eth_phy_read, eth_phy_write, eth_phy_autonegotiate, eth_phy_reset, eth_syscon_setup */
 
 #include <xinu.h>
 
-// extern int emac_init_new(struct dentry *devptr);
 struct	ethcblk ethertab[1];
 
 /*-----------------------------------------------------------------------
@@ -132,14 +131,14 @@ static void eth_phy_autonegotiate (
 	int tmo = ANEG_TIMEOUT;
 
 	eth_phy_read(csr, ETH_PHY_CTLREG, phyadr, &reg);
-	kprintf ( "autonegotiation starting, BMCR = %04x\n", reg );
+// 	kprintf ( "Ethernet PHY autonegotiation starting, BMCR = %04x\n", reg );
 	reg |= BMCR_ANEG_ENA;
 	eth_phy_write(csr, ETH_PHY_CTLREG, phyadr, reg);
 
 	reg |= BMCR_ANEG;
 	eth_phy_write(csr, ETH_PHY_CTLREG, phyadr, reg);
 	eth_phy_read(csr, ETH_PHY_STATREG, phyadr, &reg);
-	kprintf ( "autonegotiation started: BMSR  = %04x\n", reg );
+// 	kprintf ( "autonegotiation started: BMSR  = %04x\n", reg );
 
 	while (tmo-- && ! (reg & BMSR_ANEGCOMPLETE)) {
 		DELAY(ETH_AW_INIT_DELAY);
@@ -147,11 +146,11 @@ static void eth_phy_autonegotiate (
 	}
 
 	if (!(reg & BMSR_ANEGCOMPLETE)) {
-		kprintf("Autonegotiation Failed\n");
+		kprintf("Ethernet PHY Autonegotiation Failed\n");
 	}
 	else {
-	    kprintf ( "autonegotion done: BMSR  = %04x\n", reg);
-	    kprintf ( "PHY autonegotion done in %d milliseconds\n", 2*(ANEG_TIMEOUT-tmo) );
+// 	    kprintf ( "autonegotion done: BMSR  = %04x\n", reg);
+	    kprintf ( "Ethernet PHY autonegotion done in %d milliseconds\n", 2*(ANEG_TIMEOUT-tmo) );
 	}
 }
 
@@ -184,7 +183,7 @@ int32	eth_phy_reset (
 
 	for(retries = 0; retries < 10; retries++) {
 		if(eth_phy_read(csr, ETH_PHY_CTLREG, phyadr, &phyreg) == SYSERR) {
-			kprintf("eth_phy_reset failure 1\n");
+// 			kprintf("eth_phy_reset failure 1\n");
 			return SYSERR;
 		}
 		if((phyreg & ETH_PHY_CTLREG_RESET) == 0) {
@@ -197,7 +196,7 @@ int32	eth_phy_reset (
 		}
 	}
 	if(retries >= 3) {
-		kprintf("eth_phy_reset failure 2\n");
+// 		kprintf("eth_phy_reset failure 2\n");
 		return SYSERR;
 	}
 
@@ -208,7 +207,7 @@ int32	eth_phy_reset (
 
 	for(retries = 0; retries < 10; retries++) {
 		if(eth_phy_read(csr, ETH_PHY_STATREG, phyadr, &phyreg) == SYSERR) {
-			kprintf("eth_phy_reset failure 3\n");
+// 			kprintf("eth_phy_reset failure 3\n");
 			return SYSERR;
 		}
 
@@ -223,7 +222,7 @@ int32	eth_phy_reset (
 		}
 	}
 	if(retries >= 3) {
-		kprintf("eth_phy_reset failure 4 - retries: %d\n", retries);
+// 		kprintf("eth_phy_reset failure 4 - retries: %d\n", retries);
 		return SYSERR;
 	}
 
@@ -246,7 +245,7 @@ int32	eth_phy_reset (
  * passes to us, but it is just "clean living" to perform all
  * of our own initialization.
  */
-static void emac_syscon_setup ( void )
+static void eth_syscon_setup ( void )
 {
 	volatile unsigned int *sc = EMAC_SYSCON;
 
@@ -278,7 +277,7 @@ int32	ethinit	(
 	int32	retval;			/* Return value			*/
 	int32	i;			/* Index variable		*/
 
-// 	emac_syscon_setup();
+	eth_syscon_setup();
 
 	/* Get the Ethernet control block address	*/
 	/* from the device table entry			*/
@@ -329,6 +328,7 @@ int32	ethinit	(
 		kprintf("Link is Half Duplex\n");
 	}
 
+	//TODO Read actual MAC address instead of using hardcoded MAC
 //	/* Read the device MAC address */
 // 	for(i = 0; i < 2; i++) {
 // 		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
@@ -344,145 +344,28 @@ int32	ethinit	(
 	}
 	kprintf("%02X\n", ethptr->devAddress[5]);
 
-	kprintf("Calling emac_init_new()");
+// 	kprintf("Calling emac_init_new()");
 
+	allwinner_eth_init(devptr);
+// 	kprintf("Finished emac_init_new()");
 
+	// Finish PHY setup
+	csrptr->basic_ctl_0 = CTL_SPEED_100 | CTL_FULL_DUPLEX;
+// 	kprintf ( "emac CTL0 (new) = %08x\n", csrptr->basic_ctl_0 );
 
+	allwinner_eth_activate();
 
-
-
-
-
-	emac_init_new(devptr);
-	kprintf("Finished emac_init_new()");
-	emac_activate();
-
-
-//	/* Initialize the rx ring size field */
-//	ethptr->rxRingSize = ETH_AM335X_RX_RING_SIZE;
-//
-//	/* Allocate memory for the rx ring */
-//	ethptr->rxRing = (void*)getmem(sizeof(struct eth_a_rx_desc)*
-//					ethptr->rxRingSize);
-//	if((int32)ethptr->rxRing == SYSERR) {
-//		return SYSERR;
-//	}
-//
-//	/* Zero out the rx ring */
-//	memset((char*)ethptr->rxRing, NULLCH,
-//		sizeof(struct eth_a_rx_desc)*ethptr->rxRingSize);
-//
-//	/* Allocate memory for rx buffers */
-//	ethptr->rxBufs = (void*)getmem(ETH_BUF_SIZE *
-//					ethptr->rxRingSize);
-//	if((int32)ethptr->rxBufs == SYSERR) {
-//		return SYSERR;
-//	}
-//
-//	/* Zero out the rx buffers */
-//	memset((char *)ethptr->rxBufs, NULLCH, ETH_BUF_SIZE *
-//						ethptr->rxRingSize);
-//
-//	/* Initialize the rx ring */
-//
-//	rdescptr = (struct eth_a_rx_desc *)ethptr->rxRing;
-//	pktptr = (struct netpacket *)ethptr->rxBufs;
-//
-//	for(i = 0; i < ethptr->rxRingSize; i++) {
-//		rdescptr->next = rdescptr + 1;
-//		rdescptr->buffer = (uint32)pktptr->net_ethdst;
-//		rdescptr->buflen = ETH_BUF_SIZE;
-//		rdescptr->bufoff = 0;
-//		rdescptr->stat = ETH_AM335X_RDS_OWN;
-//		rdescptr++;
-//		pktptr++;
-//	}
-//	(--rdescptr)->next = NULL;
-//
-//	ethptr->rxHead = 0;
-//	ethptr->rxTail = 0;
 	ethptr->isem = semcreate(0);
 	if((int32)ethptr->isem == SYSERR) {
 		return SYSERR;
 	}
-//
-//	/* initialize the tx ring size */
-//	ethptr->txRingSize = ETH_AM335X_TX_RING_SIZE;
-//
-//	/* Allocate memory for tx ring */
-//	ethptr->txRing = (void*)getmem(sizeof(struct eth_a_tx_desc)*
-//					ethptr->txRingSize);
-//	if((int32)ethptr->txRing == SYSERR) {
-//		return SYSERR;
-//	}
-//
-//	/* Zero out the tx ring */
-//	memset((char*)ethptr->txRing, NULLCH,
-//		sizeof(struct eth_a_tx_desc)*ethptr->txRingSize);
-//
-//	/* Allocate memory for tx buffers */
-//	ethptr->txBufs = (void*)getmem(ETH_BUF_SIZE *
-//					ethptr->txRingSize);
-//	if((int32)ethptr->txBufs == SYSERR) {
-//		return SYSERR;
-//	}
-//
-//	/* Zero out the tx buffers */
-//	memset((char*)ethptr->txBufs, NULLCH, ETH_BUF_SIZE *
-//						ethptr->txRingSize);
-//
-//	/* Initialize the tx ring */
-//
-//	tdescptr = (struct eth_a_tx_desc *)ethptr->txRing;
-//	pktptr = (struct netpacket *)ethptr->txBufs;
-//
-//	for(i = 0; i < ethptr->txRingSize; i++) {
-//		tdescptr->next = NULL;
-//		tdescptr->buffer = (uint32)pktptr->net_ethdst;
-//		tdescptr->buflen = ETH_BUF_SIZE;
-//		tdescptr->bufoff = 0;
-//		tdescptr->stat = (ETH_AM335X_TDS_SOP |
-//				  ETH_AM335X_TDS_EOP |
-//				  ETH_AM335X_TDS_DIR |
-//				  ETH_AM335X_TDS_P1);
-//		tdescptr++;
-//		pktptr++;
-//	}
-//
-//	ethptr->txHead = 0;
-//	ethptr->txTail = 0;
+
 	ethptr->osem = semcreate(ethptr->txRingSize);
 	if((int32)ethptr->osem == SYSERR) {
 		return SYSERR;
 	}
-//
-//	/* Enable the ALE and put it into bypass mode */
-//	csrptr->ale->ctrl = (ETH_AM335X_ALECTL_EN |
-//			     ETH_AM335X_ALECTL_BY);
-//
-//	/* Put the ports 0, 1 in forwarding state */
-//	csrptr->ale->portctl[0] = ETH_AM335X_ALEPCTL_FWD;
-//	csrptr->ale->portctl[1] = ETH_AM335X_ALEPCTL_FWD;
-//
-//	/* Start the rx and tx processes in DMA */
-//	csrptr->cpdma->tx_ctrl = 1;
-//	csrptr->cpdma->rx_ctrl = 1;
-//
-//	/* Initialize the head desc pointers for tx and rx */
-//	csrptr->stateram->tx_hdp[0] = 0;
-//	csrptr->stateram->rx_hdp[0] = (uint32)ethptr->rxRing;
-//
-//	/* Enable Rx and Tx in MAC */
-//	csrptr->sl->macctrl |= ETH_AM335X_SLCTL_EN;
-//
-//	/* Set interrupt vectors */
-//	set_evec(ETH_AM335X_TXINT, (uint32)devptr->dvintr);
-//	set_evec(ETH_AM335X_RXINT, (uint32)devptr->dvintr);
-//
-//	/* Enable the CPDMA interrupts */
-//	csrptr->cpdma->tx_intmask_set = 0x1;
-//	csrptr->cpdma->rx_intmask_set = 0x1;
-//
+
+// TODO Route interrupts to core 0
 //	/* Route the interrupts to core 0 */
 //	csrptr->wr->c0_tx_en = 0x1;
 //	csrptr->wr->c0_rx_en = 0x1;
