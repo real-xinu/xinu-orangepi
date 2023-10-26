@@ -325,15 +325,7 @@ int32	ethinit	(
 		kprintf("Link is Half Duplex\n");
 	}
 
-	//TODO Read actual MAC address instead of using hardcoded MAC
-//	/* Read the device MAC address */
-// 	for(i = 0; i < 2; i++) {
-// 		ethptr->devAddress[4+i] = *((byte *)(0x44e10630+i));
-// 	}
-// 	for(i = 0; i < 4; i++) {
-// 		ethptr->devAddress[i] = *((byte *)(0x44e10634+i));
-// 	}
-	fetch_linux_mac((char*) ethptr->devAddress);
+	fetch_random_mac((char*) ethptr->devAddress);
 //
 	kprintf("MAC Address is: ");
 	for(i = 0; i < 5; i++) {

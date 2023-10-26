@@ -31,6 +31,8 @@
  */
 
 #include <xinu.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 struct	ethcblk ethertab[1];
 struct	ethcblk *ethptr;		/* Ethernet control blk pointer	*/
@@ -39,6 +41,8 @@ void emac_show ( void );
 void tx_start ( void );
 void rx_start ( void );
 
+byte global_mac_addr[6];
+int global_mac_addr_set;
 
 /* ------------------------------------------------------------ */
 /* Descriptors */
@@ -267,7 +271,37 @@ void get_emac_addr ( char *addr )
 }
 
 /*
- * Hardcoded MAC address (Need to add MAC detection later)
+ * Random MAC address
+ */
+void fetch_random_mac ( char *addr )
+{
+	if (!global_mac_addr_set) {
+		*addr++ = 0x02; //MUST have 2 bit set and 1 bit clear
+		global_mac_addr[0] = *(addr - 1);
+		*addr++ = rand() % 256;
+		global_mac_addr[1] = *(addr - 1);
+		*addr++ = rand() % 256;
+		global_mac_addr[2] = *(addr - 1);
+		*addr++ = rand() % 256;
+		global_mac_addr[3] = *(addr - 1);
+		*addr++ = rand() % 256;
+		global_mac_addr[4] = *(addr - 1);
+		*addr++ = rand() % 256;
+		global_mac_addr[5] = *(addr - 1);
+		global_mac_addr_set = 1;
+	}
+	else {
+		*addr++ = global_mac_addr[0]; //MUST have 2 bit set and 1 bit clear
+		*addr++ = global_mac_addr[1];
+		*addr++ = global_mac_addr[2];
+		*addr++ = global_mac_addr[3];
+		*addr++ = global_mac_addr[4];
+		*addr++ = global_mac_addr[5];
+	}
+}
+
+/*
+ * Hardcoded MAC address
  */
 void fetch_linux_mac ( char *addr )
 {
@@ -279,12 +313,24 @@ void fetch_linux_mac ( char *addr )
 	*addr++ = 0xff;
 }
 
+/*
+ * MAC address left in CSR by UBoot (Note: networking did not work properly when I tried using this)
+ */
 void fetch_uboot_mac ( char *addr )
 {
 	// char *addr = emac_mac;
-
 	unsigned long mac_hi = csrptr->mac_addr[0].hi;
 	unsigned long mac_lo = csrptr->mac_addr[0].lo;
+
+	int i;
+	for (i = 0; i < 5; ++i) {
+		unsigned long mac_hii = csrptr->mac_addr[i].hi;
+		unsigned long mac_loi = csrptr->mac_addr[i].lo;
+		kprintf("%d:\n", i);
+		kprintf("uboot mac_hi: %08x\n", mac_hii);
+		kprintf("uboot mac_lo: %04x\n", mac_loi);
+	}
+
 
 	/* This is just from good old U-Boot
 	kprintf ( "MAC addr %d: %08x %08x\n", ep->mac_addr[0].hi, ep->mac_addr[0].lo );
@@ -303,15 +349,11 @@ void fetch_uboot_mac ( char *addr )
 	*addr++ = mac_hi & 0xff;
 }
 
-/* We have been pulling our hair out getting the emac properly
- * initialized from scratch, so as an "end run" approach, we
- * just try using much of the initialization we inherit from U-Boot.
- */
+
 int allwinner_eth_init ( struct dentry *devptr )
 {
 	ethptr = &ethertab[devptr->dvminor];
 	csrptr = ethptr->csr;
-	int i;
 
 	// validate my structure layout
 // 	kprintf ( "Shoud be 0xd0 == 0x%x\n", &csrptr->rgmii_stat );
@@ -354,12 +396,6 @@ int allwinner_eth_init ( struct dentry *devptr )
 // 	kprintf ( "emac TX CTL1 = %08x\n", csrptr->tx_ctl_1 );
 	// kprintf ( "emac rx_filt = %08x\n", ep->rx_filt );
 
-	// for ( i=0; i<8; i++ ) {
-	for ( i=0; i<1; i++ ) {
-	    kprintf ( "MAC addr from U-Boot %d: %08x %08x\n",
-		i, csrptr->mac_addr[i].hi, csrptr->mac_addr[i].lo );
-	}
-
 	/* The mac address registers read as all ones, except the first.
 	 * MAC addr 0: 00008c26 9b7f2002
 	 * MAC addr 0: 00 00 8c 26 9b 7f 20 02
@@ -372,16 +408,10 @@ int allwinner_eth_init ( struct dentry *devptr )
 	 * MAC address.
 	 */
 
-#ifdef USE_UBOOT_MAC
-	fetch_uboot_mac ( emac_mac );
-#else
-	// get_mac ( emac_mac );
-	fetch_linux_mac ( emac_mac );
+	fetch_random_mac ( emac_mac );
 	set_mac ( emac_mac );
-	kprintf ( "*** Using hardcoded MAC address ***\n" );
-#endif
 
-	kprintf ( "MAC addr in use: %08x %08x\n", csrptr->mac_addr[0].hi, csrptr->mac_addr[0].lo );
+// 	kprintf ( "MAC addr in use: %08x %08x\n", csrptr->mac_addr[0].hi, csrptr->mac_addr[0].lo );
 
 	// this would yield promiscuous mode ?? */
 	// ep->rx_filt = RX_FILT_DIS;
@@ -419,7 +449,6 @@ int allwinner_eth_init ( struct dentry *devptr )
 }
 
 /* Get things going.
- * Called by emac_activate()
  */
 void allwinner_eth_enable ( void )
 {

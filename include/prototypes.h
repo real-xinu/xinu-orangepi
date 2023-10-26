@@ -5,6 +5,7 @@ extern	status	addargs(pid32, int32, int32[], int32,char *, void *);
 extern int allwinner_eth_init ( struct dentry *devptr );
 extern	void allwinner_eth_debug ( void );
 extern void fetch_linux_mac ( char *addr );
+extern void fetch_random_mac ( char *addr );
 extern void allwinner_eth_activate ( void );
 
 /* in file arp.c */
