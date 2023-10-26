@@ -1,4 +1,7 @@
-/* ethinit.c - ethinit, eth_phy_read, eth_phy_write, eth_phy_autonegotiate, eth_phy_reset, eth_syscon_setup */
+/*
+ * Copyright (C) 2023 Mitchell Augustin <augustm@purdue.edu>,  Tom Trebisky  <tom@mmto.org>
+ * ethinit.c - ethinit, eth_phy_read, eth_phy_write, eth_phy_autonegotiate, eth_phy_reset, eth_syscon_setup
+ */
 
 #include <xinu.h>
 

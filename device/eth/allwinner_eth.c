@@ -65,6 +65,10 @@ sid32 emac_sem;
 
 void allwinner_eth_debug ( void );
 
+/*------------------------------------------------------------------------
+ * rx_list_show - prints the RX ring
+ *------------------------------------------------------------------------
+ */
 void rx_list_show ( void )
 {
 	struct emac_desc *desc = rx_list;
@@ -86,6 +90,10 @@ void rx_list_show ( void )
 	}
 }
 
+/*------------------------------------------------------------------------
+ * tx_list_show - prints the TX ring
+ *------------------------------------------------------------------------
+ */
 void tx_list_show ( void )
 {
 	struct emac_desc *desc = tx_list;
@@ -114,7 +122,10 @@ void tx_list_show ( void )
  * and we have 64 * 64 bytes for descriptors (4K)
  * This is 128 + 4 = 132K, fits handily in 1M
  */
-
+/*------------------------------------------------------------------------
+ * rx_list_init - Initializes the RX ring
+ *------------------------------------------------------------------------
+ */
 struct emac_desc *rx_list_init ( void )
 {
 	struct emac_desc *edp;
@@ -153,6 +164,10 @@ struct emac_desc *rx_list_init ( void )
 	return desc;
 }
 
+/*------------------------------------------------------------------------
+ * reset_rx_list - Empties the RX ring and makes it available for DMA
+ *------------------------------------------------------------------------
+ */
 void reset_rx_list ( struct emac_desc *list, int num )
 {
 	struct emac_desc *edp;
@@ -164,6 +179,10 @@ void reset_rx_list ( struct emac_desc *list, int num )
 	emac_cache_flush ( (unsigned long) list, (unsigned long) &list[num] );
 }
 
+/*------------------------------------------------------------------------
+ * tx_list_init - Initializes the TX ring
+ *------------------------------------------------------------------------
+ */
 struct emac_desc *tx_list_init ( void )
 {
 	struct emac_desc *edp;
@@ -193,6 +212,10 @@ struct emac_desc *tx_list_init ( void )
 	return desc;
 }
 
+/*------------------------------------------------------------------------
+ * init_rings - Configures RX/TX rings for DMA
+ *------------------------------------------------------------------------
+ */
 void init_rings ( struct dentry *devptr )
 {
 // 	kprintf("Starting ring init\n");
@@ -225,13 +248,13 @@ void init_rings ( struct dentry *devptr )
 // 	kprintf("Completed ring init\n");
 }
 
-/* ------------------------------------------------------------ */
-/* Interrupts */
-/* ------------------------------------------------------------ */
-
 /* Interestingly the emac can accomodate 8 MAC addresses.
  * All but the first must have a bit set to indicate they
  *  are active.
+ */
+/*------------------------------------------------------------------------
+ * set_mac - Sets the MAC address stored in the H3 EMAC CSR to mac_id
+ *------------------------------------------------------------------------
  */
 void set_mac ( char *mac_id )
 {
@@ -244,6 +267,10 @@ void set_mac ( char *mac_id )
 // actually takes 10 ticks
 #define SOFT_RESET_TIMEOUT	500
 
+/*------------------------------------------------------------------------
+ * emac_reset - Soft-resets the EMAC
+ *------------------------------------------------------------------------
+ */
 void emac_reset ( void )
 {
 	int tmo = SOFT_RESET_TIMEOUT;
@@ -270,8 +297,13 @@ void get_emac_addr ( char *addr )
 	memcpy ( addr, emac_mac, ETH_ADDR_SIZE );
 }
 
-/*
- * Random MAC address
+/*------------------------------------------------------------------------
+ * fetch_random_mac - Generates a pseudorandom MAC address based on your default hardware seed
+ * Note: The Orange Pi does not have a "true" MAC address embedded in the hardware - instead, it is up to the OS or bootloader
+ * to generate one at runtime. If you are using uboot to boot Xinu, uboot will generate its own MAC address, then Xinu will generate
+ * its own. If you have connection issues due to the randomized MAC, you can change occurrences of fetch_random_mac to fetch_linux_mac
+ * and change the bytes of the MAC to that of your uboot MAC address.
+ *------------------------------------------------------------------------
  */
 void fetch_random_mac ( char *addr )
 {
@@ -300,8 +332,9 @@ void fetch_random_mac ( char *addr )
 	}
 }
 
-/*
- * Hardcoded MAC address
+/*------------------------------------------------------------------------
+ * fetch_linux_mac - Sets addr to the hardcoded static MAC address below
+ *------------------------------------------------------------------------
  */
 void fetch_linux_mac ( char *addr )
 {
@@ -313,8 +346,9 @@ void fetch_linux_mac ( char *addr )
 	*addr++ = 0xff;
 }
 
-/*
- * MAC address left in CSR by UBoot (Note: networking did not work properly when I tried using this)
+/*------------------------------------------------------------------------
+ * fetch_uboot_mac - Sets addr to the MAC address left in CSR by UBoot (Note: networking did not work properly when I tried using this)
+ *------------------------------------------------------------------------
  */
 void fetch_uboot_mac ( char *addr )
 {
@@ -349,7 +383,10 @@ void fetch_uboot_mac ( char *addr )
 	*addr++ = mac_hi & 0xff;
 }
 
-
+/*------------------------------------------------------------------------
+ * allwinner_eth_init - Initializes allwinner EMAC. Called from ethinit() after Phy is initialized.
+ *------------------------------------------------------------------------
+ */
 int allwinner_eth_init ( struct dentry *devptr )
 {
 	ethptr = &ethertab[devptr->dvminor];
@@ -448,7 +485,9 @@ int allwinner_eth_init ( struct dentry *devptr )
 	return 0;
 }
 
-/* Get things going.
+/*------------------------------------------------------------------------
+ * allwinner_eth_enable - Enables allwinner EMAC interrupts and starts receiver and transmitter
+ *------------------------------------------------------------------------
  */
 void allwinner_eth_enable ( void )
 {
@@ -461,12 +500,20 @@ void allwinner_eth_enable ( void )
 	tx_start ();
 }
 
+/*------------------------------------------------------------------------
+ * tx_dma_start - Enables TX DMA
+ *------------------------------------------------------------------------
+ */
 void tx_dma_start ( void )
 {
 	/* Poke the Tx DMA */
 	csrptr->tx_ctl_1 |= TX_DMA_START;
 }
 
+/*------------------------------------------------------------------------
+ * tx_start - Enables transmitter
+ *------------------------------------------------------------------------
+ */
 void tx_start ( void )
 {
 	/* Restart Tx DMA */
@@ -476,6 +523,10 @@ void tx_start ( void )
 	csrptr->tx_ctl_0 |= TX_EN;
 }
 
+/*------------------------------------------------------------------------
+ * rx_start - Enables receiver
+ *------------------------------------------------------------------------
+ */
 void rx_start ( void )
 {
 	/* Restart Rx DMA */
@@ -488,6 +539,10 @@ void rx_start ( void )
 /* These are the "official" production entry points to this driver.
  */
 
+/*------------------------------------------------------------------------
+ * allwinner_eth_activate - Enables EMAC
+ *------------------------------------------------------------------------
+ */
 void allwinner_eth_activate ( void )
 {
 // 	kprintf ( "Emac activated\n" );
@@ -498,6 +553,10 @@ void allwinner_eth_activate ( void )
 
 /* Displayed as "emac" command output.
  *  more details than the above.
+ */
+/*------------------------------------------------------------------------
+ * allwinner_eth_debug - Prints EMAC status and tx/rx rings
+ *------------------------------------------------------------------------
  */
 void allwinner_eth_debug ( void )
 {

@@ -1,0 +1,4 @@
+This directory holds Xinu sources for the Orange Pi.
+
+Note on Ethernet on the Orange Pi:
+-The Orange Pi does not have a "true" MAC address embedded in the hardware - instead, it is up to the OS or bootloader to generate one at runtime. If you are using uboot to boot Xinu, uboot will generate its own MAC address, then Xinu will generate its own. If you have connection issues due to the randomized MAC, you can change occurrences of fetch_random_mac to fetch_linux_mac and change the bytes of the MAC to that of your uboot MAC address.
