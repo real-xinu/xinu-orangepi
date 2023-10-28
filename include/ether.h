@@ -65,6 +65,13 @@ struct	etherPkt {
 
 #define ETH_PHY_STATREG_LINK	0x0004
 
+/* Ethernet autonegotiation */
+#define ANEG_TIMEOUT 5000
+#define BMCR_ANEG_ENA 0x1000
+#define BMCR_ANEG 0x0200
+#define BMSR_ANEGCOMPLETE 0x0020
+
+
 struct	ethcblk	{
 	byte	state; 		/* ETH_STATE_... as defined above 	*/
 	struct	dentry	*phy;	/* physical eth device for Tx DMA 	*/

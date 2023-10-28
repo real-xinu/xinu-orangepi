@@ -58,6 +58,7 @@ devcall	ttyinit(
 	uptr->lcr |= UART_LCR_DLAB;
 	uptr->dlm = UART_DLM;
 	uptr->dll = UART_DLL;
+	uptr->lcr &= ~UART_LCR_DLAB;
 
 	uptr->lcr |= UART_LCR_8N1;	/* 8 bit char, No Parity, 1 Stop*/
 	uptr->fcr = 0x00;		/* Disable FIFO for now		*/

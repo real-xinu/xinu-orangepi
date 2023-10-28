@@ -13,57 +13,46 @@ int32	ethread	(
 	)
 {
 	struct	ethcblk *ethptr;	/* Ethernet ctl blk ptr	*/
-	struct	eth_a_csreg *csrptr;	/* Ethernet CSR pointer	*/
-	struct	eth_a_rx_desc *rdescptr;/* Rx Desc. pointer	*/
-	struct	eth_a_rx_desc *prev;	/* Prev Rx desc pointer	*/
-	uint32	retval;			/* Num of bytes returned*/
+// 	struct	eth_aw_csreg *csrptr;	/* Ethernet CSR pointer	(not currently needed here, so commented out) */
+	struct	emac_desc *rdescptr;/* Rx Desc. pointer	*/
+	uint32	retval = 0;			/* Num of bytes returned*/
 
 	ethptr = &ethertab[devptr->dvminor];
 
-	/* Get the pointer to Ethernet CSR */
-	csrptr = (struct eth_a_csreg *)ethptr->csr;
+	/* Get the pointer to Ethernet CSR (not currently needed here, so commented out) */
+// 	csrptr = (struct eth_aw_csreg *)ethptr->csr;
 
 	/* Wait for a packet */
+// 	kprintf("ethptr->isem ct: %d\n", semcount(ethptr->isem));
 	wait(ethptr->isem);
 
 	/* Get pointer to the descriptor */
-	rdescptr = (struct eth_a_rx_desc *)ethptr->rxRing +
+	rdescptr = (struct emac_desc *)ethptr->rxRing +
 						ethptr->rxHead;
 
 	/* Read the packet length */
-	retval = rdescptr->packlen;
+	retval = rdescptr->size;
 	if(retval > count) {
 		retval = count;
 	}
 
 	/* Copy the packet into user provided buffer */
-	memcpy((char *)buf, (char *)rdescptr->buffer, retval);
+	memcpy((char *)buf, (char *)rdescptr->buf, retval);
+
+	memset(rdescptr->buf, '\0', RX_ETH_SIZE);
+	emac_cache_flush ( (unsigned long) rdescptr->buf, (unsigned long) rdescptr->buf + RX_ETH_SIZE);
 
 	/* Initialize the descriptor for next packet */
-	rdescptr->stat = ETH_AM335X_RDS_OWN;
-	rdescptr->bufoff = 0;
-	rdescptr->buflen = ETH_BUF_SIZE;
-	rdescptr->packlen = 0;
-	rdescptr->next = NULL;
+	rdescptr->status = ETH_AW_RX_DESC_CTL;
+	rdescptr->size = RX_ETH_SIZE;
 
-	/* Insert the descriptor into Rx queue */
-	prev = (struct eth_a_rx_desc *)csrptr->stateram->rx_hdp[0];
-	if(prev == NULL) {
-		kprintf("hdp 0, adding %x\n", rdescptr);
-		csrptr->stateram->rx_hdp[0] = (uint32)rdescptr;
-	}
-	else {
-		while(prev->next != NULL) {
-			prev = prev->next;
-		}
-		prev->next = rdescptr;
-	}
-
+	emac_cache_flush ( (unsigned long) rdescptr, (unsigned long) &rdescptr[1] );
 	/* Increment the head index of rx ring */
 	ethptr->rxHead++;
 	if(ethptr->rxHead >= ethptr->rxRingSize) {
 		ethptr->rxHead = 0;
 	}
 
+// 	kprintf("ethread done (%d bytes)\n", retval);
 	return retval;
 }

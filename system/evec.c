@@ -62,6 +62,7 @@ void initevec(void){
 		exp_vector[i] = (uint32)defexp_handler;
 	}
 
+<<<<<<< HEAD
 	/* overwrite with specific exception handlers as needed */
 	exp_vector[RSTH_IND] = (uint32)rst_except;
 	exp_vector[UDIH_IND] = (uint32)udi_except;

@@ -42,7 +42,7 @@ tty:
 
 /* type of a ethernet device */
 eth:
-	on am335x_eth
+	on allwinner_eth
 		-i ethinit	-o ioerr	-c ioerr
 		-r ethread	-g ioerr	-p ioerr
 		-w ethwrite	-s ioerr	-n ethcontrol
@@ -131,7 +131,7 @@ spi:
    NULLDEV is null on nothing
 
    /* Physical Ethernet (raw packet transfer) */
-   ETHER0 is eth   on am335x_eth csr 0x01C30000 -irq 0
+   ETHER0 is eth   on allwinner_eth csr 0x01C30000 -irq 0
 
    /* Define a namespace device */
    NAMESPACE is nam on top
