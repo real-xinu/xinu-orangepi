@@ -467,6 +467,10 @@ int allwinner_eth_init ( struct dentry *devptr )
 	/* Set up interrupts */
 	set_irq_handler(IRQ_EMAC, (uint32)devptr->dvintr);
 	set_irq_handler(IRQ_DMA, (uint32)devptr->dvintr);
+
+	/* Route interrupts to core 0 */
+	set_irq_target(IRQ_EMAC, 0);
+	set_irq_target(IRQ_DMA, 0);
 // 	irq_hookup ( IRQ_EMAC, emac_handler, 0 );
 // 	kprintf("Completed IRQ hookup\n");
 
