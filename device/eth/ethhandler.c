@@ -162,8 +162,9 @@ interrupt ethhandler (
 	statx = stat & INT_RX_MASK;
 // 	kprintf("EMAC interrupt (ethhandler()): %08x\n", stat);
 
-	if ( statx && statx != INT_RX )
-	    printf ( " *** unexpected emac Rx int status: %08x\n", stat );
+	if ( statx && statx != INT_RX ) {
+// 	    printf ( " *** unexpected emac Rx int status: %08x\n", stat );
+	}
 
 	// csrptr->int_ena = INT_RX | INT_TX | INT_TX_UNDERFLOW;
 	if ( stat & INT_RX ) {
