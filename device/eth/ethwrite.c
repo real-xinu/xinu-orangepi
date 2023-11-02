@@ -41,6 +41,7 @@ int32	ethwrite (
 // 	kprintf("before ethwrite wait (txTail: %d)\n", ethptr->txTail);
 	/* Wait for an empty slot in the queue */
 	wait(ethptr->osem);
+	intmask mask = xsec_beg(ethptr->ethlock);	/* multicore protection */
 
 	/* Get the pointer to the next descriptor */
 	tdescptr = (struct emac_desc *)ethptr->txRing +
@@ -94,5 +95,6 @@ int32	ethwrite (
 // 	kprintf("txTail is now %d, txHead is %d\n", ethptr->txTail, ethptr->txHead);
 
 // 	kprintf("desc status after: %d\n", tdescptr->status);
+	xsec_end(mask, ethptr->ethlock);
 	return count;
 }

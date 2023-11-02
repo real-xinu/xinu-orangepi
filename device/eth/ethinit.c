@@ -283,6 +283,7 @@ int32	ethinit	(
 	/* from the device table entry			*/
 
 	ethptr = &ethertab[devptr->dvminor];
+	ethptr->ethlock = newlock();
 
 	/* Store the address of CSRs in the Ethernet control block	*/
 

@@ -157,6 +157,7 @@ interrupt ethhandler (
 	 */
 	// tx_cleaner ();
 
+	intmask mask = xsec_beg(ethptr->ethlock);	/* multicore protection */
 	resched_cntl(DEFER_START);
 
 	statx = stat & INT_RX_MASK;
@@ -196,4 +197,5 @@ interrupt ethhandler (
 
 
 	resched_cntl(DEFER_STOP);
+	xsec_end(mask, ethptr->ethlock);
 }

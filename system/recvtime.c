@@ -24,6 +24,7 @@ umsg32	recvtime(
 
 	/* Check for state changed by another processor */
 	if(prptr->prstate != PR_CURR){ 
+		kprintf("recvtime state error in proc %d\n", currpid);
 		xsec_endn(mask, 2, sleepqlock, prptr->prlock);
 		return SYSERR;
 	}

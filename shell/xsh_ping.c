@@ -100,6 +100,7 @@ shellcmd xsh_ping(int nargs, char *args[])
 	retval = icmp_recv(slot, buf, sizeof(buf), 3000);
 	icmp_release(slot);
 	if (retval == TIMEOUT) {
+		kprintf("timeout\n");
 		fprintf(stderr, "%s: no response from host %s\n", args[0],
 					args[1]);
 		return 1;

@@ -25,6 +25,7 @@ int32	ethread	(
 	/* Wait for a packet */
 // 	kprintf("ethptr->isem ct: %d\n", semcount(ethptr->isem));
 	wait(ethptr->isem);
+	intmask mask = xsec_beg(ethptr->ethlock);	/* multicore protection */
 
 	/* Get pointer to the descriptor */
 	rdescptr = (struct emac_desc *)ethptr->rxRing +
@@ -54,5 +55,6 @@ int32	ethread	(
 	}
 
 // 	kprintf("ethread done (%d bytes)\n", retval);
+	xsec_end(mask, ethptr->ethlock);
 	return retval;
 }
