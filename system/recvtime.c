@@ -23,8 +23,7 @@ umsg32	recvtime(
 	mask = xsec_begn(2, sleepqlock, prptr->prlock);
 
 	/* Check for state changed by another processor */
-	if(prptr->prstate != PR_CURR){ 
-		kprintf("recvtime state error in proc %d\n", currpid);
+	if(prptr->prstate != PR_CURR){
 		xsec_endn(mask, 2, sleepqlock, prptr->prlock);
 		return SYSERR;
 	}
@@ -37,9 +36,11 @@ umsg32	recvtime(
 			return SYSERR;
 		}
 		prptr->prstate = PR_RECTIM;
+		xsec_endn(mask, 2, sleepqlock, prptr->prlock);
 		resched();
 	}
 
+	mask = xsec_begn(2, sleepqlock, prptr->prlock);
 	/* Either message arrived or timer expired */
 
 	if (prptr->prhasmsg) {

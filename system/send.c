@@ -26,8 +26,17 @@ syscall	send(
 		return SYSERR;
 	}
 
+
 	prptr->prmsg = msg;		/* Deliver message		*/
 	prptr->prhasmsg = TRUE;		/* Indicate message is waiting	*/
+
+	xsec_end(mask, prptr->prlock);
+
+	/* Check to make sure receiver is no longer running on a core */
+// 	while (prptr->prcpu != CPU_NONE) {
+// // 		kprintf("%d", prptr->prcpu);
+// 	}
+	mask = xsec_beg(prptr->prlock);
 
 	/* If recipient waiting or in timed-wait make it ready */
 
