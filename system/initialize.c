@@ -80,11 +80,11 @@ void	nulluser()
 
 	/* Initialize the network stack and start processes */
 
-	net_init(); //TODO:
+	net_init();
 
 //	/* Initialization is finished, unblock auxiliary cores */
 //
-//	cpu_sev();
+	cpu_sev();
 
 	/* Create a process to finish startup and start main */
 

@@ -1,8 +1,9 @@
-This directory holds Xinu sources for the Orange Pi. This branch contains the multicore migration of these sources, which is a work in progress.
+This directory holds Xinu sources for the Orange Pi. This branch contains the multicore migration of these sources, which is a work in progress and is not guaranteed to be stable.
 
 Note on Multicore branches:
 -This branch contains (as of 11/2/23) all of the commits in multicore_migration_no_ethernet plus Ethernet and networking code from master that has been adapted to use multicore locking facilities. As such, this branch is the "main" multicore branch.
 -As far as I am aware, the Ethernet code merge has not introduced any regressions or bugs that were not already present in multicore_migration_no_ethernet, but I have opted to preserve multicore_migration_no_ethernet separately just in case.
+--The only exception might be that I uncommented the cpu_sev(); call in initialize.c/nulluser(), which is what actually unblocks the other CPU cores after init. multicore_migration_no_ethernet did not have this uncommented, so only 1 core was actually being used for processes there. Therefore, there may be regressions I am unaware of, but this will ultimately need to be uncommented for the multicore version to be useful.
 
 Note on Makefile:
 -If you freshly cloned the master branch or switched to it from a different branch and are getting compilation errors when running "make" from the compile/ directory, run "make clean", then "make" a few more times. Compilation will then complete successfully.
