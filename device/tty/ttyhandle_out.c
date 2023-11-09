@@ -12,20 +12,21 @@ void	ttyhandle_out(
 	 struct	uart_csreg *csrptr	/* Address of UART's CSRs	*/
 	)
 {
-	
+
 	int32	ochars;			/* Number of output chars sent	*/
 					/*   to the UART		*/
 	int32	avail;			/* Available chars in output buf*/
 	int32	uspace;			/* Space left in onboard UART	*/
 					/*   output FIFO		*/
 	uint32 	ier = 0;
+	intmask mask;
 
-	lock(typtr->tylock);	/* exclusive access to control block */
+	mask = xsec_beg(typtr->tylock);	/* exclusive access to control block */
 
 	/* If output is currently held, simply ignore the call */
 
 	if (typtr->tyoheld) {
-		unlock(typtr->tylock);
+		xsec_end(mask, typtr->tylock);
 		return;
 	}
 
@@ -35,10 +36,10 @@ void	ttyhandle_out(
 	     (semcount(typtr->tyosem) >= TY_OBUFLEN) ) {
 		ier = csrptr->ier;
 		csrptr->ier = ier & ~UART_IER_ETBEI;
-		unlock(typtr->tylock);
+		xsec_end(mask, typtr->tylock);
 		return;
 	}
-	
+
 	/* Initialize uspace to the available space in the Tx FIFO */
 
 	uspace = UART_FIFO_SIZE - csrptr->txfifo_lvl;
@@ -77,6 +78,6 @@ void	ttyhandle_out(
 		ier = csrptr->ier;
 		csrptr->ier = (ier & ~UART_IER_ETBEI);
 	}
-	unlock(typtr->tylock);
+	xsec_end(mask, typtr->tylock);
 	return;
 }

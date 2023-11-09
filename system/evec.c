@@ -151,6 +151,12 @@ void pfa_handler(void){
  */
 void dab_handler(void){
 	kputc('D');
+	uint32 lr;	/* link register */
+
+	/* get link register */
+	asm volatile ( "mov %0, lr\n" : "=r"(lr));
+
+	kprintf("Data abort exception. Link Register: 0x%x", lr);
 	panic("**** DATA ABORT EXCEPTION ****");
 	return;
 }
