@@ -170,7 +170,6 @@ status	ip_send(
 
 	retval = arp_resolve(nxthop, pktptr->net_ethdst);
 	if (retval != OK) {
-		kprintf("arpsyserr\n");
 		freebuf((char *)pktptr);
 		xsec_end(mask, prptr->prlock);
 		return SYSERR;

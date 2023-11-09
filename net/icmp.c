@@ -240,7 +240,7 @@ status	icmp_send (
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	netpacket *pkt;		/* Packet returned by icmp_mkpkt*/
 	int32	retval;			/* Value returned by ip_send	*/
-	struct  procent *prptr;
+        struct  procent *prptr;
 
 	prptr = &proctab[currpid];
 

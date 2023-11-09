@@ -90,7 +90,6 @@ shellcmd xsh_ping(int nargs, char *args[])
 	retval = icmp_send(ipaddr, ICMP_ECHOREQST, slot,
 					seq++, buf, sizeof(buf));
 	if (retval == SYSERR) {
-		kprintf("icmp_send syserr\n");
 		fprintf(stderr, "%s: no response from host %s\n", args[0], args[1]);
 		icmp_release(slot);
 		return 1;
