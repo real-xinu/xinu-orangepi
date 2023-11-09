@@ -8,6 +8,9 @@ Current status of master branch:
 ---2: Run "ping -i 0.01 -c 1000 [orange PI IP]" on another computer to test fast pings
 ---3: In Xinu on the pi, run "ping 1.1.1.1" repeatedly to demonstrate that internally initiated network traffic is still delivered as expected even while other high-throughput activity is happening.
 
+Known TODOs:
+-Sometimes a new DHCP request will run when a domain name is pinged, causing Xinu to get a new IP address. This is unintended and should be fixed.
+
 Multicore support is a work in progress - please refer to the README in multicore_migration for more information on its status.
 
 Note on Makefile:
