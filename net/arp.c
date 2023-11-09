@@ -32,6 +32,8 @@ status	arp_resolve (
 	int32	slot;			/* ARP table slot to use	*/
 	struct	arpentry  *arptr;	/* Ptr to ARP cache entry	*/
 	int32	msg;			/* Message returned by recvtime	*/
+	struct  procent *prptr;
+	prptr = &proctab[currpid];
 
 	/* Use MAC broadcast address for IP limited broadcast */
 
@@ -49,7 +51,9 @@ status	arp_resolve (
 
 	/* Ensure only one process uses ARP at a time */
 
-	mask = disable();
+
+	/* Ensure only one process accesses output queue at a time */
+	mask = xsec_beg(prptr->prlock);
 
 	/* See if next hop address is already present in ARP cache */
 
@@ -69,7 +73,7 @@ status	arp_resolve (
 
 		if (arptr->arstate == AR_RESOLVED) {
 			memcpy(mac, arptr->arhaddr, ARP_HALEN);
-			restore(mask);
+			xsec_end(mask, prptr->prlock);
 			return OK;
 		}
 
@@ -77,7 +81,7 @@ status	arp_resolve (
 		/*	only one process can be	waiting at a time	*/
 
 		if (arptr->arstate == AR_PENDING) {
-			restore(mask);
+			xsec_end(mask, prptr->prlock);
 			return SYSERR;
 		}
 	}
@@ -87,7 +91,7 @@ status	arp_resolve (
 
 	slot = arp_alloc();
 	if (slot == SYSERR) {
-		restore(mask);
+		xsec_end(mask, prptr->prlock);
 		return SYSERR;
 	}
 
@@ -128,7 +132,7 @@ status	arp_resolve (
 		if (msg == TIMEOUT) {
 			continue;
 		} else if (msg == SYSERR) {
-			restore(mask);
+			xsec_end(mask, prptr->prlock);
 			return SYSERR;
 		} else {	/* entry is resolved */
 			break;
@@ -139,14 +143,14 @@ status	arp_resolve (
 
 	if (msg == TIMEOUT) {
 		arptr->arstate = AR_FREE;   /* Invalidate cache entry */
-		restore(mask);
+		xsec_end(mask, prptr->prlock);
 		return TIMEOUT;
 	}
 
 	/* Return hardware address */
 
 	memcpy(mac, arptr->arhaddr, ARP_HALEN);
-	restore(mask);
+	xsec_end(mask, prptr->prlock);
 	return OK;
 }
 
@@ -165,6 +169,8 @@ void	arp_in (
 	struct	arpentry  *arptr;	/* Ptr to ARP cache entry	*/
 	bool8	found;			/* Is the sender's address in	*/
 					/*   the cache?			*/
+	struct  procent *prptr;
+	prptr = &proctab[currpid];
 
 	/* Convert packet from network order to host order */
 
@@ -180,7 +186,7 @@ void	arp_in (
 
 	/* Ensure only one process uses ARP at a time */
 
-	mask = disable();
+	mask = xsec_beg(prptr->prlock);
 
 	/* Search cache for sender's IP address */
 
@@ -222,7 +228,7 @@ void	arp_in (
 
 	if (pktptr->arp_op == ARP_OP_RPLY) {
 		freebuf((char *)pktptr);
-		restore(mask);
+		xsec_end(mask, prptr->prlock);
 		return;
 	}
 
@@ -233,7 +239,7 @@ void	arp_in (
 	if ((!NetData.ipvalid) ||
 			(pktptr->arp_tarpa != NetData.ipucast)) {
 		freebuf((char *)pktptr);
-		restore(mask);
+		xsec_end(mask, prptr->prlock);
 		return;
 	}
 
@@ -245,7 +251,7 @@ void	arp_in (
 		if (slot == SYSERR) {	/* Cache is full */
 			kprintf("ARP cache overflow on interface\n");
 			freebuf((char *)pktptr);
-			restore(mask);
+			xsec_end(mask, prptr->prlock);
 			return;
 		}
 		arptr = &arpcache[slot];
@@ -287,7 +293,7 @@ void	arp_in (
 
 	write(ETHER0, (char *)&apkt, sizeof(struct arppacket));
 	freebuf((char *)pktptr);
-	restore(mask);
+	xsec_end(mask, prptr->prlock);
 	return;
 }
 
