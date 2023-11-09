@@ -17,18 +17,17 @@ devcall	ttyread(
 	int32	nread;			/* Number of characters read	*/
 	int32	firstch;		/* First input character on line*/
 	char	ch;			/* Next input character		*/
-	intmask mask;		/* dummy interrupt mask for xsec */
 
 	if (count < 0) {
 		return SYSERR;
 	}
 	typtr= &ttytab[devptr->dvminor];
 
-	mask = xsec_beg(typtr->tylock);
+	lock(typtr->tylock);
 
 	if (typtr->tyimode != TY_IMCOOKED) {
-
-		xsec_end(mask, typtr->tylock);
+		
+		unlock(typtr->tylock);
 
 		/* For count of zero, return all available characters */
 
@@ -45,7 +44,7 @@ devcall	ttyread(
 		}
 		return nread;
 	}
-	xsec_end(mask, typtr->tylock);	/* in case ttygetc blocks */
+	unlock(typtr->tylock);	/* in case ttygetc blocks */
 
 	/* Block until input arrives */
 	firstch = ttygetc(devptr);

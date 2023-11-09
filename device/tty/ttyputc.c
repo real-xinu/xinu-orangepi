@@ -15,21 +15,19 @@ devcall	ttyputc(
 
 	typtr = &ttytab[devptr->dvminor];
 
-	intmask mask;
-
-	mask = xsec_beg(typtr->tylock);
+	lock(typtr->tylock);
 
 	/* Handle output CRLF by sending CR first */
 
     if ( ch==TY_NEWLINE && typtr->tyocrlf ) {
                 ttyputc(devptr, TY_RETURN);
 	}
-
-	xsec_end(mask, typtr->tylock);		/* in case wait() needs to resched */
+	
+	unlock(typtr->tylock);		/* in case wait() needs to resched */
 
 	wait(typtr->tyosem);		/* Wait	for space in queue */
 
-	mask = xsec_beg(typtr->tylock);
+	lock(typtr->tylock);
 
 	*typtr->tyotail++ = ch;
 
@@ -38,7 +36,7 @@ devcall	ttyputc(
 	if (typtr->tyotail >= &typtr->tyobuff[TY_OBUFLEN]) {
 		typtr->tyotail = typtr->tyobuff;
 	}
-	xsec_end(mask, typtr->tylock);
+	unlock(typtr->tylock);
 
 	/* Start output in case device is idle */
 
