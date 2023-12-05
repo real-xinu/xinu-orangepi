@@ -10,19 +10,6 @@ Additional notes on Multicore branches:
 -As far as I am aware, the Ethernet code merge has not introduced any regressions or bugs that were not already present in multicore_migration_no_ethernet, but I have opted to preserve multicore_migration_no_ethernet separately just in case.
 --The only exception might be that I uncommented the cpu_sev(); call in initialize.c/nulluser(), which is what actually unblocks the other CPU cores after init. multicore_migration_no_ethernet did not have this uncommented, so only 1 core was actually being used for processes there. Therefore, there may be regressions I am unaware of, but this will ultimately need to be uncommented for the multicore version to be useful.
 
-Current status of master branch:
--Single-core only
--All networking features are working reliably according to my tests. Xinu can handle up to 80mbps throughput reliably with multiple data streams
---Tested 3 components at once:
----1: Run "iperf -c [orange PI IP] -u -b 80m -t 30 -p 7" on another computer while udpeserver is running on the pi to test 80mbps throughput
----2: Run "ping -i 0.01 -c 1000 [orange PI IP]" on another computer to test fast pings
----3: In Xinu on the pi, run "ping 1.1.1.1" repeatedly to demonstrate that internally initiated network traffic is still delivered as expected even while other high-throughput activity is happening.
-
-Known TODOs:
--None as of 12/5/2023
-
-Multicore support is a work in progress - please refer to the README in multicore_migration for more information on its status.
-
 Note on Makefile:
 -If you freshly cloned the master branch or switched to it from a different branch and are getting compilation errors when running "make" from the compile/ directory, run "make clean", then "make" a few more times. Compilation will then complete successfully.
 
