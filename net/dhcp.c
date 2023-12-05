@@ -158,6 +158,11 @@ uint32	getlocalip(void)
 	uint32	tmp;			/* Used for byte conversion	*/
 	uint32* tmp_server_ip;		/* Temporary DHCP server pointer*/
 
+	// If we already have an IP, return it
+	if (NetData.ipvalid) {
+		return NetData.ipucast;
+	}
+
 	slot = udp_register(0, UDP_DHCP_SPORT, UDP_DHCP_CPORT);
 	if (slot == SYSERR) {
 		kprintf("getlocalip: cannot register with UDP\n");
